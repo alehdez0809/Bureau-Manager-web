@@ -317,7 +317,7 @@ function NuevoInquilino() {
                       type="email"
                       id="correo_inquilino"
                       name="correo_inquilino"
-                      placeholder="Correo Materno"
+                      placeholder="Correo Electrónico"
                       value={formulario.correo_inquilino}
                       onChange={handleChange}
                     />

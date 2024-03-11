@@ -361,11 +361,15 @@ function NuevoRecibo() {
   const handleSubmit = async event => {
     event.preventDefault();
     try { 
-      let ddd=0;
-      ddd=parseInt(formulario.cuota_ordinaria) + parseInt(formulario.cuota_penalizacion) + parseInt(formulario.cuota_extraordinaria) + parseInt(formulario.cuota_reserva) + parseInt(formulario.cuota_adeudos);
-      ddd=ddd.toString();
+      let ddd = 0;
+      ddd = (parseInt(formulario.cuota_ordinaria) || 0) 
+          + (parseInt(formulario.cuota_penalizacion) || 0) 
+          + (parseInt(formulario.cuota_extraordinaria) || 0) 
+          + (parseInt(formulario.cuota_reserva) || 0) 
+          + (parseInt(formulario.cuota_adeudos) || 0);
+      ddd = ddd.toString();
       console.log(ddd);
-      formulario.total_pagar=ddd
+      formulario.total_pagar = ddd;
       console.log(formulario.total_pagar);
       const resultado = await axios.post('http://localhost:4000/api/registrarRecibo', formulario);
       if (resultado.data === 200) {
