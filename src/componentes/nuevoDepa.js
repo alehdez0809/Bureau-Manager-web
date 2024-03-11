@@ -12,8 +12,22 @@ function EditoEdificio() {
 
   const [edificios, setEdificios] = useState([]);
 
+  const [condominios, setCondominios] = useState([]);
+  const [idCondominioSeleccionado, setIdCondominioSeleccionado] = useState(null);
 
   useEffect(() => {
+    axios.get('http://localhost:4000/api/getCondominios')
+      .then(resultado => {
+        setCondominios(resultado.data);
+        setIdCondominioSeleccionado(resultado.data[0]?.id_condominio);
+      })
+      .catch(error => {
+        console.error(error);
+        alert('Error al obtener los condominios');
+      });
+  }, []);
+
+  /*useEffect(() => {
         axios.get(`http://localhost:4000/api/getEdificios`)
           .then(resultado => {
             if (resultado.data.length === 0) {
@@ -31,7 +45,23 @@ function EditoEdificio() {
             console.error(error);
             alert('Error al obtener los edificios');
           });
-  }, []);
+  }, []);*/
+
+  useEffect(() => {
+    if (idCondominioSeleccionado) {
+      axios.post('http://localhost:4000/api/getEdificiosbyCondominio', { id_condominio: idCondominioSeleccionado })
+        .then(resultado => {
+          setEdificios(resultado.data);
+          setFormulario({
+            id_edificio: resultado.data[0]?.id_edificio
+          });
+        })
+        .catch(error => {
+          console.error(error);
+          alert('Error al obtener los edificios');
+        });
+    }
+  }, [idCondominioSeleccionado]);
   
 
   const handleChange = event => {
@@ -49,6 +79,10 @@ function EditoEdificio() {
         id_edificio: selectedEdificio.id_edificio
       }));
     }
+  };
+
+  const handleChangeSelectCondominios = event => {
+    setIdCondominioSeleccionado(parseInt(event.target.value));
   };
 
   const handleSubmit = async event => {
@@ -78,11 +112,19 @@ function EditoEdificio() {
           <form onSubmit={handleSubmit}>
             <h1>Nuevo Departamento</h1>
             <div class="form-group">
+              <label className='labelInput'>Seleccione un Condominio: </label>
+              <select id="condominios" onChange={handleChangeSelectCondominios}>
+                {condominios.map(c => <option key={c.id_condominio} value={c.id_condominio}>{c.nombre_condominio}</option>)}
+              </select>
+            </div> 
+            <br></br>
+            <div class="form-group">
             <label className='labelInput'>Seleccione un Edificio: </label>
             <select id="opciones" onChange={handleChangeSelectEdificios}>
                 {opcionesEdificio}
               </select>
             </div>
+            <br></br>
             <div class="form-group">
               <label className='labelInput'>Nombre/Numero del Departamento: </label>
               <input
