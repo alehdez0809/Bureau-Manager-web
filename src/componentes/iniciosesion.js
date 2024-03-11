@@ -4,6 +4,9 @@ import axios from 'axios';
 import logo from '../img/logo2.png';
 import { useAuth } from '../AuthContext';
 
+
+
+
 function Formulario() {
     const [formulario, setFormulario] = useState({
       correo_administrador: '',
@@ -59,7 +62,11 @@ function Formulario() {
           }*/
           
           if(resultado.data.token){
-            login(resultado.data.token);
+            login(resultado.data.token, resultado.data.id_administrador);
+            const id_administrador = resultado.data.id_administrador;
+            console.log(id_administrador);
+            
+            
             navigate('/MenuPrincipal');
           }else{
             setVisible(true);

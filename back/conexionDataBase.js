@@ -493,7 +493,7 @@ app.post('/api/getAdmin', (req, res) => {
   console.log(req.body);
   const { correo_administrador, contraseña_administrador } = req.body;
   connection.query(
-    'SELECT * FROM Administrador WHERE correo_administrador = ? AND contraseña_administrador = ?',
+    'SELECT * FROM administrador WHERE correo_administrador = ? AND contraseña_administrador = ?',
     [correo_administrador, contraseña_administrador],
     (error, results) => {
       if (error) {
@@ -503,7 +503,7 @@ app.post('/api/getAdmin', (req, res) => {
         console.log(results.length);
         if (results.length === 1) {
           const token = jwt.sign({ correo_administrador }, secretKey, { expiresIn: '5m' });
-          res.json({ token });
+          res.json({ token, id_administrador: results[0].id_administrador});
         } else {
           res.status(401).send('Correo o contraseña incorrectos');
         }
