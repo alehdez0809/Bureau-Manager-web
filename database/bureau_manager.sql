@@ -1,10 +1,8 @@
-CREATE DATABASE  IF NOT EXISTS `bureau-manager` /*!40100 DEFAULT CHARACTER SET utf8 */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `bureau-manager`;
--- MySQL dump 10.13  Distrib 8.0.28, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.32, for Win64 (x86_64)
 --
 -- Host: localhost    Database: bureau-manager
 -- ------------------------------------------------------
--- Server version	8.0.28
+-- Server version	8.0.32
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -56,7 +54,7 @@ CREATE TABLE `administrador` (
   `correo_administrador` varchar(45) NOT NULL,
   `contraseña_administrador` varchar(20) NOT NULL,
   PRIMARY KEY (`id_administrador`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -65,6 +63,7 @@ CREATE TABLE `administrador` (
 
 LOCK TABLES `administrador` WRITE;
 /*!40000 ALTER TABLE `administrador` DISABLE KEYS */;
+INSERT INTO `administrador` VALUES (8,'Alejandra','Hernandez','Quinones','alesitahq@gmail.com','hola123'),(9,'Emmanuel','Villarruel','Morales','evillarruelmorales@gmail','hola123');
 /*!40000 ALTER TABLE `administrador` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -102,8 +101,11 @@ CREATE TABLE `condominio` (
   `id_condominio` int NOT NULL AUTO_INCREMENT,
   `nombre_condominio` varchar(45) NOT NULL,
   `direccion_condominio` varchar(100) NOT NULL,
-  PRIMARY KEY (`id_condominio`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+  `id_administrador` int NOT NULL,
+  PRIMARY KEY (`id_condominio`),
+  KEY `id_administrador_idx` (`id_administrador`),
+  CONSTRAINT `id_administrador` FOREIGN KEY (`id_administrador`) REFERENCES `administrador` (`id_administrador`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -112,6 +114,7 @@ CREATE TABLE `condominio` (
 
 LOCK TABLES `condominio` WRITE;
 /*!40000 ALTER TABLE `condominio` DISABLE KEYS */;
+INSERT INTO `condominio` VALUES (7,'Fuentes de Azcapotzalco','Av. Aquiles Serdán, No. 464, Col. Ángel Zimbrón, Azcapotzalco, CDMX',8),(8,'Tlalpan','Calz De Tlalpan 2490 - 1, Avante, Coyoacan, C.p 04460, Df C.P 04460,',8),(9,'Cafetales','Xochimilco, 109',8),(10,'Río Neva','Río Neva, 201',9),(11,'Mar Negro','Tacuba',9),(12,'Rebsamen','Calle Rebsamen, 203',8);
 /*!40000 ALTER TABLE `condominio` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -219,14 +222,11 @@ DROP TABLE IF EXISTS `departamento`;
 CREATE TABLE `departamento` (
   `id_departamento` int NOT NULL AUTO_INCREMENT,
   `id_edificio` int NOT NULL,
-  `id_inquilino` int NOT NULL,
   `numero_departamento` varchar(10) NOT NULL,
   PRIMARY KEY (`id_departamento`),
   KEY `id_edificio_idx` (`id_edificio`),
-  KEY `id_inquilino_idx` (`id_inquilino`),
-  CONSTRAINT `id_edificio` FOREIGN KEY (`id_edificio`) REFERENCES `edificio` (`id_edificio`) ON UPDATE CASCADE,
-  CONSTRAINT `id_inquilino` FOREIGN KEY (`id_inquilino`) REFERENCES `inquilino` (`id_inquilino`) ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+  CONSTRAINT `id_edificio` FOREIGN KEY (`id_edificio`) REFERENCES `edificio` (`id_edificio`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -235,6 +235,7 @@ CREATE TABLE `departamento` (
 
 LOCK TABLES `departamento` WRITE;
 /*!40000 ALTER TABLE `departamento` DISABLE KEYS */;
+INSERT INTO `departamento` VALUES (18,13,'H005'),(19,14,'I601');
 /*!40000 ALTER TABLE `departamento` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -281,7 +282,7 @@ CREATE TABLE `edificio` (
   PRIMARY KEY (`id_edificio`),
   KEY `id_condominio_idx` (`id_condominio`),
   CONSTRAINT `id_condominio` FOREIGN KEY (`id_condominio`) REFERENCES `condominio` (`id_condominio`) ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb3;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -290,32 +291,8 @@ CREATE TABLE `edificio` (
 
 LOCK TABLES `edificio` WRITE;
 /*!40000 ALTER TABLE `edificio` DISABLE KEYS */;
+INSERT INTO `edificio` VALUES (13,7,'Edificio H'),(14,7,'Edificio I'),(15,11,'Edificio A');
 /*!40000 ALTER TABLE `edificio` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `fecha de pago`
---
-
-DROP TABLE IF EXISTS `fecha de pago`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `fecha de pago` (
-  `id_fecha` int NOT NULL AUTO_INCREMENT,
-  `dia_fecha` int NOT NULL,
-  `mes_fecha` varchar(15) NOT NULL,
-  `año_fecha` int NOT NULL,
-  PRIMARY KEY (`id_fecha`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `fecha de pago`
---
-
-LOCK TABLES `fecha de pago` WRITE;
-/*!40000 ALTER TABLE `fecha de pago` DISABLE KEYS */;
-/*!40000 ALTER TABLE `fecha de pago` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -327,12 +304,15 @@ DROP TABLE IF EXISTS `inquilino`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `inquilino` (
   `id_inquilino` int NOT NULL AUTO_INCREMENT,
+  `id_departamento` int NOT NULL,
   `nombre_inquilino` varchar(45) NOT NULL,
   `apellino_paterno_inquilino` varchar(45) NOT NULL,
   `apellino_materno_inquilino` varchar(45) NOT NULL,
   `correo_inquilino` varchar(45) NOT NULL,
-  PRIMARY KEY (`id_inquilino`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+  PRIMARY KEY (`id_inquilino`),
+  KEY `id_departamento_idx` (`id_departamento`),
+  CONSTRAINT `id_departamento` FOREIGN KEY (`id_departamento`) REFERENCES `departamento` (`id_departamento`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -341,65 +321,58 @@ CREATE TABLE `inquilino` (
 
 LOCK TABLES `inquilino` WRITE;
 /*!40000 ALTER TABLE `inquilino` DISABLE KEYS */;
+INSERT INTO `inquilino` VALUES (17,18,'Alejandra','Hernández','Quinones','alejandrahernandeztelpuchcalli@gmail.com');
 /*!40000 ALTER TABLE `inquilino` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `recibo`
+-- Table structure for table `recibocompleto`
 --
 
-DROP TABLE IF EXISTS `recibo`;
+DROP TABLE IF EXISTS `recibocompleto`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `recibo` (
+CREATE TABLE `recibocompleto` (
   `id_recibo` int NOT NULL AUTO_INCREMENT,
   `id_condominio` int NOT NULL,
   `id_departamento` int NOT NULL,
   `id_inquilino` int NOT NULL,
-  `id_fecha` int NOT NULL,
-  `id_concepto` int NOT NULL,
-  `id_ordinaria` int NOT NULL,
-  `id_extraordinaria` int NOT NULL,
-  `id_penalizacion` int NOT NULL,
-  `id_reserva` int NOT NULL,
-  `id_adeudos` int NOT NULL,
-  `id_total` int NOT NULL,
+  `nombre_completo_inquilino` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `fecha` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `no_recibo` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `concepto_pago` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `cuota_ordinaria` varchar(15) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `concepto_cuota_ordinaria` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `cuota_penalizacion` varchar(15) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `concepto_cuota_penalizacion` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `cuota_extraordinaria` varchar(15) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `concepto_cuota_extraordinaria` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `cuota_reserva` varchar(15) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `concepto_cuota_reserva` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `cuota_adeudos` varchar(15) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `concepto_cuota_adeudos` varchar(50) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `total_pagar` varchar(15) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `id_administrador` int NOT NULL,
   PRIMARY KEY (`id_recibo`),
   KEY `id_condominio_idx` (`id_condominio`),
   KEY `id_departamento_idx` (`id_departamento`),
   KEY `id_inquilino_idx` (`id_inquilino`),
-  KEY `id_fecha_idx` (`id_fecha`),
-  KEY `id_concepto_idx` (`id_concepto`),
-  KEY `id_ordinaria_idx` (`id_ordinaria`),
-  KEY `id_extraordinaria_idx` (`id_extraordinaria`),
-  KEY `id_penalizacion_idx` (`id_penalizacion`),
-  KEY `id_reserva_idx` (`id_reserva`),
-  KEY `id_adeudos_idx` (`id_adeudos`),
-  KEY `id_total_idx` (`id_total`),
-  KEY `id_administrador_idx` (`id_administrador`),
-  CONSTRAINT `adeudos` FOREIGN KEY (`id_adeudos`) REFERENCES `adeudos anteriores` (`id_adeudos`) ON UPDATE CASCADE,
-  CONSTRAINT `administrador` FOREIGN KEY (`id_administrador`) REFERENCES `administrador` (`id_administrador`) ON UPDATE CASCADE,
-  CONSTRAINT `concepto` FOREIGN KEY (`id_concepto`) REFERENCES `concepto de pago` (`id_concepto`) ON UPDATE CASCADE,
+  KEY `administrador_idx` (`id_administrador`),
+  CONSTRAINT `administrador` FOREIGN KEY (`id_administrador`) REFERENCES `administrador` (`id_administrador`),
   CONSTRAINT `condominio` FOREIGN KEY (`id_condominio`) REFERENCES `condominio` (`id_condominio`) ON UPDATE CASCADE,
   CONSTRAINT `departamento` FOREIGN KEY (`id_departamento`) REFERENCES `departamento` (`id_departamento`) ON UPDATE CASCADE,
-  CONSTRAINT `extraordinaria` FOREIGN KEY (`id_extraordinaria`) REFERENCES `cuota extraordinaria` (`id_extraordinaria`) ON UPDATE CASCADE,
-  CONSTRAINT `fecha` FOREIGN KEY (`id_fecha`) REFERENCES `fecha de pago` (`id_fecha`) ON UPDATE CASCADE,
-  CONSTRAINT `inquilino` FOREIGN KEY (`id_inquilino`) REFERENCES `inquilino` (`id_inquilino`) ON UPDATE CASCADE,
-  CONSTRAINT `ordinaria` FOREIGN KEY (`id_ordinaria`) REFERENCES `cuota ordinaria` (`id_ordinaria`) ON UPDATE CASCADE,
-  CONSTRAINT `penalizacion` FOREIGN KEY (`id_penalizacion`) REFERENCES `cuota de penalización` (`id_penalizacion`) ON UPDATE CASCADE,
-  CONSTRAINT `reserva` FOREIGN KEY (`id_reserva`) REFERENCES `cuota de fondo de reserva` (`id_reserva`) ON UPDATE CASCADE,
-  CONSTRAINT `total` FOREIGN KEY (`id_total`) REFERENCES `total pagado` (`id_total`) ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+  CONSTRAINT `inquilino` FOREIGN KEY (`id_inquilino`) REFERENCES `inquilino` (`id_inquilino`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `recibo`
+-- Dumping data for table `recibocompleto`
 --
 
-LOCK TABLES `recibo` WRITE;
-/*!40000 ALTER TABLE `recibo` DISABLE KEYS */;
-/*!40000 ALTER TABLE `recibo` ENABLE KEYS */;
+LOCK TABLES `recibocompleto` WRITE;
+/*!40000 ALTER TABLE `recibocompleto` DISABLE KEYS */;
+INSERT INTO `recibocompleto` VALUES (15,7,18,17,'Alejandra Hernández Quinones','2024-03-11','001','Hola','130','concepto 1','130','concepto 2','130','concepto 3','130','concepto 4','','','520',8);
+/*!40000 ALTER TABLE `recibocompleto` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -449,5 +422,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-04-14 16:09:34
-
+-- Dump completed on 2024-03-11  4:39:47
