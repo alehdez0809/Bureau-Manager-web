@@ -4,6 +4,8 @@ import axios from 'axios';
 
 
 function NuevoRecibo() {
+  const authData = JSON.parse(localStorage.getItem('authData'));
+  const id_administrador = parseInt(authData?.id);
 
   const [formulario, setFormulario] = useState({
     id_condominio: '',
@@ -25,6 +27,7 @@ function NuevoRecibo() {
     cuota_adeudos:'',
     concepto_cuota_adeudos:'',
     total_pagar:'',
+    id_administrador: id_administrador,
   });
 
   const [visible, setVisible] = useState(false);
@@ -34,7 +37,9 @@ function NuevoRecibo() {
   const [inquilinos, setInquilinos] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/getCondominios')
+    const authData = JSON.parse(localStorage.getItem('authData'));
+    const id_administrador = parseInt(authData?.id);
+    axios.get(`http://localhost:4000/api/getCondominios/${id_administrador}`)
       .then(response => {
         if(response.data.length === 0){
           setEdificios([]);

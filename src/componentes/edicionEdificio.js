@@ -16,7 +16,9 @@ function EditoEdificio() {
 
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/getCondominios')
+    const authData = JSON.parse(localStorage.getItem('authData'));
+    const id_administrador = parseInt(authData?.id);
+    axios.get(`http://localhost:4000/api/getCondominios/${id_administrador}`)
       .then(response => {
         if(response.data.length === 0){
           setFormulario({
@@ -56,7 +58,11 @@ function EditoEdificio() {
       })
       .catch(error => {
         console.log(error);
-        alert('Error al obtener los condominios');
+        if (error.response && error.response.status === 404) {
+          ///
+        } else {
+          alert('Error al obtener los condominios');
+        }
       });
   }, []);
   

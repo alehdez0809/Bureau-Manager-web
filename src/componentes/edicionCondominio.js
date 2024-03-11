@@ -15,21 +15,37 @@ function EditoCondominio() {
   const [errorNombre, setErrorNombre] = useState('');
   const [errorDireccion, setErrorDireccion] = useState('');
 
+
+  const authData = JSON.parse(localStorage.getItem('authData'));
+  const id_administrador = parseInt(authData?.id);
+
   useEffect(() => {
-    axios.get('http://localhost:4000/api/getCondominios')
-      .then(response => {
-        setCondominios(response.data);
-        setFormulario({
-          id_condominio: response.data[0].id_condominio,
-          nombre_condominio: response.data[0].nombre_condominio,
-          direccion_condominio: response.data[0].direccion_condominio
+    if (id_administrador) {
+      axios.get(`http://localhost:4000/api/getCondominios/${id_administrador}`)
+        .then(response => {
+          setCondominios(response.data);
+          if (response.data.length > 0) {
+            setFormulario({
+              id_condominio: response.data[0].id_condominio,
+              nombre_condominio: response.data[0].nombre_condominio,
+              direccion_condominio: response.data[0].direccion_condominio
+            });
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          
+          if (error.response && error.response.status === 404) {
+            
+            ///
+          } else {
+            
+            alert('Error al obtener los condominios');
+          }
         });
-      })
-      .catch(error => {
-        console.log(error);
-        alert('Error al obtener los condominios');
-      });
-  }, []);
+    }
+  }, [id_administrador]);
+  
 
   const handleChange = event => {
     const { name, value } = event.target;
@@ -117,6 +133,7 @@ function EditoCondominio() {
                 value={formulario.nombre_condominio}
                 onChange={handleChange}
               />
+              {<div className="error-message">{errorNombre}</div>}
             </div>
             <div class="form-group">
               <label className='labelInput'>Direccion del condominio: </label>
@@ -128,6 +145,8 @@ function EditoCondominio() {
                 value={formulario.direccion_condominio}
                 onChange={handleChange}
               />
+              {<div className="error-message">{errorDireccion}</div>}
+              
             </div>
             <div className="botones-container">
               <Link to="/EdicionyRegistro">

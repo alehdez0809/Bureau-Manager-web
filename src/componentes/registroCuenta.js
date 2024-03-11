@@ -16,6 +16,9 @@ function RegistrarCuenta() {
       setFormulario(prevState => ({ ...prevState, [name]: value }));
     };
     const [errors, setErrors] = useState({});
+
+    const [errorMessage, setErrorMessage] = useState('');
+
     const handleSubmit = async event => {
       event.preventDefault();
       if (validateForm()) {
@@ -24,10 +27,10 @@ function RegistrarCuenta() {
             'http://localhost:4000/api/registrarCuenta',
             formulario
           );
-          if (resultado.data === 200) {
+          if (resultado.data === "Cuenta registrada exitosamente") {
             navigate('/');
           } else {
-            alert(resultado.data);
+            setErrorMessage('Ya existe una cuenta registrada con este correo electrónico');
           }
         } catch (error) {
           console.error(error);
@@ -152,6 +155,7 @@ function RegistrarCuenta() {
                 onChange={handleChange}
           /> 
           {<div className="error-message">{errors.contraseña_administrador}</div>}
+          {<div className="error-message" id='error-cuenta-registrada'>{errorMessage}</div>}
         </div>
         <button type="submit">Registrarse</button>
         <p>¿Ya tienes una cuenta? <Link to="/">Inicia sesión</Link></p>

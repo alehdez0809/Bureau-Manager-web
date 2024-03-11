@@ -3,10 +3,15 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 
+
 function NuevoCondominio() {
+
+  const authData = JSON.parse(localStorage.getItem('authData'));
+  const id_administrador = parseInt(authData?.id);
   const [formulario, setFormulario] = useState({
     nombre_condominio: '',
-    direccion_condominio: ''
+    direccion_condominio: '',
+    id_administrador: id_administrador
   });
 
   const [errorCorreo, setErrorCorreo] = useState('');
@@ -42,7 +47,7 @@ function NuevoCondominio() {
     if (formulario.direccion_condominio.trim() === '') {
       setErrorContraseña('*Ingrese una direccion de condominio');
     }
-    if (formulario.nombre_condominio.trim() !== '' && formulario.direccion_condominio.trim() !== '') {
+    if (formulario.nombre_condominio.trim() !== '' && formulario.direccion_condominio.trim() !== '' && formulario.id_administrador) {
       try {
         const resultado = await axios.post('http://localhost:4000/api/registrarCondominio', formulario);
         if (resultado.data === 200) {

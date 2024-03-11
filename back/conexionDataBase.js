@@ -9,6 +9,8 @@ const app = express();
 const jwt = require('jsonwebtoken');
 const secretKey = 'tu_clave_secreta';
 
+
+
 app.use(cors());
 
 const connection = mysql.createConnection({
@@ -205,13 +207,35 @@ async function crearPDFMultiple(datosList) {
 app.post('/api/registrarCuenta', (req, res) => {
   console.log(req.body);
   const { nombre_administrador, apellido_paterno_administrador, apellido_materno_administrador, correo_administrador, contraseña_administrador } = req.body;
-  const sql = `INSERT INTO administrador (nombre_administrador, apellido_paterno_administrador, apellido_materno_administrador, correo_administrador, contraseña_administrador) VALUES (?, ?, ?, ?, ?)`;
-  const values = [nombre_administrador, apellido_paterno_administrador, apellido_materno_administrador, correo_administrador, contraseña_administrador];
-  connection.query(sql, values, error => {
-    if (error) console.log(error);
-    res.send("200");
-  });
+
+  // Primero, verifica si el correo ya está registrado
+  connection.query(
+    'SELECT correo_administrador FROM administrador WHERE correo_administrador = ?',
+    [correo_administrador],
+    (error, results) => {
+      if (error) {
+        console.error(error);
+        return res.status(500).send('Error al verificar el correo electrónico');
+      }
+
+      if (results.length > 0) {
+        return res.status(400).send('Ya existe una cuenta con el correo electrónico registrado');
+      }
+
+      const sql = `INSERT INTO administrador (nombre_administrador, apellido_paterno_administrador, apellido_materno_administrador, correo_administrador, contraseña_administrador) VALUES (?, ?, ?, ?, ?)`;
+      const values = [nombre_administrador, apellido_paterno_administrador, apellido_materno_administrador, correo_administrador, contraseña_administrador];
+
+      connection.query(sql, values, error => {
+        if (error) {
+          console.log(error);
+          return res.status(500).send('Error al registrar la cuenta');
+        }
+        res.send("Cuenta registrada exitosamente");
+      });
+    }
+  );
 });
+
 
 app.post('/api/registrarDepartamento', (req, res) => {
   connection.connect(error => {
@@ -232,9 +256,9 @@ app.post('/api/registrarDepartamento', (req, res) => {
 app.post('/api/registrarCondominio', (req, res) => {
   console.log("-------------------------------")
   console.log(req.body);
-  const { nombre_condominio, direccion_condominio } = req.body;
-  const sql = `INSERT INTO condominio (nombre_condominio, direccion_condominio) VALUES (?, ?)`;
-  const values = [nombre_condominio, direccion_condominio];
+  const { nombre_condominio, direccion_condominio , id_administrador} = req.body;
+  const sql = `INSERT INTO condominio (nombre_condominio, direccion_condominio, id_administrador) VALUES (?, ?, ?)`;
+  const values = [nombre_condominio, direccion_condominio, id_administrador];
   connection.query(sql, values, error => {
     if (error) console.log(error);
     res.send("200");
@@ -268,10 +292,10 @@ app.post('/api/registrarInquilino', (req, res) => {
 app.post('/api/registrarRecibo', (req, res) => {
   console.log("-------------------------------")
   console.log(req.body);
-  const { id_condominio, id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, concepto_pago, cuota_ordinaria, concepto_cuota_ordinaria, cuota_penalizacion, concepto_cuota_penalizacion, cuota_extraordinaria, concepto_cuota_extraordinaria, cuota_reserva, concepto_cuota_reserva, cuota_adeudos, concepto_cuota_adeudos, total_pagar } = req.body;
-  const sql = `INSERT INTO reciboCompleto (id_condominio, id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, concepto_pago, cuota_ordinaria, concepto_cuota_ordinaria, cuota_penalizacion, concepto_cuota_penalizacion, cuota_extraordinaria, concepto_cuota_extraordinaria, cuota_reserva, concepto_cuota_reserva, cuota_adeudos, concepto_cuota_adeudos, total_pagar) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const { id_condominio, id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, concepto_pago, cuota_ordinaria, concepto_cuota_ordinaria, cuota_penalizacion, concepto_cuota_penalizacion, cuota_extraordinaria, concepto_cuota_extraordinaria, cuota_reserva, concepto_cuota_reserva, cuota_adeudos, concepto_cuota_adeudos, total_pagar, id_administrador } = req.body;
+  const sql = `INSERT INTO reciboCompleto (id_condominio, id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, concepto_pago, cuota_ordinaria, concepto_cuota_ordinaria, cuota_penalizacion, concepto_cuota_penalizacion, cuota_extraordinaria, concepto_cuota_extraordinaria, cuota_reserva, concepto_cuota_reserva, cuota_adeudos, concepto_cuota_adeudos, total_pagar, id_administrador) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const values = [
-    id_condominio, id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, concepto_pago, cuota_ordinaria, concepto_cuota_ordinaria, cuota_penalizacion, concepto_cuota_penalizacion, cuota_extraordinaria, concepto_cuota_extraordinaria, cuota_reserva, concepto_cuota_reserva, cuota_adeudos, concepto_cuota_adeudos, total_pagar];
+    id_condominio, id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, concepto_pago, cuota_ordinaria, concepto_cuota_ordinaria, cuota_penalizacion, concepto_cuota_penalizacion, cuota_extraordinaria, concepto_cuota_extraordinaria, cuota_reserva, concepto_cuota_reserva, cuota_adeudos, concepto_cuota_adeudos, total_pagar, id_administrador];
   connection.query(sql, values, error => {
     if (error) console.log(error);
     res.send("200");
@@ -512,8 +536,9 @@ app.post('/api/getAdmin', (req, res) => {
   );
 });
 
-app.get('/api/getRecibos', (req, res) => {
-  connection.query('SELECT * FROM reciboCompleto', (error, results) => {
+app.get('/api/getRecibos/:id_administrador', (req, res) => {
+  const id_administrador  = parseInt(req.params.id_administrador);
+  connection.query('SELECT * FROM reciboCompleto WHERE id_administrador = ?', [id_administrador], (error, results) => {
     if (error) {
       console.error(error);
       res.status(500).send('Error al obtener los registros de la tabla');
@@ -523,16 +548,22 @@ app.get('/api/getRecibos', (req, res) => {
   });
 });
 
-app.get('/api/getCondominios', (req, res) => {
-  connection.query('SELECT * FROM condominio', (error, results) => {
+app.get('/api/getCondominios/:id_administrador', (req, res) => {
+  const id_administrador = parseInt(req.params.id_administrador);
+  connection.query('SELECT * FROM condominio WHERE id_administrador = ?', [id_administrador], (error, results) => {
     if (error) {
       console.error(error);
       res.status(500).send('Error al obtener los registros de la tabla');
     } else {
-      res.json(results);
+      if (results.length > 0) {
+        res.json(results);
+      } else {
+        res.status(404).send('No se encontraron condominios para el administrador especificado');
+      }
     }
   });
 });
+
 
 app.post('/api/getEdificiosbyCondominio', (req, res) => {
   console.log(req.body);

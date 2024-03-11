@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-function EditoEdificio() {
+function EditoDepartamento() {
 
   const [formulario, setFormulario] = useState({
     id_edificio: '',
@@ -14,53 +14,78 @@ function EditoEdificio() {
   const [departamentos, setDepartamentos] = useState([]);
   const [edificios, setEdificios] = useState([]);
 
+  const [condominios, setCondominios] = useState([]);
+  const [idCondominioSeleccionado, setIdCondominioSeleccionado] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/getEdificios')
-      .then(response => {
-        if(response.data.length === 0){
-          setEdificios([]);
-          setFormulario({
-            id_edificio: 0
-        });}else{
-          setEdificios(response.data);
-          setFormulario({
-            id_edificio: response.data[0].id_edificio
-          });
+    const authData = JSON.parse(localStorage.getItem('authData'));
+    const id_administrador = parseInt(authData?.id);
+    axios.get(`http://localhost:4000/api/getCondominios/${id_administrador}`)
+      .then(resultado => {
+        setCondominios(resultado.data);
+        if (resultado.data.length > 0) {
+          setIdCondominioSeleccionado(resultado.data[0].id_condominio);
         }
-  
-        // Mueve el segundo axios.get() dentro del then() del primer axios.get()
-        const selectedEdifcio = response.data[0].id_edificio;
-        const diccionario = {};
-        diccionario['id_edificio'] = parseInt(selectedEdifcio);
-  
-        axios.post(`http://localhost:4000/api/getDepartamentosbyEdificios`,diccionario)
-          .then(resultado => {
-            if (resultado.data.length === 0) {
-              setDepartamentos([]);
-              setFormulario({
-                id_departamento: 0,
-                nombre_departamento: "",
-              });
-            } else {
-              setDepartamentos(resultado.data);
-              setFormulario({
-                id_departamento: resultado.data[0].id_departamento,
-                nombre_departamento: resultado.data[0].numero_departamento,
-              });
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            alert('Error al obtener los departamentos');
-          });
-  
       })
       .catch(error => {
-        console.log(error);
-        alert('Error al obtener los edificios');
+        console.error(error);
+        if (error.response && error.response.status === 404) {   
+          ///
+        } else {
+          alert('Error al obtener los condominios');
+        }
       });
   }, []);
+
+
+  useEffect(() => {
+    if (idCondominioSeleccionado) {
+      axios.post('http://localhost:4000/api/getEdificiosbyCondominio', { id_condominio: idCondominioSeleccionado })
+        .then(response => {
+          setEdificios(response.data);
+      
+          if (response.data.length > 0) {
+            setFormulario(prev => ({ ...prev, id_edificio: response.data[0].id_edificio, id_departamento: '', nombre_departamento: '' }));
+            
+            cargarDepartamentos(response.data[0].id_edificio);
+          } else {
+          
+            setDepartamentos([]);
+            setFormulario(prev => ({ ...prev, id_edificio: '', id_departamento: '', nombre_departamento: '' }));
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          alert('Error al obtener los edificios');
+        });
+    }
+  }, [idCondominioSeleccionado]);
+  
+  const cargarDepartamentos = (idEdificio) => {
+    axios.post('http://localhost:4000/api/getDepartamentosbyEdificios', { id_edificio: idEdificio })
+      .then(resultado => {
+        setDepartamentos(resultado.data);
+        if (resultado.data.length > 0) {
+          setFormulario(prev => ({
+            ...prev,
+            id_departamento: resultado.data[0].id_departamento,
+            nombre_departamento: resultado.data[0].numero_departamento,
+          }));
+        } else {
+          // Manejo de no resultados
+          setFormulario(prev => ({
+            ...prev,
+            id_departamento: '',
+            nombre_departamento: '',
+          }));
+          alert('No hay departamentos disponibles para el edificio seleccionado.');
+        }
+      })
+      .catch(error => {
+        console.error('Error al obtener los departamentos', error);
+        alert('Error al obtener los departamentos');
+      });
+  };  
   
 
   const handleChange = event => {
@@ -69,39 +94,17 @@ function EditoEdificio() {
   };
 
   const handleChangeSelect = event => {
-    const elegido=parseInt(event.target.value)
-    const selectedEdificio = edificios.find(c => c.id_edificio === elegido);
+    const idEdificioSeleccionado = parseInt(event.target.value);
+    setFormulario(prev => ({ ...prev, id_edificio: idEdificioSeleccionado }));
+    cargarDepartamentos(idEdificioSeleccionado);
+  };
 
-    if (selectedEdificio) {
-        const diccionario = {};
-        diccionario['id_edificio'] = selectedEdificio.id_edificio;
+  const handleChangeSelectCondominio = event => {
+    const idSeleccionado = parseInt(event.target.value);
+    setIdCondominioSeleccionado(idSeleccionado);
+    setEdificios([]); 
+    setFormulario(prev => ({ ...prev, id_edificio: '', nombre_departamento: '' })); 
   
-        axios.post(`http://localhost:4000/api/getDepartamentosbyEdificios`,diccionario)
-          .then(resultado => {
-            if (resultado.data.length === 0) {
-              setDepartamentos([]);
-              setFormulario({
-                id_departamento: 0,
-                nombre_departamento: "",
-              });
-            } else {
-              setDepartamentos(resultado.data);
-              setFormulario({
-                id_departamento: resultado.data[0].id_departamento,
-                nombre_departamento: resultado.data[0].numero_departamento,
-              });
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            alert('Error al obtener los departamentos');
-          });
-
-      setFormulario(prevState => ({
-        ...prevState,
-        id_edificio: selectedEdificio.id_edificio
-      }));
-    }
   };
 
   const handleChangeSelectDepartamentos = event => {
@@ -150,9 +153,24 @@ function EditoEdificio() {
       c => <option key={c.id_edificio} value={c.id_edificio}>{c.nombre_edificio}</option>
     );
   }
+
+
+  let opcionesCondominio;
+  if (condominios.length === 0) {
+    opcionesCondominio = <option value="Defecto">No hay condominios disponibles</option>;
+  }else{
+    opcionesCondominio = condominios.map(c => <option key={c.id_condominio} value={c.id_condominio}>{c.nombre_condominio}</option>);
+  }
+
     return (
           <form onSubmit={handleSubmit}>
             <h1>Editar Departamento</h1>
+            <div className="form-group">
+              <label className='labelInput'>Seleccione un Condominio: </label>
+              <select id="opcionesCondominio" onChange={handleChangeSelectCondominio} value={idCondominioSeleccionado}>
+                {opcionesCondominio}
+              </select>
+            </div>
             <div class="form-group">
             <label className='labelInput'>Seleccione un Edificio: </label>
             <select id="opciones" onChange={handleChangeSelect}>
@@ -186,5 +204,5 @@ function EditoEdificio() {
           </form>   
     );
   }
-  export default EditoEdificio;
+  export default EditoDepartamento;
   

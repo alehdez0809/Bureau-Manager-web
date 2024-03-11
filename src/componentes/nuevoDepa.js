@@ -16,14 +16,20 @@ function EditoEdificio() {
   const [idCondominioSeleccionado, setIdCondominioSeleccionado] = useState(null);
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/getCondominios')
+    const authData = JSON.parse(localStorage.getItem('authData'));
+    const id_administrador = parseInt(authData?.id);
+    axios.get(`http://localhost:4000/api/getCondominios/${id_administrador}`)
       .then(resultado => {
         setCondominios(resultado.data);
         setIdCondominioSeleccionado(resultado.data[0]?.id_condominio);
       })
       .catch(error => {
         console.error(error);
-        alert('Error al obtener los condominios');
+        if (error.response && error.response.status === 404) {   
+          ///
+        } else {
+          alert('Error al obtener los condominios');
+        }
       });
   }, []);
 
@@ -100,6 +106,13 @@ function EditoEdificio() {
     }
   };
 
+  let opcionesCondominio;
+  if (condominios.length === 0) {
+    opcionesCondominio = <option value="Defecto">No hay condominios disponibles</option>;
+  } else {
+    opcionesCondominio = condominios.map(c => <option key={c.id_condominio} value={c.id_condominio}>{c.nombre_condominio}</option>);
+  }  
+
   let opcionesEdificio;
   if (edificios.length === 0) {
     opcionesEdificio = <option value="Defecto">No hay edificios registrados</option>;
@@ -114,7 +127,7 @@ function EditoEdificio() {
             <div class="form-group">
               <label className='labelInput'>Seleccione un Condominio: </label>
               <select id="condominios" onChange={handleChangeSelectCondominios}>
-                {condominios.map(c => <option key={c.id_condominio} value={c.id_condominio}>{c.nombre_condominio}</option>)}
+                {opcionesCondominio}
               </select>
             </div> 
             <br></br>

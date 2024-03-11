@@ -11,7 +11,9 @@ function VerRecibo() {
 
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/getRecibos')
+    const authData = JSON.parse(localStorage.getItem('authData'));
+    const id_administrador = parseInt(authData?.id);
+    axios.get(`http://localhost:4000/api/getRecibos/${id_administrador}`)
       .then(response => {
         if(response.data.length === 0){
           setRegistros([]);

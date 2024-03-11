@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 
+
 function NuevoEdificio() {
   const [formulario, setFormulario] = useState({
     id_condominio: '',
@@ -12,7 +13,9 @@ function NuevoEdificio() {
   const [condominios, setCondominios] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/getCondominios')
+    const authData = JSON.parse(localStorage.getItem('authData'));
+    const id_administrador = parseInt(authData?.id);
+    axios.get(`http://localhost:4000/api/getCondominios/${id_administrador}`)
       .then(response => {
         setCondominios(response.data);
         setFormulario({
@@ -21,7 +24,11 @@ function NuevoEdificio() {
       })
       .catch(error => {
         console.log(error);
-        alert('Error al obtener los condominios');
+        if (error.response && error.response.status === 404) {   
+          ///
+        } else {
+          alert('Error al obtener los condominios');
+        }
       });
   }, []);
 

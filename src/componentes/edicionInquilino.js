@@ -23,7 +23,9 @@ function EditoInquilino() {
   const [inquilinos, setInquilinos] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:4000/api/getCondominios')
+    const authData = JSON.parse(localStorage.getItem('authData'));
+    const id_administrador = parseInt(authData?.id);
+    axios.get(`http://localhost:4000/api/getCondominios/${id_administrador}`)
       .then(response => {
         if(response.data.length === 0){
           setEdificios([]);

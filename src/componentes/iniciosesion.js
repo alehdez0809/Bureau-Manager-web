@@ -19,6 +19,7 @@ function Formulario() {
     
     const [errorCorreo, setErrorCorreo] = useState('');
     const [errorContraseña, setErrorContraseña] = useState('');
+    const [errorCuenta, setErrorCuenta] = useState('');
 
     const handleChange = event => {
       const { name, value } = event.target;
@@ -69,11 +70,15 @@ function Formulario() {
             
             navigate('/MenuPrincipal');
           }else{
-            setVisible(true);
+            
+              setVisible(true);
+              setErrorCuenta('Correo electrónico o contraseña incorrectos');
+            
+      
           }
         } catch (error) {
           console.error(error);
-          alert('Error al enviar los datos');
+          setErrorCuenta('Correo electrónico o contraseña incorrectos');
         }
       }
     };
@@ -111,6 +116,7 @@ function Formulario() {
               />
             {<div className="error-message">{errorContraseña}</div>}
             </div>
+            {<div className="error-message">{errorCuenta}</div>}
             <button type="submit">Iniciar Sesión</button>
             <div className="error-message" style={{ display: visible ? 'block' : 'none' }}>Correo electrónico o contraseña incorrectos</div>
             <p>¿No te has registrado? <Link to="/RegistrarCuenta">Crear Cuenta</Link></p>
