@@ -9,6 +9,8 @@ function VerRecibo() {
   const [registros, setRegistros] = useState([]);
   const [recibosSeleccionados, setRecibosSeleccionados] = useState([]);
 
+  const [mensajeExito, setMensajeExito] = useState('');
+
 
   useEffect(() => {
     const authData = JSON.parse(localStorage.getItem('authData'));
@@ -37,6 +39,7 @@ function VerRecibo() {
             const resultado = await axios.post('http://localhost:4000/api/enviarRecibosCorreoElectronico', recibosSeleccionados);
             if (resultado.data === 200) {
               setVisible(true);
+              setMensajeExito('Recibos enviados correctamente');
               setRecibosSeleccionados([]);
             } else {
               alert(resultado.data);
@@ -126,7 +129,8 @@ function VerRecibo() {
                 {opcionesRegistro}
                 </tbody>
             </table>
-            <div className='Aceptado' style={{ display: visible ? 'block' : 'none' }}>Registro exitoso</div>
+            <div className='Aceptado' style={{ display: visible ? 'block' : 'none' }}>Recibo descargado</div>
+            <div className='mensajeExito' style={{ display: visible ? 'block' : 'none' }}>{mensajeExito}</div>
             <div className='select-container'>
             <div className="botones-container"> 
               <Link to="/MenuPrincipal">

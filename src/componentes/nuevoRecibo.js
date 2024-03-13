@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import e from 'connect-flash';
 
 
 function NuevoRecibo() {
@@ -35,6 +36,8 @@ function NuevoRecibo() {
   const [condominios, setCondominios] = useState([]);
   const [edificios, setEdificios] = useState([]);
   const [inquilinos, setInquilinos] = useState([]);
+
+  const [errores, setErrores] = useState({});
 
   useEffect(() => {
     const authData = JSON.parse(localStorage.getItem('authData'));
@@ -369,6 +372,12 @@ function NuevoRecibo() {
 
   const handleSubmit = async event => {
     event.preventDefault();
+
+    if (!validarCampos()) {
+      console.log('Hay errores en la validación');
+      return; 
+    }
+
     try { 
       let ddd = 0;
       ddd = (parseInt(formulario.cuota_ordinaria) || 0) 
@@ -409,6 +418,92 @@ function NuevoRecibo() {
     }
   };
 
+  function esNumero(dato) {
+    return /^\d+$/.test(dato) || /^\d+(\.\d+)?$/.test(dato); 
+  }
+  
+  
+  function contieneLetras(dato) {
+    return /[a-zA-Z]/.test(dato); 
+  }
+  
+  const validarCampos = () => {
+    let erroresTemp = {};
+    if (!formulario.no_recibo.trim()) {
+      erroresTemp.no_recibo = 'Este campo es obligatorio';
+    }else if(!esNumero(formulario.no_recibo)){
+      erroresTemp.no_recibo = 'Este dato debe ser un número';
+    }  
+    
+    if (!formulario.fecha.trim()) {
+      erroresTemp.fecha = 'Este campo es obligatorio';
+    }
+    if (!formulario.concepto_pago.trim()) {
+      erroresTemp.concepto_pago = 'Este campo es obligatorio';
+    }else if(!contieneLetras(formulario.concepto_pago)){
+      erroresTemp.concepto_pago = 'Este dato debe contener letras';
+    } 
+     
+    if (!formulario.cuota_ordinaria.trim()) {
+      erroresTemp.cuota_ordinaria = 'Este campo es obligatorio';
+    }else if (!esNumero(formulario.cuota_ordinaria)) {
+      erroresTemp.cuota_ordinaria = 'Este dato debe ser un número';
+    }
+    
+    if (!formulario.concepto_cuota_ordinaria.trim()) {
+      erroresTemp.concepto_cuota_ordinaria = 'Este campo es obligatorio';
+    }else if(!contieneLetras(formulario.concepto_cuota_ordinaria)){
+      erroresTemp.concepto_cuota_ordinaria = 'Este dato debe contener letras';
+    }
+    
+    if (formulario.cuota_penalizacion.trim() !== '') {
+      if(!esNumero(formulario.cuota_penalizacion)){
+        erroresTemp.cuota_penalizacion = 'Este dato debe ser un número';
+      }
+    }  
+    if (formulario.concepto_cuota_penalizacion.trim() !== '') {
+      if (!contieneLetras(formulario.concepto_cuota_penalizacion)) {
+        erroresTemp.concepto_cuota_penalizacion = 'Este dato debe contener letras';
+      }
+    }
+    if(formulario.cuota_extraordinaria.trim() !== ''){
+      if (!esNumero(formulario.cuota_extraordinaria)) {
+        erroresTemp.cuota_extraordinaria = 'Este dato debe ser un número';
+      }
+    }  
+    if (formulario.concepto_cuota_extraordinaria.trim() !== '') {
+      if (!contieneLetras(formulario.concepto_cuota_extraordinaria)) {
+        erroresTemp.concepto_cuota_extraordinaria = 'Este dato debe contener letras';
+      }
+    }
+    if (formulario.cuota_reserva.trim() !== '') {
+      if (!esNumero(formulario.cuota_reserva)) {
+        erroresTemp.cuota_reserva = 'Este dato debe ser un número';
+      }
+    }
+    if (formulario.concepto_cuota_reserva.trim() !== '') {
+      if (!contieneLetras(formulario.concepto_cuota_reserva)) {
+        erroresTemp.concepto_cuota_reserva = 'Este dato debe contener letras';
+      }
+    }  
+    if (formulario.cuota_adeudos.trim() !== '') { 
+      if (!esNumero(formulario.cuota_adeudos)) {
+        erroresTemp.cuota_adeudos = 'Este dato debe ser un número';
+      }
+    }
+    if (formulario.concepto_cuota_adeudos.trim() !== '') {
+      if (!contieneLetras(formulario.concepto_cuota_adeudos)) {
+        erroresTemp.concepto_cuota_adeudos = 'Este dato debe contener letras';
+      }
+    }     
+  
+    setErrores(erroresTemp);
+    return Object.keys(erroresTemp).length === 0; 
+  }
+
+  
+  
+  
 
   let opcionesCondominio;
   if (condominios.length === 0) {
@@ -487,6 +582,7 @@ function NuevoRecibo() {
                       value={formulario.no_recibo}
                       onChange={handleChange}
                     />
+                    <div className="error-message">{errores.no_recibo}</div>
                 </div>
                 <div className='select-item'>
                     <label className='labelInput'>Fecha Del Recibo: </label>
@@ -497,6 +593,7 @@ function NuevoRecibo() {
                       value={formulario.fecha}
                       onChange={handleChange}
                     />
+                    <div className="error-message">{errores.fecha}</div>
                 </div>
             </div>
             
@@ -511,6 +608,7 @@ function NuevoRecibo() {
                       value={formulario.concepto_pago}
                       onChange={handleChange}
                     />
+                    <div className="error-message">{errores.concepto_pago}</div>
                 </div>
                 <div className='select-item'>
                     <label className='labelInput'>Cuota Ordinaria($): </label>
@@ -522,6 +620,7 @@ function NuevoRecibo() {
                       value={formulario.cuota_ordinaria}
                       onChange={handleChange}
                     />
+                    <div className="error-message">{errores.cuota_ordinaria}</div>
                 </div>
                 <div className='select-item'>
                     <label className='labelInput'>Concepto de Cuota Ordinaria: </label>
@@ -533,6 +632,7 @@ function NuevoRecibo() {
                       placeholder="Cuota Ordinaria"
                       onChange={handleChange}
                     />
+                    <div className="error-message">{errores.concepto_cuota_ordinaria}</div>
                 </div>
             </div>
 
@@ -548,6 +648,7 @@ function NuevoRecibo() {
                       value={formulario.cuota_penalizacion}
                       onChange={handleChange}
                     />
+                    <div className="error-message">{errores.cuota_penalizacion}</div>
                 </div>
                 
                 <div className='select-item'>
@@ -560,6 +661,7 @@ function NuevoRecibo() {
                       placeholder="Cuota de Penalizacion"
                       onChange={handleChange}
                     />
+                    <div className="error-message">{errores.concepto_cuota_penalizacion}</div>
                 </div>
                 <div className='select-item'></div>
             </div>
@@ -576,6 +678,7 @@ function NuevoRecibo() {
                       value={formulario.cuota_extraordinaria}
                       onChange={handleChange}
                     />
+                    <div className="error-message">{errores.cuota_extraordinaria}</div>
                 </div>
                 
                 <div className='select-item'>
@@ -588,6 +691,7 @@ function NuevoRecibo() {
                       placeholder="Cuota Extraordinaria"
                       onChange={handleChange}
                     />
+                    <div className="error-message">{errores.concepto_cuota_extraordinaria}</div>
                 </div>
                 <div className='select-item'></div>
             </div>
@@ -604,6 +708,7 @@ function NuevoRecibo() {
                       value={formulario.cuota_reserva}
                       onChange={handleChange}
                     />
+                    <div className="error-message">{errores.cuota_reserva}</div>
                 </div>
                 
                 <div className='select-item'>
@@ -616,6 +721,7 @@ function NuevoRecibo() {
                       placeholder="Cuota de Reserva"
                       onChange={handleChange}
                     />
+                    <div className="error-message">{errores.concepto_cuota_reserva}</div>
                 </div>
                 <div className='select-item'></div>
             </div>
@@ -632,6 +738,7 @@ function NuevoRecibo() {
                       value={formulario.cuota_adeudos}
                       onChange={handleChange}
                     />
+                    <div className="error-message">{errores.cuota_adeudos}</div>
                 </div>
                 
                 <div className='select-item'>
@@ -644,6 +751,7 @@ function NuevoRecibo() {
                       placeholder="Cuota de Adeudos"
                       onChange={handleChange}
                     />
+                    <div className="error-message">{errores.concepto_cuota_adeudos}</div>
                 </div>
                 <div className='select-item'></div>
             </div>
