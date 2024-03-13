@@ -9,7 +9,11 @@ export function useAuth() {
 }
 
 export const AuthProvider = ({ children }) => {
-  const [authToken, setAuthToken] = useState(null);
+  const [authToken, setAuthToken] = useState(() => {
+    // Intenta obtener el token del localStorage
+    const localData = localStorage.getItem('authData');
+    return localData ? JSON.parse(localData).token : null;
+  });
 
   // Función para iniciar sesión y guardar el token
   const login = (token, id) => {
@@ -21,6 +25,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setAuthToken(null);
     localStorage.removeItem('authData');
+    localStorage.removeItem('authToken');
   };
 
   

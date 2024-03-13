@@ -142,7 +142,11 @@ function NuevoRecibo() {
       })
       .catch(error => {
         console.log(error);
-        alert('Error al obtener los condominios');
+        if (error.response && error.response.status === 404) {   
+          ///
+        } else {
+          alert('Error al obtener los condominios');
+        }
       });
   }, []);
   

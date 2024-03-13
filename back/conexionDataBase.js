@@ -9,7 +9,8 @@ const app = express();
 const jwt = require('jsonwebtoken');
 const secretKey = 'tu_clave_secreta';
 
-
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 app.use(cors());
 
@@ -212,7 +213,7 @@ app.post('/api/registrarCuenta', (req, res) => {
   connection.query(
     'SELECT correo_administrador FROM administrador WHERE correo_administrador = ?',
     [correo_administrador],
-    (error, results) => {
+    async (error, results) => {
       if (error) {
         console.error(error);
         return res.status(500).send('Error al verificar el correo electrónico');
@@ -221,9 +222,10 @@ app.post('/api/registrarCuenta', (req, res) => {
       if (results.length > 0) {
         return res.status(400).send('Ya existe una cuenta con el correo electrónico registrado');
       }
+      const hasheo = await bcrypt.hash(contraseña_administrador, saltRounds);
 
       const sql = `INSERT INTO administrador (nombre_administrador, apellido_paterno_administrador, apellido_materno_administrador, correo_administrador, contraseña_administrador) VALUES (?, ?, ?, ?, ?)`;
-      const values = [nombre_administrador, apellido_paterno_administrador, apellido_materno_administrador, correo_administrador, contraseña_administrador];
+      const values = [nombre_administrador, apellido_paterno_administrador, apellido_materno_administrador, correo_administrador, hasheo];
 
       connection.query(sql, values, error => {
         if (error) {
@@ -517,20 +519,31 @@ app.post('/api/getAdmin', (req, res) => {
   console.log(req.body);
   const { correo_administrador, contraseña_administrador } = req.body;
   connection.query(
-    'SELECT * FROM administrador WHERE correo_administrador = ? AND contraseña_administrador = ?',
-    [correo_administrador, contraseña_administrador],
+    'SELECT * FROM administrador WHERE correo_administrador = ?',
+    [correo_administrador],
     (error, results) => {
       if (error) {
         console.error(error);
         res.status(500).send('Error al obtener los registros');
+      } else if (results.length === 1) {
+        // Usuario encontrado, ahora compara la contraseña
+        const user = results[0];
+        bcrypt.compare(contraseña_administrador, user.contraseña_administrador, (error, isMatch) => {
+          if (error) {
+            console.error(error);
+            res.status(500).send('Error al verificar la contraseña');
+          } else if (isMatch) {
+            // Las contraseñas coinciden, procede con el inicio de sesión
+            const token = jwt.sign({ correo_administrador }, secretKey, { expiresIn: '5m' });
+            res.json({ token, id_administrador: user.id_administrador });
+          } else {
+            // Las contraseñas no coinciden
+            res.status(401).send('Correo o contraseña incorrectos');
+          }
+        });
       } else {
-        console.log(results.length);
-        if (results.length === 1) {
-          const token = jwt.sign({ correo_administrador }, secretKey, { expiresIn: '5m' });
-          res.json({ token, id_administrador: results[0].id_administrador});
-        } else {
-          res.status(401).send('Correo o contraseña incorrectos');
-        }
+        // Usuario no encontrado
+        res.status(404).send('Usuario no encontrado');
       }
     }
   );

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logo from '../img/logo2.png';
@@ -20,6 +20,16 @@ function Formulario() {
     const [errorCorreo, setErrorCorreo] = useState('');
     const [errorContraseña, setErrorContraseña] = useState('');
     const [errorCuenta, setErrorCuenta] = useState('');
+
+    useEffect(() => {
+      const localData = localStorage.getItem('authData');
+      if (localData) {
+          const { token } = JSON.parse(localData);
+          if (token) {
+              navigate('/MenuPrincipal'); 
+          }
+        }
+    }, [navigate]);
 
     const handleChange = event => {
       const { name, value } = event.target;
