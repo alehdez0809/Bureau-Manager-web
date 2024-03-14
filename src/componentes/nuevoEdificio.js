@@ -11,21 +11,29 @@ function NuevoEdificio() {
   });
   const [visible, setVisible] = useState(false);
   const [condominios, setCondominios] = useState([]);
+  const [error, setError] = useState('');
+  const [errorEdificio, setErrorEdificio] = useState('');
 
   useEffect(() => {
     const authData = JSON.parse(localStorage.getItem('authData'));
     const id_administrador = parseInt(authData?.id);
     axios.get(`http://localhost:4000/api/getCondominios/${id_administrador}`)
       .then(response => {
-        setCondominios(response.data);
-        setFormulario({
-          id_condominio: response.data[0].id_condominio
-        });
+        if (response.data.length > 0){
+          setCondominios(response.data);
+          setFormulario(prevState => ({
+            ...prevState,
+            id_condominio: response.data[0].id_condominio
+          }));
+        }else{
+          setError('Debes registrar antes un condominio');
+        }      
       })
       .catch(error => {
         console.log(error);
         if (error.response && error.response.status === 404) {   
           ///
+          setError('Debes registrar antes un condominio');
         } else {
           alert('Error al obtener los condominios');
         }
@@ -49,20 +57,32 @@ function NuevoEdificio() {
     const selectedCondominio = condominios.find(c => c.id_condominio === elegido);
 
     if (selectedCondominio) {
+      setError('');
       setFormulario(prevState => ({
         ...prevState,
         id_condominio: selectedCondominio.id_condominio
       }));
+    }else{
+      setError('Debes registrar antes un condominio');
     }
   };
 
 
   const handleSubmit = async event => {
     event.preventDefault();
+    if (formulario.id_condominio === '' || formulario.id_condominio === 'Defecto') {
+      setError('Debes registrar antes un condominio');
+      return;
+    }
+    if (formulario.nombre_edificio.trim() === '') {
+      setErrorEdificio('Ingrese un nombre para el edificio');
+      return;
+    }
     try {
       const resultado = await axios.post('http://localhost:4000/api/registrarEdificio', formulario);
       if (resultado.data === 200) {
         setVisible(true);
+        setError('');
       } else {
         alert(resultado.data);
       }
@@ -82,6 +102,7 @@ function NuevoEdificio() {
                 {opciones}
               </select>
             </div>
+            <div className="error-message">{error}</div>
             <div class="form-group">
               <label className='labelInput'>Nombre del Edificio: </label>
               <input
@@ -92,6 +113,7 @@ function NuevoEdificio() {
                 value={formulario.nombre_edificio}
                 onChange={handleChange}
               />
+              <div className="error-message">{errorEdificio}</div>
             </div>
             <div className="botones-container">
               <Link to="/EdicionyRegistro">

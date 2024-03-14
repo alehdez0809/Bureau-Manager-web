@@ -538,16 +538,17 @@ app.post('/api/getAdmin', (req, res) => {
         console.error(error);
         res.status(500).send('Error al obtener los registros');
       } else if (results.length === 1) {
-        // Usuario encontrado, ahora compara la contraseña
+       
         const user = results[0];
         bcrypt.compare(contraseña_administrador, user.contraseña_administrador, (error, isMatch) => {
           if (error) {
             console.error(error);
             res.status(500).send('Error al verificar la contraseña');
           } else if (isMatch) {
-            // Las contraseñas coinciden, procede con el inicio de sesión
+            
             const token = jwt.sign({ correo_administrador }, secretKey, { expiresIn: '5m' });
             res.json({ token, id_administrador: user.id_administrador });
+            ///res.json({ id_administrador: user.id_administrador });
           } else {
             // Las contraseñas no coinciden
             res.status(401).send('Correo o contraseña incorrectos');

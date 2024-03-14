@@ -14,19 +14,27 @@ function EditoEdificio() {
 
   const [condominios, setCondominios] = useState([]);
   const [idCondominioSeleccionado, setIdCondominioSeleccionado] = useState(null);
+  const [error, setError] = useState('');
+  const [errorEdificio, setErrorEdificio] = useState('');
+  const [errorDepa, setErrorDepa] = useState('');
 
   useEffect(() => {
     const authData = JSON.parse(localStorage.getItem('authData'));
     const id_administrador = parseInt(authData?.id);
     axios.get(`http://localhost:4000/api/getCondominios/${id_administrador}`)
       .then(resultado => {
-        setCondominios(resultado.data);
-        setIdCondominioSeleccionado(resultado.data[0]?.id_condominio);
+        if(resultado.data.length > 0){
+          setCondominios(resultado.data);
+          setIdCondominioSeleccionado(resultado.data[0]?.id_condominio);
+        }else{
+          setError('Debes registrar antes un condominio');
+        }
+        
       })
       .catch(error => {
         console.error(error);
         if (error.response && error.response.status === 404) {   
-          ///
+          setError('Debes registrar antes un condominio');
         } else {
           alert('Error al obtener los condominios');
         }
@@ -57,10 +65,16 @@ function EditoEdificio() {
     if (idCondominioSeleccionado) {
       axios.post('http://localhost:4000/api/getEdificiosbyCondominio', { id_condominio: idCondominioSeleccionado })
         .then(resultado => {
-          setEdificios(resultado.data);
-          setFormulario({
-            id_edificio: resultado.data[0]?.id_edificio
-          });
+          if(resultado.data.length > 0){
+            setEdificios(resultado.data);
+            setFormulario(prevState =>({
+              ...prevState,
+              id_edificio: resultado.data[0]?.id_edificio
+            }));
+          }else{
+            setErrorEdificio('Debes registrar antes un edificio');
+          }  
+          
         })
         .catch(error => {
           console.error(error);
@@ -80,6 +94,7 @@ function EditoEdificio() {
     const selectedEdificio = edificios.find(c => c.id_edificio === elegido);
 
     if (selectedEdificio) {
+      setErrorEdificio('');
       setFormulario(prevState => ({
         ...prevState,
         id_edificio: selectedEdificio.id_edificio
@@ -93,6 +108,18 @@ function EditoEdificio() {
 
   const handleSubmit = async event => {
     event.preventDefault();
+    if(formulario.id_edificio === '' || formulario.id_edificio === 'Defecto'){
+      setErrorEdificio('Debes registrar antes un edificio');
+      return;
+    }
+    if (formulario.id_condominio === '' || formulario.id_condominio === 'Defecto') {
+      setError('Debes registrar antes un condominio');
+      return;
+    }
+    if(formulario.numero_departamento.trim() === ''){
+      setErrorDepa('Ingrese un nombre/numero del departamento');
+      return;
+    }
     try {
       const resultado = await axios.post('http://localhost:4000/api/registrarDepartamento', formulario);
       if (resultado.data === 200) {
@@ -129,6 +156,7 @@ function EditoEdificio() {
               <select id="condominios" onChange={handleChangeSelectCondominios}>
                 {opcionesCondominio}
               </select>
+              <div className='error-message'>{error}</div>
             </div> 
             <br></br>
             <div class="form-group">
@@ -136,6 +164,7 @@ function EditoEdificio() {
             <select id="opciones" onChange={handleChangeSelectEdificios}>
                 {opcionesEdificio}
               </select>
+              <div className='error-message'>{errorEdificio}</div>
             </div>
             <br></br>
             <div class="form-group">
@@ -148,6 +177,7 @@ function EditoEdificio() {
                 value={formulario.numero_departamento}
                 onChange={handleChange}
               />
+              <div className='error-message'>{errorDepa}</div>
             </div>
             <div className="botones-container">
               <Link to="/EdicionyRegistro">

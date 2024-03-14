@@ -13,6 +13,9 @@ function EditoEdificio() {
 
   const [condominios, setCondominios] = useState([]);
   const [edificios, setEdificios] = useState([]);
+  const [error, setError] = useState('');
+  const [errorEdificio, setErrorEdificio] = useState('');
+  const [errorEdificio2, setErrorEdificio2] = useState('');
 
 
   useEffect(() => {
@@ -23,11 +26,14 @@ function EditoEdificio() {
         if(response.data.length === 0){
           setFormulario({
             id_condominio: 0
-        });}else{
+        });}else if(response.data.length > 0){
           setCondominios(response.data);
-          setFormulario({
+          setFormulario(prevState => ({
+            ...prevState,
             id_condominio: response.data[0].id_condominio
-          });
+          }));
+        }else{
+          setError('Debes registrar antes un condominio');
         }
   
         // Mueve el segundo axios.get() dentro del then() del primer axios.get()
@@ -42,12 +48,15 @@ function EditoEdificio() {
                 id_edificio: 0,
                 nombre_edificio: "",
               });
-            } else {
+            } else if (resultado.data.length > 0) {
               setEdificios(resultado.data);
-              setFormulario({
+              setFormulario(prevState =>({
+                ...prevState,
                 id_edificio: resultado.data[0].id_edificio,
                 nombre_edificio: resultado.data[0].nombre_edificio,
-              });
+              }));
+            }else{
+              setErrorEdificio('Debes registrar antes un edificio');
             }
           })
           .catch(error => {
@@ -59,7 +68,7 @@ function EditoEdificio() {
       .catch(error => {
         console.log(error);
         if (error.response && error.response.status === 404) {
-          ///
+          setError('Debes registrar antes un condominio');
         } else {
           alert('Error al obtener los condominios');
         }
@@ -77,6 +86,7 @@ function EditoEdificio() {
     const selectedCondominio = condominios.find(c => c.id_condominio === elegido);
 
     if (selectedCondominio) {
+        setError('');
         const diccionario = {};
         diccionario['id_condominio'] = selectedCondominio.id_condominio;
   
@@ -88,12 +98,15 @@ function EditoEdificio() {
                 id_edificio: 0,
                 nombre_edificio: "",
               });
-            } else {
+            } else if (resultado.data.length > 0){
               setEdificios(resultado.data);
-              setFormulario({
+              setFormulario(prevState => ({
+                ...prevState,
                 id_edificio: resultado.data[0].id_edificio,
                 nombre_edificio: resultado.data[0].nombre_edificio,
-              });
+              }));
+            }else{
+              setErrorEdificio('Debes registrar antes un edificio');
             }
           })
           .catch(error => {
@@ -113,6 +126,7 @@ function EditoEdificio() {
     const selectedEdificio = edificios.find(c => c.id_edificio === elegido);
 
     if (selectedEdificio) {
+      setErrorEdificio('');
       setFormulario(prevState => ({
         ...prevState,
         id_edificio: selectedEdificio.id_edificio,
@@ -123,6 +137,18 @@ function EditoEdificio() {
 
   const handleSubmit = async event => {
     event.preventDefault();
+    if (formulario.id_condominio === '' || formulario.id_condominio === 'Defecto') {
+      setError('Debes registrar antes un condominio');
+      return;
+    }
+    if (formulario.id_edificio === '' || formulario.id_edificio === 'Defecto') {
+      setErrorEdificio('Debes registrar antes un edificio');
+      return;
+    }
+    if (formulario.nombre_edificio.trim() === '') {
+      setErrorEdificio2('Debes ingresar un nombre para el edificio');
+      return;
+    }
     try {
       const resultado = await axios.post('http://localhost:4000/api/actualizarEdificio', formulario);
       if (resultado.data === 200) {
@@ -162,12 +188,14 @@ function EditoEdificio() {
             <select id="opciones" onChange={handleChangeSelect}>
                 {opcionesCondominio}
               </select>
+            <div className='error-message'>{error}</div>  
             </div>
             <div class="form-group">
             <label className='labelInput'>Seleccione un Edificio: </label>
             <select id="opciones" onChange={handleChangeSelectEdificios}>
                 {opcionesEdificio}
               </select>
+            <div className='error-message'>{errorEdificio}</div>    
             </div>
             <div class="form-group">
               <label className='labelInput'>Nombre del Edificio: </label>
@@ -179,6 +207,7 @@ function EditoEdificio() {
                 value={formulario.nombre_edificio}
                 onChange={handleChange}
               />
+            <div className='error-message'>{errorEdificio2}</div>
             </div>
             <div className="botones-container">
               <Link to="/EdicionyRegistro">

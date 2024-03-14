@@ -21,6 +21,14 @@ function EditoInquilino() {
   const [condominios, setCondominios] = useState([]);
   const [edificios, setEdificios] = useState([]);
   const [inquilinos, setInquilinos] = useState([]);
+  
+  const [error, setError] = useState('');
+  const [errorEdificio, setErrorEdificio] = useState('');
+  const [errorDepartamento, setErrorDepartamento] = useState('');
+  const [errorInquilino, setErrorInquilino] = useState('');
+  const [errorNombre, setErrorNombre] = useState('');
+  const [errorApellidoP, setErrorApellidoP] = useState('');
+  const [errorApellidoM, setErrorApellidoM] = useState('');
 
   useEffect(() => {
     const authData = JSON.parse(localStorage.getItem('authData'));
@@ -135,7 +143,11 @@ function EditoInquilino() {
       })
       .catch(error => {
         console.log(error);
-        alert('Error al obtener los condominios');
+        if (error.response && error.response.status === 404) {   
+          ///
+        } else {
+          alert('Error al obtener los condominios');
+        }
       });
   }, []);
   
@@ -376,6 +388,35 @@ function EditoInquilino() {
 
   const handleSubmit = async event => {
     event.preventDefault();
+    if(formulario.id_condominio === '' || formulario.id_condominio === 'Defecto'){
+      setError('Debe tener al menos un condominio registrado');
+      return;
+    }  
+    if(formulario.id_edificio === '' || formulario.id_edificio === 'Defecto'){
+      setErrorEdificio('Debe tener al menos un edificio registrado');
+      return;
+    }
+    if(formulario.id_departamento === '' || formulario.id_departamento === 'Defecto'){
+      setErrorDepartamento('Debe tener al menos un departamento registrado');
+      return;
+    }
+    if(formulario.id_inquilino === '' || formulario.id_inquilino === 'Defecto'){
+      setErrorInquilino('Debe tener al menos un inquilino registrado');
+      return;
+    }  
+    if(!formulario.nombre_inquilino || formulario.nombre_inquilino.trim() === ''){
+      setErrorNombre('Debe ingresar un nombre');
+      return;
+    }
+    if(!formulario.apellino_paterno_inquilino || formulario.apellino_paterno_inquilino.trim() === ''){
+      setErrorApellidoP('Debe ingresar un apellido paterno'); 
+      return;
+    }
+    if(!formulario.apellino_materno_inquilino || formulario.apellino_materno_inquilino.trim() === ''){
+      setErrorApellidoM('Debe ingresar un apellido materno');
+      return;
+    }
+
     try {
       const resultado = await axios.post('http://localhost:4000/api/actualizarInquilino', formulario);
       if (resultado.data === 200) {
@@ -436,18 +477,21 @@ function EditoInquilino() {
                 <select id="opciones" onChange={handleChangeSelect}>
                   {opcionesCondominio}
                 </select>
+                <div className='error-message'>{error}</div>
                 </div>
             <div className='select-item'>
                 <label className='labelInput'>Seleccione un Edificio: </label>
                 <select id="opciones" onChange={handleChangeSelectEdificios}>
                     {opcionesEdificio}
                   </select>
+                  <div className='error-message'>{errorEdificio}</div>
             </div>
             <div className='select-item'>
                 <label className='labelInput'>Seleccione un Departamento: </label>
                 <select id="opciones" onChange={handleChangeSelectDepartamentos}>
                 {opcionesDepartamento}
               </select>
+              <div className='error-message'>{errorDepartamento}</div>
             </div>
             </div>
             <div className='select-container'>
@@ -456,6 +500,7 @@ function EditoInquilino() {
                     <select id="opciones" onChange={handleChangeSelectInquilino}>
                       {opcionesInquilino}
                     </select>
+                    <div className='error-message'>{errorInquilino}</div>
                 </div>
             </div>
             <div className='select-container'>
@@ -469,6 +514,7 @@ function EditoInquilino() {
                       value={formulario.nombre_inquilino}
                       onChange={handleChange}
                     />
+                    <div className='error-message'>{errorNombre}</div>
                 </div>
                 <div className='select-item'>
                     <label className='labelInput'>Apellido Paterno: </label>
@@ -480,6 +526,7 @@ function EditoInquilino() {
                       value={formulario.apellino_paterno_inquilino}
                       onChange={handleChange}
                     />
+                    <div className='error-message'>{errorApellidoP}</div>
                 </div>
                 <div className='select-item'>
                     <label className='labelInput'>Apellido Materno: </label>
@@ -491,6 +538,7 @@ function EditoInquilino() {
                       value={formulario.apellino_materno_inquilino}
                       onChange={handleChange}
                     />
+                    <div className='error-message'>{errorApellidoM}</div>
                 </div>
             </div>
             <div className='select-container'>
@@ -500,7 +548,7 @@ function EditoInquilino() {
                       type="email"
                       id="correo_inquilino"
                       name="correo_inquilino"
-                      placeholder="Correo Materno"
+                      placeholder="Correo electrónico"
                       value={formulario.correo_inquilino}
                       onChange={handleChange}
                     />

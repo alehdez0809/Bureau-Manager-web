@@ -18,6 +18,7 @@ import MenuInquilino from "./componentes/menuInquilino.js";
 import EditoInquilino from "./componentes/edicionInquilino.js";
 import NuevoRecibo from "./componentes/nuevoRecibo.js";
 import VerRecibo from "./componentes/verRecibos.js";
+import Verificacion from "./componentes/verificacion.js";
 
 
 function PrivateRoute({ children }) {
@@ -47,6 +48,7 @@ function App() {
           <Route path="/EditoInquilino" element={<PrivateRoute> <EditoInquilino /> </PrivateRoute>}  />
           <Route path="/NuevoRecibo" element={<PrivateRoute> <NuevoRecibo /> </PrivateRoute>}  />
           <Route path="/VerRecibo" element={<PrivateRoute> <VerRecibo /> </PrivateRoute>}  />
+          <Route path="/Verificacion" element={<Verificacion />}  />
         </Routes>
       </Router>
     </AuthProvider>  

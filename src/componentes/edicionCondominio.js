@@ -15,6 +15,8 @@ function EditoCondominio() {
   const [errorNombre, setErrorNombre] = useState('');
   const [errorDireccion, setErrorDireccion] = useState('');
 
+  const [error, setError] = useState('');
+
 
   const authData = JSON.parse(localStorage.getItem('authData'));
   const id_administrador = parseInt(authData?.id);
@@ -23,13 +25,17 @@ function EditoCondominio() {
     if (id_administrador) {
       axios.get(`http://localhost:4000/api/getCondominios/${id_administrador}`)
         .then(response => {
-          setCondominios(response.data);
+          
           if (response.data.length > 0) {
-            setFormulario({
+            setCondominios(response.data);
+            setFormulario(prevState => ({
+              ...prevState,
               id_condominio: response.data[0].id_condominio,
               nombre_condominio: response.data[0].nombre_condominio,
               direccion_condominio: response.data[0].direccion_condominio
-            });
+            }));
+          }else{
+            setError('Debes registrar antes un condominio');
           }
         })
         .catch(error => {
@@ -38,6 +44,7 @@ function EditoCondominio() {
           if (error.response && error.response.status === 404) {
             
             ///
+            setError('Debes registrar antes un condominio');
           } else {
             
             alert('Error al obtener los condominios');
@@ -81,18 +88,25 @@ function EditoCondominio() {
     const selectedCondominio = condominios.find(c => c.id_condominio === elegido);
 
     if (selectedCondominio) {
+      setError('');
       setFormulario(prevState => ({
         ...prevState,
         id_condominio: selectedCondominio.id_condominio,
         nombre_condominio: selectedCondominio.nombre_condominio,
         direccion_condominio: selectedCondominio.direccion_condominio
       }));
+    }else{
+      setError('Debes registrar antes un condominio');
     }
   };
 
 
   const handleSubmit = async event => {
     event.preventDefault();
+    if (formulario.id_condominio === '' || formulario.id_condominio === 'Defecto') {
+      setError('Debes registrar antes un condominio');
+      return;
+    }
     if (formulario.nombre_condominio.trim() === '') {
       setErrorNombre('*Ingrese un nombre de condominio');
     }
@@ -122,6 +136,7 @@ function EditoCondominio() {
             <select id="opciones" onChange={handleChangeSelect}>
                 {opciones}
               </select>
+            <div className='error-message'>{error}</div>  
             </div>
             <div class="form-group">
               <label className='labelInput'>Nombre del condominio: </label>

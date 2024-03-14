@@ -16,6 +16,10 @@ function EditoDepartamento() {
 
   const [condominios, setCondominios] = useState([]);
   const [idCondominioSeleccionado, setIdCondominioSeleccionado] = useState('');
+  const [error, setError] = useState('');
+  const [errorEdificio, setErrorEdificio] = useState('');
+  const [errorDepartamento, setErrorDepartamento] = useState('');
+  const [errorDepartamento2, setErrorDepartamento2] = useState('');
 
   useEffect(() => {
     const authData = JSON.parse(localStorage.getItem('authData'));
@@ -25,12 +29,14 @@ function EditoDepartamento() {
         setCondominios(resultado.data);
         if (resultado.data.length > 0) {
           setIdCondominioSeleccionado(resultado.data[0].id_condominio);
+        }else{
+          setError('Debes registrar antes un condominio');
         }
       })
       .catch(error => {
         console.error(error);
         if (error.response && error.response.status === 404) {   
-          ///
+          setError('Debes registrar antes un condominio');
         } else {
           alert('Error al obtener los condominios');
         }
@@ -49,7 +55,7 @@ function EditoDepartamento() {
             
             cargarDepartamentos(response.data[0].id_edificio);
           } else {
-          
+            setErrorEdificio('Debes registrar antes un edificio');
             setDepartamentos([]);
             setFormulario(prev => ({ ...prev, id_edificio: '', id_departamento: '', nombre_departamento: '' }));
           }
@@ -72,7 +78,7 @@ function EditoDepartamento() {
             nombre_departamento: resultado.data[0].numero_departamento,
           }));
         } else {
-          // Manejo de no resultados
+          setErrorDepartamento('Debes registrar antes un departamento');
           setFormulario(prev => ({
             ...prev,
             id_departamento: '',
@@ -112,6 +118,7 @@ function EditoDepartamento() {
     const selectedDepartamento = departamentos.find(c => c.id_departamento === elegido);
 
     if (selectedDepartamento) {
+      setErrorDepartamento('');
       setFormulario(prevState => ({
         ...prevState,
         id_departamento: selectedDepartamento.id_departamento,
@@ -122,6 +129,22 @@ function EditoDepartamento() {
 
   const handleSubmit = async event => {
     event.preventDefault();
+    if (formulario.id_edificio === '' || formulario.id_edificio === 'Defecto') {
+      setErrorEdificio('*Seleccione un edificio');
+      return;
+    }
+    if (formulario.id_departamento === '' || formulario.id_departamento === 'Defecto') {
+      setErrorDepartamento('*Seleccione un departamento');
+      return;
+    }
+    if (formulario.id_condominio === '' || formulario.id_condominio === 'Defecto') {
+      setError('Debes registrar antes un condominio');
+      return;
+    }
+    if (formulario.nombre_departamento.trim() === '') {
+      setErrorDepartamento2('Ingrese un nombre/número para el departamento');
+      return;
+    }
     try {
       const resultado = await axios.post('http://localhost:4000/api/actualizarDepartamento', formulario);
       if (resultado.data === 200) {
@@ -170,18 +193,21 @@ function EditoDepartamento() {
               <select id="opcionesCondominio" onChange={handleChangeSelectCondominio} value={idCondominioSeleccionado}>
                 {opcionesCondominio}
               </select>
+              <div className='error-message'>{error}</div>
             </div>
             <div class="form-group">
             <label className='labelInput'>Seleccione un Edificio: </label>
             <select id="opciones" onChange={handleChangeSelect}>
                 {opcionesEdificio}
               </select>
+              <div className='error-message'>{errorEdificio}</div>
             </div>
             <div class="form-group">
             <label className='labelInput'>Seleccione un Departamento: </label>
             <select id="opciones" onChange={handleChangeSelectDepartamentos}>
                 {opcionesDepartamento}
               </select>
+              <div className='error-message'>{errorDepartamento}</div>
             </div>
             <div class="form-group">
               <label className='labelInput'>Nombre/Numero del Departamento: </label>
@@ -193,6 +219,7 @@ function EditoDepartamento() {
                 value={formulario.nombre_departamento}
                 onChange={handleChange}
               />
+              <div className='error-message'>{errorDepartamento2}</div>
             </div>
             <div className="botones-container">
               <Link to="/EdicionyRegistro">
