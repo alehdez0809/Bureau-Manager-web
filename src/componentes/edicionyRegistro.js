@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from '../css/styles2.css';
 import { Link } from 'react-router-dom';
 
 function EdicionyRegistro() {
+    useEffect(() => {
+        document.body.classList.add('body1');
+
+        return () => {
+            document.body.classList.remove('body1');
+        };
+    }, []);
     return (
           <form >
             <h1>Edicion y Registro</h1>

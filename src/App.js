@@ -19,6 +19,7 @@ import EditoInquilino from "./componentes/edicionInquilino.js";
 import NuevoRecibo from "./componentes/nuevoRecibo.js";
 import VerRecibo from "./componentes/verRecibos.js";
 import Verificacion from "./componentes/verificacion.js";
+import Layout from "./componentes/Layout.js";
 
 
 function PrivateRoute({ children }) {
@@ -32,24 +33,27 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
-          <Route path="/" element={<Formulario />}  />
-          <Route path="/RegistrarCuenta" element={<RegistrarCuenta />}  />
-          <Route path="/MenuPrincipal" element={<PrivateRoute> <MenuInicial /></PrivateRoute>}  />
-          <Route path="/EdicionyRegistro" element={<PrivateRoute> <EdicionyRegistro /> </PrivateRoute>}  />
-          <Route path="/NuevoCondominio" element={<PrivateRoute> <NuevoCondominio /> </PrivateRoute>}  />
-          <Route path="/EditoCondominio" element={<PrivateRoute> <EditoCondominio /> </PrivateRoute>}  />
-          <Route path="/NuevoEdificio" element={<PrivateRoute> <NuevoEdificio /> </PrivateRoute>}  />
-          <Route path="/EditoEdificio" element={<PrivateRoute> <EditoEdificio /> </PrivateRoute>}  />
-          <Route path="/NuevoDepartamento" element={<PrivateRoute> <NuevoDepartamento /> </PrivateRoute>}  />
-          <Route path="/EditoDepartamento" element={<PrivateRoute> <EditoDepartamento /> </PrivateRoute>}  />
-          <Route path="/NuevoInquilino" element={<PrivateRoute> <NuevoInquilino /> </PrivateRoute>}  />
-          <Route path="/MenuInquilino" element={<PrivateRoute> <MenuInquilino /> </PrivateRoute>}  />
-          <Route path="/EditoInquilino" element={<PrivateRoute> <EditoInquilino /> </PrivateRoute>}  />
-          <Route path="/NuevoRecibo" element={<PrivateRoute> <NuevoRecibo /> </PrivateRoute>}  />
-          <Route path="/VerRecibo" element={<PrivateRoute> <VerRecibo /> </PrivateRoute>}  />
-          <Route path="/Verificacion" element={<Verificacion />}  />
-        </Routes>
+
+          <Routes>
+            <Route path="/" element={<Formulario />}  />
+            <Route path="/RegistrarCuenta" element={<RegistrarCuenta />}  />
+            <Route path="/MenuPrincipal" element={<PrivateRoute> <Layout><MenuInicial /></Layout></PrivateRoute>}  />
+            <Route path="/EdicionyRegistro" element={<PrivateRoute> <Layout><EdicionyRegistro /></Layout> </PrivateRoute>}  />
+            <Route path="/NuevoCondominio" element={<PrivateRoute> <Layout><NuevoCondominio /> </Layout></PrivateRoute>}  />
+            <Route path="/EditoCondominio" element={<PrivateRoute> <Layout><EditoCondominio /> </Layout></PrivateRoute>}  />
+            <Route path="/NuevoEdificio" element={<PrivateRoute> <Layout><NuevoEdificio /> </Layout></PrivateRoute>}  />
+            <Route path="/EditoEdificio" element={<PrivateRoute> <Layout><EditoEdificio /> </Layout></PrivateRoute>}  />
+            <Route path="/NuevoDepartamento" element={<PrivateRoute> <Layout><NuevoDepartamento /> </Layout></PrivateRoute>}  />
+            <Route path="/EditoDepartamento" element={<PrivateRoute> <Layout><EditoDepartamento /> </Layout></PrivateRoute>}  />
+            <Route path="/NuevoInquilino" element={<PrivateRoute> <Layout><NuevoInquilino /> </Layout></PrivateRoute>}  />
+            <Route path="/MenuInquilino" element={<PrivateRoute> <Layout><MenuInquilino /> </Layout></PrivateRoute>}  />
+            <Route path="/EditoInquilino" element={<PrivateRoute> <Layout><EditoInquilino /> </Layout></PrivateRoute>}  />
+            <Route path="/NuevoRecibo" element={<PrivateRoute> <Layout><NuevoRecibo /></Layout> </PrivateRoute>}  />
+            <Route path="/VerRecibo" element={<PrivateRoute> <Layout><VerRecibo /></Layout> </PrivateRoute>}  />
+            <Route path="/Verificacion" element={<Verificacion />}  />
+            
+          </Routes>
+      
       </Router>
     </AuthProvider>  
   );

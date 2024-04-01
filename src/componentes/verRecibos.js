@@ -27,6 +27,11 @@ function VerRecibo() {
         console.log(error);
         alert('Error al obtener los recibos');
       });
+        document.body.classList.add('body1');
+
+        return () => {
+            document.body.classList.remove('body1');
+        };
   }, []);
   
 
@@ -110,7 +115,7 @@ function VerRecibo() {
 ));
   }
     return (
-        <div className='div-contenedor '>
+        <div className='div-contenedor div-espaciado'>
           <form className="fromRecibo" onSubmit={handleSubmit}>
             <h2>Seleccione los Recibos a enviar</h2>
 

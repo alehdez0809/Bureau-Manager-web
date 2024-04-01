@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
@@ -18,6 +18,14 @@ function NuevoCondominio() {
   const [errorContraseña, setErrorContraseña] = useState('');
 
   const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    document.body.classList.add('body1');
+
+    return () => {
+        document.body.classList.remove('body1');
+    };
+}, []);
 
   const handleChange = event => {
     const { name, value } = event.target;

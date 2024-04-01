@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Link , useNavigate} from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 
@@ -10,6 +10,13 @@ function MenuInicial() {
         logout(); 
         navigate("/"); 
     };
+    useEffect(() => {
+        document.body.classList.add('body1');
+
+        return () => {
+            document.body.classList.remove('body1');
+        };
+    }, []);
     return (
           <form className='fromMenu'>
             <h1>Menu Principal</h1>

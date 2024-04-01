@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 function MenuInquilino() {
+    useEffect(() => {
+        document.body.classList.add('body1');
+
+        return () => {
+            document.body.classList.remove('body1');
+        };
+    }, []);
     return (
           <form >
             <h1>Administrar Inquilino</h1>

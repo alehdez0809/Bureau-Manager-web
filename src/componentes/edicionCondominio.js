@@ -51,6 +51,13 @@ function EditoCondominio() {
           }
         });
     }
+
+      document.body.classList.add('body1');
+
+      return () => {
+          document.body.classList.remove('body1');
+      };
+
   }, [id_administrador]);
   
 

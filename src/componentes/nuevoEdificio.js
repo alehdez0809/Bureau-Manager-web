@@ -38,6 +38,12 @@ function NuevoEdificio() {
           alert('Error al obtener los condominios');
         }
       });
+        document.body.classList.add('body1');
+
+        return () => {
+            document.body.classList.remove('body1');
+        };
+
   }, []);
 
   const handleChange = event => {

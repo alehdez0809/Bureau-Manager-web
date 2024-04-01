@@ -29,6 +29,13 @@ function Formulario() {
               navigate('/MenuPrincipal'); 
           }
         }
+
+          document.body.classList.add('body1');
+  
+          return () => {
+              document.body.classList.remove('body1');
+          };
+
     }, [navigate]);
 
     const handleChange = event => {
