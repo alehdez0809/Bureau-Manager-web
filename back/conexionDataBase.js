@@ -297,7 +297,7 @@ app.post('/api/registrarInquilino', (req, res) => {
 app.post('/api/registrarRecibo', (req, res) => {
   console.log("-------------------------------")
   console.log(req.body);
-  const { id_condominio, id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, concepto_pago, cuota_ordinaria, concepto_cuota_ordinaria, cuota_penalizacion, concepto_cuota_penalizacion, cuota_extraordinaria, concepto_cuota_extraordinaria, cuota_reserva, concepto_cuota_reserva, cuota_adeudos, concepto_cuota_adeudos, total_pagar, id_administrador } = req.body;
+  const { id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, concepto_pago, cuota_ordinaria, concepto_cuota_ordinaria, cuota_penalizacion, concepto_cuota_penalizacion, cuota_extraordinaria, concepto_cuota_extraordinaria, cuota_reserva, concepto_cuota_reserva, cuota_adeudos, concepto_cuota_adeudos, total_pagar, id_administrador } = req.body;
   const nombre_completo_inquilinoAES = CryptoJS.AES.encrypt(nombre_completo_inquilino, secretKeyAES).toString();
   const no_reciboAES = CryptoJS.AES.encrypt(no_recibo, secretKeyAES).toString();
   const cuota_ordinariaAES = CryptoJS.AES.encrypt(cuota_ordinaria, secretKeyAES).toString();
@@ -305,9 +305,9 @@ app.post('/api/registrarRecibo', (req, res) => {
   const cuota_penalizacionAES = CryptoJS.AES.encrypt(cuota_penalizacion, secretKeyAES).toString();
   const cuota_reservaAES = CryptoJS.AES.encrypt(cuota_reserva, secretKeyAES).toString();
   const cuota_adeudosAES = CryptoJS.AES.encrypt(cuota_adeudos, secretKeyAES).toString();
-  const sql = `INSERT INTO reciboCompleto (id_condominio, id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, concepto_pago, cuota_ordinaria, concepto_cuota_ordinaria, cuota_penalizacion, concepto_cuota_penalizacion, cuota_extraordinaria, concepto_cuota_extraordinaria, cuota_reserva, concepto_cuota_reserva, cuota_adeudos, concepto_cuota_adeudos, total_pagar, id_administrador) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const sql = `INSERT INTO reciboCompleto (id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, concepto_pago, cuota_ordinaria, concepto_cuota_ordinaria, cuota_penalizacion, concepto_cuota_penalizacion, cuota_extraordinaria, concepto_cuota_extraordinaria, cuota_reserva, concepto_cuota_reserva, cuota_adeudos, concepto_cuota_adeudos, total_pagar, id_administrador) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const values = [
-    id_condominio, id_departamento, id_inquilino, nombre_completo_inquilinoAES, no_reciboAES, fecha, concepto_pago, cuota_ordinariaAES, concepto_cuota_ordinaria, cuota_penalizacionAES, concepto_cuota_penalizacion, cuota_extraordinariaAES, concepto_cuota_extraordinaria, cuota_reservaAES, concepto_cuota_reserva, cuota_adeudosAES, concepto_cuota_adeudos, total_pagar, id_administrador];
+    id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilinoAES, no_reciboAES, fecha, concepto_pago, cuota_ordinariaAES, concepto_cuota_ordinaria, cuota_penalizacionAES, concepto_cuota_penalizacion, cuota_extraordinariaAES, concepto_cuota_extraordinaria, cuota_reservaAES, concepto_cuota_reserva, cuota_adeudosAES, concepto_cuota_adeudos, total_pagar, id_administrador];
   connection.query(sql, values, error => {
     if (error) console.log(error);
     res.send("200");
@@ -582,8 +582,7 @@ app.get('/api/getRecibos/:id_administrador', (req, res) => {
 
         };
       });  
-      console.log(results);
-      console.log(recibosDesencriptados);
+
       res.json(recibosDesencriptados);
     }
   });
@@ -681,6 +680,54 @@ app.get('/api/getInfoCondominio', (req, res) => {
     }
   );
 });
+
+app.get('/api/getRecibosFiltrados/:id_administrador', (req, res) => {
+  const id_administrador = parseInt(req.params.id_administrador);
+  const { condominio, edificio, departamento, mes, anio } = req.query;
+
+  let sql = 'SELECT * FROM recibocompleto WHERE id_administrador = ?';
+  let values = [id_administrador];
+
+  if (condominio) {
+    sql += ' AND id_condominio = ?';
+    values.push(condominio);
+  }
+  if (edificio) {
+    sql += ' AND id_edificio = ?';
+    values.push(edificio);
+  }
+  if (departamento) {
+    sql += ' AND id_departamento = ?';
+    values.push(departamento);
+  }
+  if (mes && anio) {
+    sql += ' AND MONTH(fecha) = ? AND YEAR(fecha) = ?';
+    values.push(mes, anio);
+  }
+
+  connection.query(sql, values, (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Error al obtener los registros filtrados');
+    } else {
+      const recibosDesencriptados = results.map((recibo) => {
+        return {
+          ...recibo,
+          nombre_completo_inquilino: CryptoJS.AES.decrypt(recibo.nombre_completo_inquilino, secretKey).toString(CryptoJS.enc.Utf8),
+          no_recibo: CryptoJS.AES.decrypt(recibo.no_recibo, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_ordinaria: CryptoJS.AES.decrypt(recibo.cuota_ordinaria, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_extraordinaria: CryptoJS.AES.decrypt(recibo.cuota_extraordinaria, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_penalizacion: CryptoJS.AES.decrypt(recibo.cuota_penalizacion, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_reserva: CryptoJS.AES.decrypt(recibo.cuota_reserva, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_adeudos: CryptoJS.AES.decrypt(recibo.cuota_adeudos, secretKey).toString(CryptoJS.enc.Utf8)
+        };
+      });
+      res.json(recibosDesencriptados);
+    }
+  });
+});
+
+
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
