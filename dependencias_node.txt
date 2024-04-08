@@ -1,0 +1,24 @@
+npm i axios
+npm i bcrypt
+npm i body-parser
+npm i react
+npm i react-dom
+npm i react-router-dom
+npm install --save-dev @testing-library/react @testing-library/jest-dom @testing-library/user-event web-vitals
+npm i express
+npm i cors
+npm i crypto-js
+npm i jsonwebtoken
+npm i jwt-decode
+npm i passport
+npm i express-session
+npm i mysql2
+npm i nodemailer
+npm i morgan
+npm i express-handlebars
+npm i express-mysql-session
+npm i pdf-lib
+npm i buffer
+npm i process
+npm i util
+npm i node-polyfill-webpack-plugin
