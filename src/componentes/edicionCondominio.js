@@ -6,7 +6,8 @@ function EditoCondominio() {
   const [formulario, setFormulario] = useState({
     id_condominio: '',
     nombre_condominio: '',
-    direccion_condominio: ''
+    direccion_condominio: '',
+    admin_condominio: 'Edith Rogelia Quiñones Bonilla'
   });
   const [visible, setVisible] = useState(false);
 
@@ -170,6 +171,19 @@ function EditoCondominio() {
               {<div className="error-message">{errorDireccion}</div>}
               
             </div>
+            <div class="form-group">
+              <label className='labelInput'>Administrador a cargo:</label>
+              <select
+                id="admin_condominio"
+                name="admin_condominio"
+                value={formulario.admin_condominio}
+                onChange={handleChange} 
+              >
+                <option value="Edith Rogelia Quiñones Bonilla">Edith Rogelia Quiñones Bonilla</option>
+                <option value="Mónica Bernal Morales">Mónica Bernal Morales</option>
+              </select>
+            </div>
+            <br/>
             <div className="botones-container">
               <Link to="/EdicionyRegistro">
                 <button className="mi-boton2">Regresar</button>

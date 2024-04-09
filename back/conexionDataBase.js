@@ -261,9 +261,9 @@ app.post('/api/registrarDepartamento', (req, res) => {
 app.post('/api/registrarCondominio', (req, res) => {
   console.log("-------------------------------")
   console.log(req.body);
-  const { nombre_condominio, direccion_condominio , id_administrador} = req.body;
-  const sql = `INSERT INTO condominio (nombre_condominio, direccion_condominio, id_administrador) VALUES (?, ?, ?)`;
-  const values = [nombre_condominio, direccion_condominio, id_administrador];
+  const { nombre_condominio, direccion_condominio , admin_condominio,id_administrador} = req.body;
+  const sql = `INSERT INTO condominio (nombre_condominio, direccion_condominio, admin_condominio,id_administrador) VALUES (?, ?, ?, ?)`;
+  const values = [nombre_condominio, direccion_condominio, admin_condominio,id_administrador];
   connection.query(sql, values, error => {
     if (error) console.log(error);
     res.send("200");
@@ -478,9 +478,9 @@ app.post('/api/generarPDFMasivo', async (req, res) => {
 app.post('/api/actualizarCondominio', (req, res) => {
   console.log("-------------------------------")
   console.log(req.body);
-  const { id_condominio, nombre_condominio, direccion_condominio } = req.body;
-  const sql = `UPDATE condominio SET nombre_condominio = ?, direccion_condominio = ? WHERE id_condominio= ?`;
-  const values = [nombre_condominio, direccion_condominio,id_condominio];
+  const { id_condominio, nombre_condominio, direccion_condominio , admin_condominio} = req.body;
+  const sql = `UPDATE condominio SET nombre_condominio = ?, direccion_condominio = ? ,admin_condominio = ? WHERE id_condominio= ?`;
+  const values = [nombre_condominio, direccion_condominio, admin_condominio,id_condominio];
   connection.query(sql, values, error => {
     if (error) console.log(error);
     res.send("200");

@@ -11,6 +11,7 @@ function NuevoCondominio() {
   const [formulario, setFormulario] = useState({
     nombre_condominio: '',
     direccion_condominio: '',
+    admin_condominio: 'Edith Rogelia Quiñones Bonilla',
     id_administrador: id_administrador
   });
 
@@ -45,6 +46,7 @@ function NuevoCondominio() {
         setErrorContraseña('');
       }
     }
+
   };
 
   const handleSubmit = async event => {
@@ -55,7 +57,7 @@ function NuevoCondominio() {
     if (formulario.direccion_condominio.trim() === '') {
       setErrorContraseña('*Ingrese una direccion de condominio');
     }
-    if (formulario.nombre_condominio.trim() !== '' && formulario.direccion_condominio.trim() !== '' && formulario.id_administrador) {
+    if (formulario.nombre_condominio.trim() !== '' && formulario.direccion_condominio.trim() !== '' && formulario.id_administrador && formulario.admin_condominio) {
       try {
         const resultado = await axios.post('http://localhost:4000/api/registrarCondominio', formulario);
         if (resultado.data === 200) {
@@ -99,8 +101,21 @@ function NuevoCondominio() {
                 value={formulario.direccion_condominio}
                 onChange={handleChange}
               />
-            {<div className="error-message">{errorContraseña}</div>}
+              {<div className="error-message">{errorContraseña}</div>}
             </div>
+            <div class="form-group">
+              <label className='labelInput'>Administrador a cargo:</label>
+              <select
+                id="admin_condominio"
+                name="admin_condominio"
+                value={formulario.admin_condominio}
+                onChange={handleChange}
+                >
+                <option value="Edith Rogelia Quiñones Bonilla">Edith Rogelia Quiñones Bonilla</option>
+                <option value="Mónica Bernal Morales">Mónica Bernal Morales</option>
+              </select>
+            </div>
+            <br/>
             <div className="botones-container">
               <Link to="/EdicionyRegistro">
                 <button className="mi-boton2">Regresar</button>
