@@ -564,7 +564,14 @@ app.post('/api/getAdmin', (req, res) => {
 
 app.get('/api/getRecibos/:id_administrador', (req, res) => {
   const id_administrador  = parseInt(req.params.id_administrador);
-  connection.query('SELECT * FROM reciboCompleto WHERE id_administrador = ?', [id_administrador], (error, results) => {
+  const sql = `
+    SELECT r.*, i.correo_inquilino, 
+           i.correo_inquilino IS NOT NULL AS tiene_correo
+    FROM reciboCompleto r
+    JOIN inquilino i ON r.id_inquilino = i.id_inquilino
+    WHERE r.id_administrador = ?;
+  `;
+  connection.query(sql, [id_administrador], (error, results) => {
     if (error) {
       console.error(error);
       res.status(500).send('Error al obtener los registros de la tabla');
@@ -578,8 +585,8 @@ app.get('/api/getRecibos/:id_administrador', (req, res) => {
           cuota_extraordinaria: CryptoJS.AES.decrypt(recibo.cuota_extraordinaria, secretKey).toString(CryptoJS.enc.Utf8),
           cuota_penalizacion: CryptoJS.AES.decrypt(recibo.cuota_penalizacion, secretKey).toString(CryptoJS.enc.Utf8),
           cuota_reserva: CryptoJS.AES.decrypt(recibo.cuota_reserva, secretKey).toString(CryptoJS.enc.Utf8),
-          cuota_adeudos: CryptoJS.AES.decrypt(recibo.cuota_adeudos, secretKey).toString(CryptoJS.enc.Utf8)
-
+          cuota_adeudos: CryptoJS.AES.decrypt(recibo.cuota_adeudos, secretKey).toString(CryptoJS.enc.Utf8),
+          tiene_correo: recibo.tiene_correo === 1
         };
       });  
 
@@ -685,23 +692,28 @@ app.get('/api/getRecibosFiltrados/:id_administrador', (req, res) => {
   const id_administrador = parseInt(req.params.id_administrador);
   const { condominio, edificio, departamento, mes, anio } = req.query;
 
-  let sql = 'SELECT * FROM recibocompleto WHERE id_administrador = ?';
+  let sql = `
+    SELECT r.*, i.correo_inquilino IS NOT NULL AS tiene_correo
+    FROM reciboCompleto r
+    JOIN inquilino i ON r.id_inquilino = i.id_inquilino
+    WHERE r.id_administrador = ?
+  `;
   let values = [id_administrador];
 
   if (condominio) {
-    sql += ' AND id_condominio = ?';
+    sql += ' AND r.id_condominio = ?';
     values.push(condominio);
   }
   if (edificio) {
-    sql += ' AND id_edificio = ?';
+    sql += ' AND r.id_edificio = ?';
     values.push(edificio);
   }
   if (departamento) {
-    sql += ' AND id_departamento = ?';
+    sql += ' AND r.id_departamento = ?';
     values.push(departamento);
   }
   if (mes && anio) {
-    sql += ' AND MONTH(fecha) = ? AND YEAR(fecha) = ?';
+    sql += ' AND MONTH(r.fecha) = ? AND YEAR(r.fecha) = ?';
     values.push(mes, anio);
   }
 
@@ -719,7 +731,8 @@ app.get('/api/getRecibosFiltrados/:id_administrador', (req, res) => {
           cuota_extraordinaria: CryptoJS.AES.decrypt(recibo.cuota_extraordinaria, secretKey).toString(CryptoJS.enc.Utf8),
           cuota_penalizacion: CryptoJS.AES.decrypt(recibo.cuota_penalizacion, secretKey).toString(CryptoJS.enc.Utf8),
           cuota_reserva: CryptoJS.AES.decrypt(recibo.cuota_reserva, secretKey).toString(CryptoJS.enc.Utf8),
-          cuota_adeudos: CryptoJS.AES.decrypt(recibo.cuota_adeudos, secretKey).toString(CryptoJS.enc.Utf8)
+          cuota_adeudos: CryptoJS.AES.decrypt(recibo.cuota_adeudos, secretKey).toString(CryptoJS.enc.Utf8),
+          tiene_correo: recibo.tiene_correo === 1
         };
       });
       res.json(recibosDesencriptados);

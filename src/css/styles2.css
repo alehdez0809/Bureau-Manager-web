@@ -121,6 +121,14 @@ html, body {
       width: calc(100% - 40px); /* resta el doble del padding a la anchura para ajustar el tamaño */
       transition: all 0.3s ease;
     }  
+    input[type="month"]{
+      background-color: #f6f6f6;
+      border: none;
+      border-radius: 5px;
+      padding: 20px; /* aumenta el padding para aumentar el tamaño */
+      margin-bottom: 10px; /* agrega un margen inferior para separar los campos */
+      transition: all 0.3s ease;
+    }
   
     button[type="submit"] {
       background-color: #4CAF50;
@@ -182,6 +190,11 @@ html, body {
       height:45px;
       margin-left: 45px;
 
+    }
+    .mi-boton2:disabled{
+      background-color: #789679;
+      color: #fff;
+      cursor: not-allowed;
     }
 
     .labelInput{

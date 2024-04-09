@@ -11,6 +11,7 @@ function VerRecibo() {
   const [recibosSeleccionados, setRecibosSeleccionados] = useState([]);
 
   const [mensajeExito, setMensajeExito] = useState('');
+  const [mensajeAdvertencia, setMensajeAdvertencia] = useState('');
 
   const [paginaActual, setPaginaActual] = useState(1);
   const [registrosPorPagina] = useState(15);
@@ -51,6 +52,19 @@ function VerRecibo() {
       cargarDepartamentos(filtroEdificio);
     }
   }, [filtroEdificio]);
+
+  useEffect(() => {
+    const recibosSinCorreo = recibosSeleccionados.some(idRecibo => {
+      const recibo = registros.find(r => r.id_recibo === idRecibo);
+      return !recibo?.tiene_correo;
+    })
+
+    if (recibosSinCorreo) {
+      setMensajeAdvertencia('Algunos recibos seleccionados pertenecen a inquilinos sin correo electrónico.');
+    } else {
+      setMensajeAdvertencia('');
+    }
+  }, [recibosSeleccionados, registros]);  
   
   const cargarCondominios = async () => {
     try {
@@ -288,10 +302,13 @@ function VerRecibo() {
               <Link to="/MenuPrincipal">
                 <button className="mi-boton2">Regresar</button>
               </Link>
-            <button className="mi-boton2" type='submit' value="correo">Enviar por Correo</button>
-            <button className="mi-boton2" type='submit' value="PDF">Hacer PDF de Recibos</button>
+            <button className="mi-boton2" type='submit' value="correo" disabled={recibosSeleccionados.length === 0 ||
+                recibosSeleccionados.some(idRecibo =>
+                !registros.find(registro => registro.id_recibo === idRecibo)?.tiene_correo)}>Enviar por Correo</button>
+            <button className="mi-boton2" type='submit' value="PDF" disabled={recibosSeleccionados.length === 0}>Hacer PDF de Recibos</button>
             </div>
             </div>
+            <div className="mensaje-advertencia">{mensajeAdvertencia}</div>
             <div className='navegacion-pag'>
               <button onClick={paginaAnterior} disabled={paginaActual === 1} className='btn-pag'><FaArrowCircleLeft/>  Anterior</button>
               <span className='span-pag'>Página {paginaActual}</span>
