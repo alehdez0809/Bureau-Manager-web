@@ -26,6 +26,7 @@ function NuevoInquilino() {
   const [errorNombre, setErrorNombre] = useState('');
   const [errorApellidoP, setErrorApellidoP] = useState('');
   const [errorApellidoM, setErrorApellidoM] = useState('');
+  const [errorInquilino, setErrorInquilino] = useState('');
 
   useEffect(() => {
     const authData = JSON.parse(localStorage.getItem('authData'));
@@ -251,7 +252,13 @@ function NuevoInquilino() {
       setErrorApellidoM('Debe ingresar un apellido materno');
       return;
     }
+
     try {
+      const response = await axios.post('http://localhost:4000/api/getInquilinosbyDepartamento', { id_departamento: formulario.id_departamento });
+      if (response.data.length > 0) {
+        setErrorInquilino('Ya existe un inquilino asignado a este departamento');
+        return;
+      }
       const resultado = await axios.post('http://localhost:4000/api/registrarInquilino', formulario);
       if (resultado.data === 200) {
         setVisible(true);
@@ -371,6 +378,8 @@ function NuevoInquilino() {
                     />
                 </div>
             </div>
+            <div className='error-message'>{errorInquilino}</div>
+            <br/>
             <div style={{ display: visible ? 'block' : 'none' }}>Registro exitoso</div>
             <div className="botones-container"> 
               <Link to="/MenuInquilino">

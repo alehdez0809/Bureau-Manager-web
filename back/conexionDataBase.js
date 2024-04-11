@@ -297,17 +297,16 @@ app.post('/api/registrarInquilino', (req, res) => {
 app.post('/api/registrarRecibo', (req, res) => {
   console.log("-------------------------------")
   console.log(req.body);
-  const { id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, concepto_pago, cuota_ordinaria, concepto_cuota_ordinaria, cuota_penalizacion, concepto_cuota_penalizacion, cuota_extraordinaria, concepto_cuota_extraordinaria, cuota_reserva, concepto_cuota_reserva, cuota_adeudos, concepto_cuota_adeudos, total_pagar, id_administrador } = req.body;
+  const { id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, mes_pago, concepto_pago, cuota_ordinaria, cuota_penalizacion, cuota_extraordinaria, cuota_reserva, cuota_adeudos, total_pagar, total_pagar_letra, id_administrador } = req.body;
   const nombre_completo_inquilinoAES = CryptoJS.AES.encrypt(nombre_completo_inquilino, secretKeyAES).toString();
-  const no_reciboAES = CryptoJS.AES.encrypt(no_recibo, secretKeyAES).toString();
   const cuota_ordinariaAES = CryptoJS.AES.encrypt(cuota_ordinaria, secretKeyAES).toString();
   const cuota_extraordinariaAES = CryptoJS.AES.encrypt(cuota_extraordinaria, secretKeyAES).toString();
   const cuota_penalizacionAES = CryptoJS.AES.encrypt(cuota_penalizacion, secretKeyAES).toString();
   const cuota_reservaAES = CryptoJS.AES.encrypt(cuota_reserva, secretKeyAES).toString();
   const cuota_adeudosAES = CryptoJS.AES.encrypt(cuota_adeudos, secretKeyAES).toString();
-  const sql = `INSERT INTO reciboCompleto (id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, concepto_pago, cuota_ordinaria, concepto_cuota_ordinaria, cuota_penalizacion, concepto_cuota_penalizacion, cuota_extraordinaria, concepto_cuota_extraordinaria, cuota_reserva, concepto_cuota_reserva, cuota_adeudos, concepto_cuota_adeudos, total_pagar, id_administrador) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const sql = `INSERT INTO reciboCompleto (id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, mes_pago, concepto_pago, cuota_ordinaria, cuota_penalizacion, cuota_extraordinaria, cuota_reserva, cuota_adeudos, total_pagar, total_pagar_letra, id_administrador) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const values = [
-    id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilinoAES, no_reciboAES, fecha, concepto_pago, cuota_ordinariaAES, concepto_cuota_ordinaria, cuota_penalizacionAES, concepto_cuota_penalizacion, cuota_extraordinariaAES, concepto_cuota_extraordinaria, cuota_reservaAES, concepto_cuota_reserva, cuota_adeudosAES, concepto_cuota_adeudos, total_pagar, id_administrador];
+    id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilinoAES, no_recibo, fecha, mes_pago, concepto_pago, cuota_ordinariaAES, cuota_penalizacionAES, cuota_extraordinariaAES, cuota_reservaAES, cuota_adeudosAES, total_pagar, total_pagar_letra, id_administrador];
   connection.query(sql, values, error => {
     if (error) console.log(error);
     res.send("200");
@@ -334,7 +333,6 @@ app.post('/api/enviarRecibosCorreoElectronico', (req, res) => {
           id_inquilino: results[0].id_inquilino,
           nombre_completo_inquilino: CryptoJS.AES.decrypt(results[0].nombre_completo_inquilino, secretKey).toString(CryptoJS.enc.Utf8),
           fecha: results[0].fecha,
-          no_recibo: CryptoJS.AES.decrypt(results[0].no_recibo, secretKey).toString(CryptoJS.enc.Utf8),
           concepto_pago: results[0].concepto_pago,
           cuota_ordinaria: CryptoJS.AES.decrypt(results[0].cuota_ordinaria, secretKey).toString(CryptoJS.enc.Utf8),
           concepto_cuota_ordinaria: results[0].concepto_cuota_ordinaria,
@@ -426,7 +424,6 @@ app.post('/api/generarPDFMasivo', async (req, res) => {
               id_inquilino: results[0].id_inquilino,
               nombre_completo_inquilino: CryptoJS.AES.decrypt(results[0].nombre_completo_inquilino, secretKey).toString(CryptoJS.enc.Utf8),
               fecha: results[0].fecha,
-              no_recibo: CryptoJS.AES.decrypt(results[0].no_recibo, secretKey).toString(CryptoJS.enc.Utf8),
               concepto_pago: results[0].concepto_pago,
               cuota_ordinaria: CryptoJS.AES.decrypt(results[0].cuota_ordinaria, secretKey).toString(CryptoJS.enc.Utf8),
               concepto_cuota_ordinaria: results[0].concepto_cuota_ordinaria,
@@ -580,7 +577,6 @@ app.get('/api/getRecibos/:id_administrador', (req, res) => {
         return {
           ...recibo,
           nombre_completo_inquilino: CryptoJS.AES.decrypt(recibo.nombre_completo_inquilino, secretKey).toString(CryptoJS.enc.Utf8),
-          no_recibo: CryptoJS.AES.decrypt(recibo.no_recibo, secretKey).toString(CryptoJS.enc.Utf8),
           cuota_ordinaria: CryptoJS.AES.decrypt(recibo.cuota_ordinaria, secretKey).toString(CryptoJS.enc.Utf8),
           cuota_extraordinaria: CryptoJS.AES.decrypt(recibo.cuota_extraordinaria, secretKey).toString(CryptoJS.enc.Utf8),
           cuota_penalizacion: CryptoJS.AES.decrypt(recibo.cuota_penalizacion, secretKey).toString(CryptoJS.enc.Utf8),
@@ -726,7 +722,6 @@ app.get('/api/getRecibosFiltrados/:id_administrador', (req, res) => {
         return {
           ...recibo,
           nombre_completo_inquilino: CryptoJS.AES.decrypt(recibo.nombre_completo_inquilino, secretKey).toString(CryptoJS.enc.Utf8),
-          no_recibo: CryptoJS.AES.decrypt(recibo.no_recibo, secretKey).toString(CryptoJS.enc.Utf8),
           cuota_ordinaria: CryptoJS.AES.decrypt(recibo.cuota_ordinaria, secretKey).toString(CryptoJS.enc.Utf8),
           cuota_extraordinaria: CryptoJS.AES.decrypt(recibo.cuota_extraordinaria, secretKey).toString(CryptoJS.enc.Utf8),
           cuota_penalizacion: CryptoJS.AES.decrypt(recibo.cuota_penalizacion, secretKey).toString(CryptoJS.enc.Utf8),
@@ -740,6 +735,22 @@ app.get('/api/getRecibosFiltrados/:id_administrador', (req, res) => {
   });
 });
 
+app.get('/api/verificarRecibo/:id_condominio/:no_recibo', (req, res) => {
+  const { id_condominio, no_recibo } = req.params;
+  const sql = `
+    SELECT COUNT(*) AS count
+    FROM reciboCompleto
+    WHERE id_condominio = ? AND no_recibo = ?;
+  `;
+  connection.query(sql, [id_condominio, no_recibo], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Error al verificar el recibo');
+    } else {
+      res.json({ existe: results[0].count > 0 });
+    }
+  });
+});
 
 
 const PORT = process.env.PORT || 4000;

@@ -16,18 +16,15 @@ function NuevoRecibo() {
     nombre_completo_inquilino:'',
     no_recibo:'',
     fecha:'',
-    concepto_pago:'',
+    mes_pago:'',	
+    concepto_pago:'CUOTAS DE MANTENIMIENTO Y ADMINISTRACIÓN',
     cuota_ordinaria:'',
-    concepto_cuota_ordinaria:'',
     cuota_penalizacion:'',
-    concepto_cuota_penalizacion:'',
     cuota_extraordinaria:'',
-    concepto_cuota_extraordinaria:'',
     cuota_reserva:'',
-    concepto_cuota_reserva:'',
     cuota_adeudos:'',
-    concepto_cuota_adeudos:'',
     total_pagar:'',
+    total_pagar_letra:'',
     id_administrador: id_administrador,
   });
 
@@ -38,6 +35,11 @@ function NuevoRecibo() {
   const [inquilinos, setInquilinos] = useState([]);
 
   const [errores, setErrores] = useState({});
+
+  const [errorNumero, setErrorNumero] = useState('');
+
+  const meses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+
 
   useEffect(() => {
     const authData = JSON.parse(localStorage.getItem('authData'));
@@ -375,6 +377,44 @@ function NuevoRecibo() {
     }
   };
 
+  const handleChangeFecha = event => {
+    const { value } = event.target;
+    const fecha = new Date(value);
+    const mesPago = `${meses[fecha.getMonth()]} ${fecha.getFullYear()}`;
+    setFormulario(prevState => ({ ...prevState, fecha: value, mes_pago: mesPago }));
+  };
+
+  function numeroALetra(numero){
+    const unidades = ["", "UNO", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE", "OCHO", "NUEVE"];
+    const decenas = ["", "DIEZ", "VEINTE", "TREINTA", "CUARENTA", "CINCUENTA", "SESENTA", "SETENTA", "OCHENTA", "NOVENTA"];
+    const centenas = ["", "CIEN", "DOSCIENTOS", "TRESCIENTOS", "CUATROCIENTOS", "QUINIENTOS", "SEISCIENTOS", "SETECIENTOS", "OCHOCIENTOS", "NOVECIENTOS"];
+    
+    let letras = "";
+
+    if (numero >= 100) {
+      letras += centenas[Math.floor(numero / 100)] + " ";
+      numero %= 100;
+    }
+    if (numero >= 10) {
+        letras += decenas[Math.floor(numero / 10)] + " ";
+        numero %= 10;
+    }
+    if (numero > 0) {
+        letras += unidades[numero] + " ";
+    }
+
+    return letras.trim() + " PESOS";
+  }
+
+  function importeEnLetra(total){
+    const entero = Math.floor(total);
+    let decimal = Math.round((total - entero) * 100);
+    if (decimal === 0){
+      decimal = "00";
+    }
+    return `${numeroALetra(entero)} ${decimal}/100 M.N.`;
+  }
+
   const handleSubmit = async event => {
     event.preventDefault();
 
@@ -382,18 +422,23 @@ function NuevoRecibo() {
       console.log('Hay errores en la validación');
       return; 
     }
+    
 
     try { 
+      const respuesta = await axios.get(`http://localhost:4000/api/verificarRecibo/${formulario.id_condominio}/${formulario.no_recibo}`);
+      if(respuesta.data.existe){
+        setErrorNumero('Ya existe un recibo con ese número de folio en el condominio seleccionado');
+        return;
+      }
       let ddd = 0;
-      ddd = (parseInt(formulario.cuota_ordinaria) || 0) 
-          + (parseInt(formulario.cuota_penalizacion) || 0) 
-          + (parseInt(formulario.cuota_extraordinaria) || 0) 
-          + (parseInt(formulario.cuota_reserva) || 0) 
-          + (parseInt(formulario.cuota_adeudos) || 0);
-      ddd = ddd.toString();
-      console.log(ddd);
-      formulario.total_pagar = ddd;
-      console.log(formulario.total_pagar);
+      ddd = (parseFloat(formulario.cuota_ordinaria) || 0) 
+          + (parseFloat(formulario.cuota_penalizacion) || 0) 
+          + (parseFloat(formulario.cuota_extraordinaria) || 0) 
+          + (parseFloat(formulario.cuota_reserva) || 0) 
+          + (parseFloat(formulario.cuota_adeudos) || 0);
+ 
+      formulario.total_pagar = ddd.toString();
+      formulario.total_pagar_letra = importeEnLetra(ddd);
       const resultado = await axios.post('http://localhost:4000/api/registrarRecibo', formulario);
       if (resultado.data === 200) {
         setVisible(true);
@@ -455,59 +500,34 @@ function NuevoRecibo() {
       erroresTemp.cuota_ordinaria = 'Este dato debe ser un número';
     }
     
-    if (!formulario.concepto_cuota_ordinaria.trim()) {
-      erroresTemp.concepto_cuota_ordinaria = 'Este campo es obligatorio';
-    }else if(!contieneLetras(formulario.concepto_cuota_ordinaria)){
-      erroresTemp.concepto_cuota_ordinaria = 'Este dato debe contener letras';
-    }
-    
     if (formulario.cuota_penalizacion.trim() !== '') {
       if(!esNumero(formulario.cuota_penalizacion)){
         erroresTemp.cuota_penalizacion = 'Este dato debe ser un número';
       }
     }  
-    if (formulario.concepto_cuota_penalizacion.trim() !== '') {
-      if (!contieneLetras(formulario.concepto_cuota_penalizacion)) {
-        erroresTemp.concepto_cuota_penalizacion = 'Este dato debe contener letras';
-      }
-    }
+
     if(formulario.cuota_extraordinaria.trim() !== ''){
       if (!esNumero(formulario.cuota_extraordinaria)) {
         erroresTemp.cuota_extraordinaria = 'Este dato debe ser un número';
       }
     }  
-    if (formulario.concepto_cuota_extraordinaria.trim() !== '') {
-      if (!contieneLetras(formulario.concepto_cuota_extraordinaria)) {
-        erroresTemp.concepto_cuota_extraordinaria = 'Este dato debe contener letras';
-      }
-    }
+
     if (formulario.cuota_reserva.trim() !== '') {
       if (!esNumero(formulario.cuota_reserva)) {
         erroresTemp.cuota_reserva = 'Este dato debe ser un número';
       }
     }
-    if (formulario.concepto_cuota_reserva.trim() !== '') {
-      if (!contieneLetras(formulario.concepto_cuota_reserva)) {
-        erroresTemp.concepto_cuota_reserva = 'Este dato debe contener letras';
-      }
-    }  
+
     if (formulario.cuota_adeudos.trim() !== '') { 
       if (!esNumero(formulario.cuota_adeudos)) {
         erroresTemp.cuota_adeudos = 'Este dato debe ser un número';
       }
     }
-    if (formulario.concepto_cuota_adeudos.trim() !== '') {
-      if (!contieneLetras(formulario.concepto_cuota_adeudos)) {
-        erroresTemp.concepto_cuota_adeudos = 'Este dato debe contener letras';
-      }
-    }     
   
     setErrores(erroresTemp);
     return Object.keys(erroresTemp).length === 0; 
   }
 
-  
-  
   
 
   let opcionesCondominio;
@@ -596,22 +616,24 @@ function NuevoRecibo() {
                       id="fecha"
                       name="fecha"
                       value={formulario.fecha}
-                      onChange={handleChange}
+                      onChange={handleChangeFecha}
                     />
                     <div className="error-message">{errores.fecha}</div>
                 </div>
             </div>
             
-            <div className='select-container'>
+            <div className='select-container' style={{ marginBottom: '10px' }}>
                 <div className='select-item'>
                     <label className='labelInput'>Concepto de pago: </label>
                     <input
+                      style={{ width: '360px' }}
                       type="text"
                       id="concepto_pago"
                       name="concepto_pago"
-                      placeholder="Concepto de Pago"
+                      placeholder="CUOTAS DE MANTENIMIENTO Y ADMINISTRACIÓN"
                       value={formulario.concepto_pago}
                       onChange={handleChange}
+                      disabled
                     />
                     <div className="error-message">{errores.concepto_pago}</div>
                 </div>
@@ -627,23 +649,10 @@ function NuevoRecibo() {
                     />
                     <div className="error-message">{errores.cuota_ordinaria}</div>
                 </div>
-                <div className='select-item'>
-                    <label className='labelInput'>Concepto de Cuota Ordinaria: </label>
-                    <input
-                      type="text"
-                      id="concepto_cuota_ordinaria"
-                      name="concepto_cuota_ordinaria"
-                      value={formulario.concepto_cuota_ordinaria}
-                      placeholder="Cuota Ordinaria"
-                      onChange={handleChange}
-                    />
-                    <div className="error-message">{errores.concepto_cuota_ordinaria}</div>
-                </div>
             </div>
 
-            <div className='select-container'>
-                
-                <div className='select-item'>
+            <div className='select-container' style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div className='select-item' style={{ flex: 1 }}>
                     <label className='labelInput'>Cuota de Penalizacion($): </label>
                     <input
                       type="text"
@@ -655,25 +664,7 @@ function NuevoRecibo() {
                     />
                     <div className="error-message">{errores.cuota_penalizacion}</div>
                 </div>
-                
-                <div className='select-item'>
-                    <label className='labelInput'>Concepto de Cuota de Penalizacion: </label>
-                    <input
-                      type="text"
-                      id="concepto_cuota_penalizacion"
-                      name="concepto_cuota_penalizacion"
-                      value={formulario.concepto_cuota_penalizacion}
-                      placeholder="Cuota de Penalizacion"
-                      onChange={handleChange}
-                    />
-                    <div className="error-message">{errores.concepto_cuota_penalizacion}</div>
-                </div>
-                <div className='select-item'></div>
-            </div>
-
-            <div className='select-container'>
-                
-                <div className='select-item'>
+                <div className='select-item' style={{ flex: 1 }}>
                     <label className='labelInput'>Cuota Extraordinaria($): </label>
                     <input
                       type="text"
@@ -685,25 +676,7 @@ function NuevoRecibo() {
                     />
                     <div className="error-message">{errores.cuota_extraordinaria}</div>
                 </div>
-                
-                <div className='select-item'>
-                    <label className='labelInput'>Concepto de Cuota Extraordinaria: </label>
-                    <input
-                      type="text"
-                      id="concepto_cuota_extraordinaria"
-                      name="concepto_cuota_extraordinaria"
-                      value={formulario.concepto_cuota_extraordinaria}
-                      placeholder="Cuota Extraordinaria"
-                      onChange={handleChange}
-                    />
-                    <div className="error-message">{errores.concepto_cuota_extraordinaria}</div>
-                </div>
-                <div className='select-item'></div>
-            </div>
-
-            <div className='select-container'>
-                
-                <div className='select-item'>
+                <div className='select-item' style={{ flex: 1 }}>
                     <label className='labelInput'>Cuota de Reserva($): </label>
                     <input
                       type="text"
@@ -715,25 +688,7 @@ function NuevoRecibo() {
                     />
                     <div className="error-message">{errores.cuota_reserva}</div>
                 </div>
-                
-                <div className='select-item'>
-                    <label className='labelInput'>Concepto de Cuota de Reserva: </label>
-                    <input
-                      type="text"
-                      id="concepto_cuota_reserva"
-                      name="concepto_cuota_reserva"
-                      value={formulario.concepto_cuota_reserva}
-                      placeholder="Cuota de Reserva"
-                      onChange={handleChange}
-                    />
-                    <div className="error-message">{errores.concepto_cuota_reserva}</div>
-                </div>
-                <div className='select-item'></div>
-            </div>
-
-            <div className='select-container'>
-                
-                <div className='select-item'>
+                <div className='select-item' style={{ flex: 1 }}>
                     <label className='labelInput'>Cuota de Adeudos($): </label>
                     <input
                       type="text"
@@ -745,23 +700,11 @@ function NuevoRecibo() {
                     />
                     <div className="error-message">{errores.cuota_adeudos}</div>
                 </div>
-                
-                <div className='select-item'>
-                    <label className='labelInput'>Concepto de Cuota de Adeudos: </label>
-                    <input
-                      type="text"
-                      id="concepto_cuota_adeudos"
-                      name="concepto_cuota_adeudos"
-                      value={formulario.concepto_cuota_adeudos}
-                      placeholder="Cuota de Adeudos"
-                      onChange={handleChange}
-                    />
-                    <div className="error-message">{errores.concepto_cuota_adeudos}</div>
-                </div>
-                <div className='select-item'></div>
             </div>
 
             <div className='Aceptado' style={{ display: visible ? 'block' : 'none' }}>Registro exitoso</div>
+            <div className='error-message'>{errorNumero}</div>
+            <br/>
             <div className="botones-container"> 
               <Link to="/MenuPrincipal">
                 <button className="mi-boton2">Regresar</button>
