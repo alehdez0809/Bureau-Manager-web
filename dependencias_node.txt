@@ -22,3 +22,6 @@ npm i buffer
 npm i process
 npm i util
 npm i node-polyfill-webpack-plugin
+npm install @pdf-lib/fontkit
+npm install react-icons
+npm install concurrently --save-dev

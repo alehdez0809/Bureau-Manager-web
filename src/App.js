@@ -18,7 +18,6 @@ import MenuInquilino from "./componentes/menuInquilino.js";
 import EditoInquilino from "./componentes/edicionInquilino.js";
 import NuevoRecibo from "./componentes/nuevoRecibo.js";
 import VerRecibo from "./componentes/verRecibos.js";
-import Verificacion from "./componentes/verificacion.js";
 import Layout from "./componentes/Layout.js";
 
 
@@ -50,7 +49,6 @@ function App() {
             <Route path="/EditoInquilino" element={<PrivateRoute> <Layout><EditoInquilino /> </Layout></PrivateRoute>}  />
             <Route path="/NuevoRecibo" element={<PrivateRoute> <Layout><NuevoRecibo /></Layout> </PrivateRoute>}  />
             <Route path="/VerRecibo" element={<PrivateRoute> <Layout><VerRecibo /></Layout> </PrivateRoute>}  />
-            <Route path="/Verificacion" element={<Verificacion />}  />
             
           </Routes>
       

@@ -5,6 +5,8 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 const fs = require('fs');
 const app = express();
+const path = require('path');
+const fontkit = require('@pdf-lib/fontkit');
 
 const jwt = require('jsonwebtoken');
 const secretKey = 'tu_clave_secreta';
@@ -36,174 +38,119 @@ app.use(bodyParser.json());
 // Permitir solicitudes CORS desde cualquier origen
 app.use(cors());
 
-const { PDFDocument, StandardFonts, PageSizes } = require('pdf-lib');
+const { PDFDocument, rgb } = require('pdf-lib');
 
-async function crearPDF(datos) {
-  // Crear un nuevo documento PDF
+async function crearPDFImagen(datos){
+  const imagePath = path.join(__dirname, './formato_recibo.PNG');
+  const fontPath = path.join(__dirname, './Arial.ttf');
   const pdfDoc = await PDFDocument.create();
+  pdfDoc.registerFontkit(fontkit);
+  const [width, height] = [612, 792]; //tamaño de una hoja tamaño carta
+  const page = pdfDoc.addPage([width, height]);
 
-  // Agregar una página al documento
-  const page = pdfDoc.addPage();
-  // Definir la fuente y el tamaño de letra
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const fontSize = 3
+  const imagenBytes = fs.readFileSync(imagePath);
+  const imagen = await pdfDoc.embedPng(imagenBytes);
 
-  // Función para escribir un texto en el PDF
-  function escribirTexto(texto, x, y) {
-    page.drawText(texto, { x, y, font, fontSize });
-  }
-  // Variables para controlar la posición del texto en el PDF
-  let x = 50;
-  let y = page.getHeight() - 50;
-  
-  // Escribir los valores en el PDF
-  escribirTexto('Inquilino:', x, y);
-  escribirTexto(datos.nombre_completo_inquilino, x + 300, y);
-  y -=40;
+  const scaleX = width / imagen.width;
+  const scaleY = (height/2) / imagen.height;
+  const scale = Math.min(scaleX, scaleY);
 
-  escribirTexto('No. de Recibo:', x, y);
-  escribirTexto(datos.no_recibo, x + 300, y);
-  y -=40;
+  page.drawImage(imagen,{
+    x:0,
+    y:height/2,
+    width:imagen.width*scale,
+    height:imagen.height*scale,
+  });
 
-  escribirTexto('Fecha:', x, y);
-  escribirTexto(datos.fecha, x + 300, y);
-  y -=40;
+  const fontColor = rgb(0, 0, 0);
+  const font = await pdfDoc.embedFont(fs.readFileSync(fontPath));
+  const colorRed = rgb(1, 0, 0);
+  const textwidthdir = font.widthOfTextAtSize(datos.direccion_condominio || '', 8);
+  const textwidthNC = font.widthOfTextAtSize(`${datos.nombre_condominio} - ${datos.nombre_edificio}` || '', 11);
+  const textwidthTPL = font.widthOfTextAtSize(`SON: (${datos.total_pagar_letra})` || '', 9);
 
-  escribirTexto('Concepto de Pago:', x, y);
-  escribirTexto(datos.concepto_pago, x + 300, y);
-  y -=40;
+  page.drawText(datos.nombre_completo_inquilino || '', {x: 125,y: height - 133,size: 13,color: fontColor,font: font});
+  page.drawText(datos.direccion_condominio || '', {x: width-textwidthdir-20,y: height - 76,size: 8,color: fontColor,font: font});
+  page.drawText(datos.no_recibo || '', {x: 532,y: height - 63,size: 13,color: colorRed,font: font});
+  page.drawText(`${datos.nombre_condominio} - ${datos.nombre_edificio}` || '', {x: width-textwidthNC-20,y: height - 89,size: 11,color: fontColor,font: font});
+  page.drawText(datos.mes_pago || '', {x: 390,y: height - 105,size: 10,color: fontColor,font: font});
+  page.drawText(datos.numero_departamento || '', {x: 532,y: height - 133,size: 13,color: colorRed,font: font});
+  page.drawText('$', {x: 125,y: height - 165,size: 10,color: fontColor,font: font});
+  page.drawText(datos.cuota_ordinaria || '', {x: 254,y: height - 165,size: 10,color: fontColor,font: font});
+  page.drawText(datos.concepto_pago || '', {x: 125,y: height - 187,size: 10,color: fontColor,font: font});
+  page.drawText('$', {x: 125,y: height - 208,size: 10,color: fontColor,font: font});
+  page.drawText(datos.cuota_adeudos || '', {x: 254,y: height - 208,size: 10,color: fontColor,font: font});
+  page.drawText('$', {x: 125,y: height - 230,size: 10,color: fontColor,font: font});
+  page.drawText(datos.cuota_extraordinaria || '', {x: 254,y: height - 230,size: 10,color: fontColor,font: font});
+  page.drawText('$', {x: 125,y: height - 253,size: 10,color: fontColor,font: font});
+  page.drawText(datos.cuota_penalizacion || '', {x: 254,y: height - 253,size: 10,color: fontColor,font: font});
+  page.drawText('$', {x: 125,y: height - 275,size: 10,color: fontColor,font: font});
+  page.drawText(datos.cuota_reserva || '', {x: 254,y: height - 275,size: 10,color: fontColor,font: font});
+  page.drawText('$', {x: 127,y: height - 302,size: 10,color: fontColor,font: font});
+  page.drawText(datos.total_pagar || '', {x: 187,y: height - 302,size: 10,color: fontColor,font: font});
+  page.drawText(`SON: (${datos.total_pagar_letra})` || '', {x: width-textwidthTPL-70,y: height - 302,size: 9,color: fontColor,font: font});
+  page.drawText(datos.admin_condominio || '', {x: 16,y: height - 348,size: 10,color: fontColor,font: font});
+  page.drawText(datos.fecha || '', {x: 410,y: height - 331,size: 10,color: fontColor,font: font});
 
-  escribirTexto('Cuota Ordinaria:', x, y);
-  escribirTexto('$'+datos.cuota_ordinaria, x + 300, y);
-  y -=40;
-
-  escribirTexto('Concepto:', x, y);
-  escribirTexto(datos.concepto_cuota_ordinaria, x + 300, y);
-  y -=40;
-
-  escribirTexto('Cuota Penalización:', x, y);
-  escribirTexto('$'+datos.cuota_penalizacion, x + 300, y);
-  y -=40;
-
-  escribirTexto('Concepto:', x, y);
-  escribirTexto(datos.concepto_cuota_penalizacion, x + 300, y);
-  y -=40;
-
-  escribirTexto('Cuota Extraordinaria:', x, y);
-  escribirTexto('$'+datos.cuota_extraordinaria, x + 300, y);
-  y -=40;
-
-  escribirTexto('Concepto:', x, y);
-  escribirTexto(datos.concepto_cuota_extraordinaria, x + 300, y);
-  y -=40;
-
-  escribirTexto('Cuota Reserva:', x, y);
-  escribirTexto('$'+datos.cuota_reserva, x + 300, y);
-  y -=40;
-
-  escribirTexto('Concepto:', x, y);
-  escribirTexto(datos.concepto_cuota_reserva, x + 300, y);
-  y -=40;
-
-  escribirTexto('Cuota Adeudos:', x, y);
-  escribirTexto('$'+datos.cuota_adeudos, x + 300, y);
-  y -=40;
-
-  escribirTexto('Concepto :', x, y);
-  escribirTexto(datos.concepto_cuota_adeudos, x + 300, y);
-  y -=40;
-
-  escribirTexto('Total a Pagar:', x, y);
-  escribirTexto('$'+datos.total_pagar, x + 300, y);
-
-  // Generar el contenido del PDF como una matriz de bytes
   const pdfBytes = await pdfDoc.save();
-
-  // Devolver los bytes del PDF
   return pdfBytes;
 }
 
-async function crearPDFMultiple(datosList) {
+async function crearPDFImagenMultiple(datosList){
+  const fontPath = path.join(__dirname, './Arial.ttf');
+  const imagePath = path.join(__dirname, './formato_recibo.PNG');
   const pdfDoc = await PDFDocument.create();
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const fontSize = 3;
+  pdfDoc.registerFontkit(fontkit);
+  const font = await pdfDoc.embedFont(fs.readFileSync(fontPath));
+  const fontColor = rgb(0, 0, 0);
+  const colorRed = rgb(1, 0, 0);
+  const [width, height] = [612, 792];
+  const imagenBytes = fs.readFileSync(imagePath);
+  const imagen = await pdfDoc.embedPng(imagenBytes);
 
   datosList.forEach((datos) => {
-    const page = pdfDoc.addPage();
+    const page = pdfDoc.addPage([width, height]);
+    const scaleX = width / imagen.width;
+    const scaleY = (height/2) / imagen.height;
+    const scale = Math.min(scaleX, scaleY);
+    const textwidthdir = font.widthOfTextAtSize(datos.direccion_condominio || '', 8);
+    const textwidthNC = font.widthOfTextAtSize(`${datos.nombre_condominio} - ${datos.nombre_edificio}` || '', 11);
+    const textwidthTPL = font.widthOfTextAtSize(`SON: (${datos.total_pagar_letra})` || '', 9);
 
-    let x = 50;
-    let y = page.getHeight() - 50;
+    page.drawImage(imagen,{
+      x:0,
+      y:height/2,
+      width:imagen.width*scale,
+      height:imagen.height*scale,
+    });
 
-    function escribirTexto(texto, x, y) {
-      page.drawText(texto, { x, y, font, fontSize });
-    }
-
-    escribirTexto('Inquilino:', x, y);
-    escribirTexto(datos.nombre_completo_inquilino, x + 300, y);
-    y -= 40;
-
-    escribirTexto('No. de Recibo:', x, y);
-    escribirTexto(datos.no_recibo, x + 300, y);
-    y -= 40;
-
-    escribirTexto('Fecha:', x, y);
-    escribirTexto(datos.fecha, x + 300, y);
-    y -= 40;
-
-    escribirTexto('Concepto de Pago:', x, y);
-    escribirTexto(datos.concepto_pago, x + 300, y);
-    y -= 40;
-
-    escribirTexto('Cuota Ordinaria:', x, y);
-    escribirTexto('$' + datos.cuota_ordinaria, x + 300, y);
-    y -= 40;
-
-    escribirTexto('Concepto:', x, y);
-    escribirTexto(datos.concepto_cuota_ordinaria, x + 300, y);
-    y -= 40;
-
-    escribirTexto('Cuota Penalización:', x, y);
-    escribirTexto('$' + datos.cuota_penalizacion, x + 300, y);
-    y -= 40;
-
-    escribirTexto('Concepto:', x, y);
-    escribirTexto(datos.concepto_cuota_penalizacion, x + 300, y);
-    y -= 40;
-
-    escribirTexto('Cuota Extraordinaria:', x, y);
-    escribirTexto('$' + datos.cuota_extraordinaria, x + 300, y);
-    y -= 40;
-
-    escribirTexto('Concepto:', x, y);
-    escribirTexto(datos.concepto_cuota_extraordinaria, x + 300, y);
-    y -= 40;
-
-    escribirTexto('Cuota Reserva:', x, y);
-    escribirTexto('$' + datos.cuota_reserva, x + 300, y);
-    y -= 40;
-
-    escribirTexto('Concepto:', x, y);
-    escribirTexto(datos.concepto_cuota_reserva, x + 300, y);
-    y -= 40;
-
-    escribirTexto('Cuota Adeudos:', x, y);
-    escribirTexto('$' + datos.cuota_adeudos, x + 300, y);
-    y -= 40;
-
-    escribirTexto('Concepto:', x, y);
-    escribirTexto(datos.concepto_cuota_adeudos, x + 300, y);
-    y -= 40;
-
-    escribirTexto('Total a Pagar:', x, y);
-    escribirTexto('$' + datos.total_pagar, x + 300, y);
+    page.drawText(datos.nombre_completo_inquilino || '', {x: 125,y: height - 133,size: 13,color: fontColor,font: font});
+    page.drawText(datos.direccion_condominio || '', {x: width-textwidthdir-20,y: height - 76,size: 8,color: fontColor,font: font});
+    page.drawText(datos.no_recibo || '', {x: 532,y: height - 63,size: 13,color: colorRed,font: font});
+    page.drawText(`${datos.nombre_condominio} - ${datos.nombre_edificio}` || '', {x: width-textwidthNC-20,y: height - 89,size: 11,color: fontColor,font: font});
+    page.drawText(datos.mes_pago || '', {x: 390,y: height - 105,size: 10,color: fontColor,font: font});
+    page.drawText(datos.numero_departamento || '', {x: 532,y: height - 133,size: 13,color: colorRed,font: font});
+    page.drawText('$', {x: 125,y: height - 165,size: 10,color: fontColor,font: font});
+    page.drawText(datos.cuota_ordinaria || '', {x: 254,y: height - 165,size: 10,color: fontColor,font: font});
+    page.drawText(datos.concepto_pago || '', {x: 125,y: height - 187,size: 10,color: fontColor,font: font});
+    page.drawText('$', {x: 125,y: height - 208,size: 10,color: fontColor,font: font});
+    page.drawText(datos.cuota_adeudos || '', {x: 254,y: height - 208,size: 10,color: fontColor,font: font});
+    page.drawText('$', {x: 125,y: height - 230,size: 10,color: fontColor,font: font});
+    page.drawText(datos.cuota_extraordinaria || '', {x: 254,y: height - 230,size: 10,color: fontColor,font: font});
+    page.drawText('$', {x: 125,y: height - 253,size: 10,color: fontColor,font: font});
+    page.drawText(datos.cuota_penalizacion || '', {x: 254,y: height - 253,size: 10,color: fontColor,font: font});
+    page.drawText('$', {x: 125,y: height - 275,size: 10,color: fontColor,font: font});
+    page.drawText(datos.cuota_reserva || '', {x: 254,y: height - 275,size: 10,color: fontColor,font: font});
+    page.drawText('$', {x: 127,y: height - 302,size: 10,color: fontColor,font: font});
+    page.drawText(datos.total_pagar || '', {x: 187,y: height - 302,size: 10,color: fontColor,font: font});
+    page.drawText(`SON: (${datos.total_pagar_letra})` || '', {x: width-textwidthTPL-70,y: height - 302,size: 9,color: fontColor,font: font});
+    page.drawText(datos.admin_condominio || '', {x: 16,y: height - 348,size: 10,color: fontColor,font: font});
+    page.drawText(datos.fecha || '', {x: 410,y: height - 331,size: 10,color: fontColor,font: font});
   });
 
   const pdfBytes = await pdfDoc.save();
   return pdfBytes;
 }
-
-
-
 
 
 // Endpoint para manejar solicitudes POST
@@ -320,7 +267,38 @@ app.post('/api/enviarRecibosCorreoElectronico', (req, res) => {
   
   for (let i = 0; i < lista.length; i++) {
     const elemento = lista[i];
-    connection.query('SELECT * FROM reciboCompleto WHERE id_recibo = ?',[elemento], (error, results) => {
+    const query = `
+      SELECT 
+        rc.id_recibo,
+        rc.id_condominio,
+        rc.id_departamento,
+        rc.id_inquilino,
+        rc.nombre_completo_inquilino,
+        rc.fecha,
+        rc.mes_pago,
+        rc.no_recibo,
+        rc.concepto_pago,
+        rc.cuota_ordinaria,
+        rc.cuota_penalizacion,
+        rc.cuota_extraordinaria,
+        rc.cuota_reserva,
+        rc.cuota_adeudos,
+        rc.total_pagar,
+        rc.total_pagar_letra,
+        c.nombre_condominio,
+        c.direccion_condominio,
+        c.admin_condominio,
+        e.nombre_edificio,
+        d.numero_departamento 
+      FROM 
+        reciboCompleto AS rc 
+      INNER JOIN departamento AS d ON rc.id_departamento = d.id_departamento 
+      INNER JOIN edificio AS e ON d.id_edificio = e.id_edificio 
+      INNER JOIN condominio AS c ON e.id_condominio = c.id_condominio 
+      WHERE
+        rc.id_recibo = ?
+    `;
+    connection.query(query,[elemento], (error, results) => {
       if (error) {
         console.error(error);
         res.status(500).send('Error al enviar los correos');
@@ -333,23 +311,26 @@ app.post('/api/enviarRecibosCorreoElectronico', (req, res) => {
           id_inquilino: results[0].id_inquilino,
           nombre_completo_inquilino: CryptoJS.AES.decrypt(results[0].nombre_completo_inquilino, secretKey).toString(CryptoJS.enc.Utf8),
           fecha: results[0].fecha,
+          mes_pago: results[0].mes_pago,
+          no_recibo: results[0].no_recibo,
           concepto_pago: results[0].concepto_pago,
           cuota_ordinaria: CryptoJS.AES.decrypt(results[0].cuota_ordinaria, secretKey).toString(CryptoJS.enc.Utf8),
-          concepto_cuota_ordinaria: results[0].concepto_cuota_ordinaria,
           cuota_penalizacion: CryptoJS.AES.decrypt(results[0].cuota_penalizacion, secretKey).toString(CryptoJS.enc.Utf8),
-          concepto_cuota_penalizacion: results[0].concepto_cuota_penalizacion,
           cuota_extraordinaria: CryptoJS.AES.decrypt(results[0].cuota_extraordinaria, secretKey).toString(CryptoJS.enc.Utf8),
-          concepto_cuota_extraordinaria: results[0].concepto_cuota_extraordinaria,
           cuota_reserva: CryptoJS.AES.decrypt(results[0].cuota_reserva, secretKey).toString(CryptoJS.enc.Utf8),
-          concepto_cuota_reserva: results[0].concepto_cuota_reserva,
           cuota_adeudos: CryptoJS.AES.decrypt(results[0].cuota_adeudos, secretKey).toString(CryptoJS.enc.Utf8),
-          concepto_cuota_adeudos: results[0].concepto_cuota_adeudos,
-          total_pagar: results[0].total_pagar
+          total_pagar: results[0].total_pagar,
+          total_pagar_letra: results[0].total_pagar_letra,
+          nombre_condominio: results[0].nombre_condominio,
+          direccion_condominio: results[0].direccion_condominio,
+          admin_condominio: results[0].admin_condominio,
+          nombre_edificio: results[0].nombre_edificio,
+          numero_departamento: results[0].numero_departamento
 
         };
         console.log(datos);
 
-        crearPDF(datos)
+        crearPDFImagen(datos)
         .then((pdfBytes) => {
           // Aquí puedes hacer lo que desees con los bytes del PDF, como guardarlo en un archivo o enviarlo al cliente
           console.log('PDF creado exitosamente');
@@ -407,11 +388,41 @@ app.post('/api/generarPDFMasivo', async (req, res) => {
     console.log(req.body);
     const lista = req.body;
     let superDatos = [];
-
+    const query = `
+      SELECT 
+        rc.id_recibo,
+        rc.id_condominio,
+        rc.id_departamento,
+        rc.id_inquilino,
+        rc.nombre_completo_inquilino,
+        rc.fecha,
+        rc.mes_pago,
+        rc.no_recibo,
+        rc.concepto_pago,
+        rc.cuota_ordinaria,
+        rc.cuota_penalizacion,
+        rc.cuota_extraordinaria,
+        rc.cuota_reserva,
+        rc.cuota_adeudos,
+        rc.total_pagar,
+        rc.total_pagar_letra,
+        c.nombre_condominio,
+        c.direccion_condominio,
+        c.admin_condominio,
+        e.nombre_edificio,
+        d.numero_departamento 
+      FROM 
+        reciboCompleto AS rc 
+      INNER JOIN departamento AS d ON rc.id_departamento = d.id_departamento 
+      INNER JOIN edificio AS e ON d.id_edificio = e.id_edificio 
+      INNER JOIN condominio AS c ON e.id_condominio = c.id_condominio 
+      WHERE
+        rc.id_recibo = ?
+    `;
     // Crear una matriz de promesas para las consultas a la base de datos
     const promises = lista.map(elemento => {
       return new Promise((resolve, reject) => {
-        connection.query('SELECT * FROM reciboCompleto WHERE id_recibo = ?', [elemento], (error, results) => {
+        connection.query(query, [elemento], (error, results) => {
           if (error) {
             console.error(error);
             reject(error);
@@ -424,18 +435,21 @@ app.post('/api/generarPDFMasivo', async (req, res) => {
               id_inquilino: results[0].id_inquilino,
               nombre_completo_inquilino: CryptoJS.AES.decrypt(results[0].nombre_completo_inquilino, secretKey).toString(CryptoJS.enc.Utf8),
               fecha: results[0].fecha,
+              mes_pago: results[0].mes_pago,
+              no_recibo: results[0].no_recibo,
               concepto_pago: results[0].concepto_pago,
               cuota_ordinaria: CryptoJS.AES.decrypt(results[0].cuota_ordinaria, secretKey).toString(CryptoJS.enc.Utf8),
-              concepto_cuota_ordinaria: results[0].concepto_cuota_ordinaria,
               cuota_penalizacion: CryptoJS.AES.decrypt(results[0].cuota_penalizacion, secretKey).toString(CryptoJS.enc.Utf8),
-              concepto_cuota_penalizacion: results[0].concepto_cuota_penalizacion,
               cuota_extraordinaria: CryptoJS.AES.decrypt(results[0].cuota_extraordinaria, secretKey).toString(CryptoJS.enc.Utf8),
-              concepto_cuota_extraordinaria: results[0].concepto_cuota_extraordinaria,
               cuota_reserva: CryptoJS.AES.decrypt(results[0].cuota_reserva, secretKey).toString(CryptoJS.enc.Utf8),
-              concepto_cuota_reserva: results[0].concepto_cuota_reserva,
               cuota_adeudos: CryptoJS.AES.decrypt(results[0].cuota_adeudos, secretKey).toString(CryptoJS.enc.Utf8),
-              concepto_cuota_adeudos: results[0].concepto_cuota_adeudos,
-              total_pagar: results[0].total_pagar
+              total_pagar: results[0].total_pagar,
+              total_pagar_letra: results[0].total_pagar_letra,
+              nombre_condominio: results[0].nombre_condominio,
+              direccion_condominio: results[0].direccion_condominio,
+              admin_condominio: results[0].admin_condominio,
+              nombre_edificio: results[0].nombre_edificio,
+              numero_departamento: results[0].numero_departamento
             };
             superDatos.push(datos);
             resolve();
@@ -447,7 +461,7 @@ app.post('/api/generarPDFMasivo', async (req, res) => {
     // Esperar a que todas las consultas se completen
     await Promise.all(promises);
 
-    const pdfBytes = await crearPDFMultiple(superDatos);
+    const pdfBytes = await crearPDFImagenMultiple(superDatos);
 
     // Guardar el archivo PDF en el servidor
     const filePath = './archivo.pdf';

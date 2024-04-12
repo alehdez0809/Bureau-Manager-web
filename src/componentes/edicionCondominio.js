@@ -7,7 +7,7 @@ function EditoCondominio() {
     id_condominio: '',
     nombre_condominio: '',
     direccion_condominio: '',
-    admin_condominio: 'Edith Rogelia Quiñones Bonilla'
+    admin_condominio: 'EDITH ROGELIA QUIÑONES BONILLA'
   });
   const [visible, setVisible] = useState(false);
 
@@ -179,8 +179,8 @@ function EditoCondominio() {
                 value={formulario.admin_condominio}
                 onChange={handleChange} 
               >
-                <option value="Edith Rogelia Quiñones Bonilla">Edith Rogelia Quiñones Bonilla</option>
-                <option value="Mónica Bernal Morales">Mónica Bernal Morales</option>
+                <option value="EDITH ROGELIA QUIÑONES BONILLA">Edith Rogelia Quiñones Bonilla</option>
+                <option value="MÓNICA BERNAL MORALES">Mónica Bernal Morales</option>
               </select>
             </div>
             <br/>

@@ -388,9 +388,14 @@ function NuevoRecibo() {
     const unidades = ["", "UNO", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE", "OCHO", "NUEVE"];
     const decenas = ["", "DIEZ", "VEINTE", "TREINTA", "CUARENTA", "CINCUENTA", "SESENTA", "SETENTA", "OCHENTA", "NOVENTA"];
     const centenas = ["", "CIEN", "DOSCIENTOS", "TRESCIENTOS", "CUATROCIENTOS", "QUINIENTOS", "SEISCIENTOS", "SETECIENTOS", "OCHOCIENTOS", "NOVECIENTOS"];
+    const miles = ["", "MIL", "DOS MIL", "TRES MIL", "CUATRO MIL", "CINCO MIL", "SEIS MIL", "SIETE MIL", "OCHO MIL", "NUEVE MIL"];
     
     let letras = "";
 
+    if (numero >= 1000){
+      letras += miles[Math.floor(numero / 1000)] + " ";
+      numero %= 1000;
+    }
     if (numero >= 100) {
       letras += centenas[Math.floor(numero / 100)] + " ";
       numero %= 100;
