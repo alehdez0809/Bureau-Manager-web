@@ -227,6 +227,15 @@ function VerRecibo() {
     }
   };
   
+  const handleSeleccionarTodos = (e) => {
+    if (e.target.checked){
+      const idsRecibos = registrosActuales.map(recibo => recibo.id_recibo);
+      setRecibosSeleccionados(idsRecibos);
+    }else{
+      const newRecibosSeleccionados = recibosSeleccionados.filter(id => !registrosActuales.some(recibo => recibo.id_recibo === id));
+      setRecibosSeleccionados(newRecibosSeleccionados);
+    }
+  };
 
 
   let opcionesRegistro = registrosActuales.length === 0 
@@ -288,7 +297,14 @@ function VerRecibo() {
                     <th>No. de Recibo</th>
                     <th>Concepto de Pago</th>
                     <th>Total de Pago</th>
-                    <th>Seleccionar:</th>
+                    <th>Seleccionar todos: 
+                      <br/>
+                      <input
+                        type='checkbox'
+                        onChange={handleSeleccionarTodos}
+                        checked={registrosActuales.length > 0 && registrosActuales.every(recibo => recibosSeleccionados.includes(recibo.id_recibo))}
+                      />
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
