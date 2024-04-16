@@ -335,6 +335,7 @@ html, body {
       top: 0;
       left: -100%;
       transition: 850ms;
+      z-index: 1500;
     }
     
     .nav-menu.active {

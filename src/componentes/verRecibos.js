@@ -14,7 +14,7 @@ function VerRecibo() {
   const [mensajeAdvertencia, setMensajeAdvertencia] = useState('');
 
   const [paginaActual, setPaginaActual] = useState(1);
-  const [registrosPorPagina] = useState(15);
+  const [registrosPorPagina] = useState(5);
 
   const [condominios, setCondominios] = useState([]);
   const [edificios, setEdificios] = useState([]);

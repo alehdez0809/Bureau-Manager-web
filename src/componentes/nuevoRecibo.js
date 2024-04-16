@@ -648,7 +648,7 @@ function NuevoRecibo() {
                       type="text"
                       id="cuota_ordinaria"
                       name="cuota_ordinaria"
-                      placeholder="12000"
+                      placeholder="$"
                       value={formulario.cuota_ordinaria}
                       onChange={handleChange}
                     />
@@ -663,7 +663,7 @@ function NuevoRecibo() {
                       type="text"
                       id="cuota_penalizacion"
                       name="cuota_penalizacion"
-                      placeholder="12000"
+                      placeholder="$"
                       value={formulario.cuota_penalizacion}
                       onChange={handleChange}
                     />
@@ -675,7 +675,7 @@ function NuevoRecibo() {
                       type="text"
                       id="cuota_extraordinaria"
                       name="cuota_extraordinaria"
-                      placeholder="12000"
+                      placeholder="$"
                       value={formulario.cuota_extraordinaria}
                       onChange={handleChange}
                     />
@@ -687,7 +687,7 @@ function NuevoRecibo() {
                       type="text"
                       id="cuota_reserva"
                       name="cuota_reserva"
-                      placeholder="12000"
+                      placeholder="$"
                       value={formulario.cuota_reserva}
                       onChange={handleChange}
                     />
@@ -699,7 +699,7 @@ function NuevoRecibo() {
                       type="text"
                       id="cuota_adeudos"
                       name="cuota_adeudos"
-                      placeholder="12000"
+                      placeholder="$"
                       value={formulario.cuota_adeudos}
                       onChange={handleChange}
                     />

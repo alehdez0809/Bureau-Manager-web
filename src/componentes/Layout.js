@@ -1,5 +1,5 @@
 import React from 'react';
-import Menu from '../bmenu/Menu.js'; // Asume que tu MenuLateral se llama Menu.js
+import Menu from '../bmenu/Menu.js'; 
 
 const Layout = ({ children }) => {
   return (

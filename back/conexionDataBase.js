@@ -767,7 +767,7 @@ app.get('/api/verificarRecibo/:id_condominio/:no_recibo', (req, res) => {
 });
 
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`Servidor iniciado en el puerto ${PORT}`);
+const PORT = 4000;
+app.listen(PORT, '0.0.0.0',() => {
+  console.log(`Servidor iniciado en http://0.0.0.0:${PORT}`);
 });
