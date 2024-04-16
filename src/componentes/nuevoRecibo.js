@@ -420,6 +420,11 @@ function NuevoRecibo() {
     return `${numeroALetra(entero)} ${decimal}/100 M.N.`;
   }
 
+  const fechaActual = new Date();
+  fechaActual.setDate(fechaActual.getDate() - 60);
+  const minDate = fechaActual.toISOString().split('T')[0];
+  const maxDate = new Date().toISOString().split('T')[0];
+
   const handleSubmit = async event => {
     event.preventDefault();
 
@@ -622,6 +627,8 @@ function NuevoRecibo() {
                       name="fecha"
                       value={formulario.fecha}
                       onChange={handleChangeFecha}
+                      min={minDate}
+                      max={maxDate}
                     />
                     <div className="error-message">{errores.fecha}</div>
                 </div>

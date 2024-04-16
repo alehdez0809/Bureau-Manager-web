@@ -112,15 +112,24 @@ html, body {
       height: 65px;
     }
     
-    input[type="text"], input[type="email"], input[type="password"],input[type="date"] {
+    input[type="text"], input[type="email"], input[type="password"]{
       background-color: #f6f6f6;
       border: none;
       border-radius: 5px;
       padding: 20px; /* aumenta el padding para aumentar el tamaño */
       margin-bottom: 10px; /* agrega un margen inferior para separar los campos */
-      width: calc(100% - 40px); /* resta el doble del padding a la anchura para ajustar el tamaño */
+      width: calc(100% - 30px); /* resta el doble del padding a la anchura para ajustar el tamaño */
       transition: all 0.3s ease;
     }  
+    input[type="date"]{
+      background-color: #f6f6f6;
+      border: none;
+      border-radius: 5px;
+      padding: 20px; /* aumenta el padding para aumentar el tamaño */
+      margin-bottom: 10px; /* agrega un margen inferior para separar los campos */
+      transition: all 0.3s ease;
+      width: 160px;
+    }
     input[type="month"]{
       background-color: #f6f6f6;
       border: none;
