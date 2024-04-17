@@ -244,16 +244,16 @@ app.post('/api/registrarInquilino', (req, res) => {
 app.post('/api/registrarRecibo', (req, res) => {
   console.log("-------------------------------")
   console.log(req.body);
-  const { id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, mes_pago, concepto_pago, cuota_ordinaria, cuota_penalizacion, cuota_extraordinaria, cuota_reserva, cuota_adeudos, total_pagar, total_pagar_letra, id_administrador } = req.body;
+  const { id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, fecha_formateada, mes_pago, concepto_pago, cuota_ordinaria, cuota_penalizacion, cuota_extraordinaria, cuota_reserva, cuota_adeudos, total_pagar, total_pagar_letra, id_administrador } = req.body;
   const nombre_completo_inquilinoAES = CryptoJS.AES.encrypt(nombre_completo_inquilino, secretKeyAES).toString();
   const cuota_ordinariaAES = CryptoJS.AES.encrypt(cuota_ordinaria, secretKeyAES).toString();
   const cuota_extraordinariaAES = CryptoJS.AES.encrypt(cuota_extraordinaria, secretKeyAES).toString();
   const cuota_penalizacionAES = CryptoJS.AES.encrypt(cuota_penalizacion, secretKeyAES).toString();
   const cuota_reservaAES = CryptoJS.AES.encrypt(cuota_reserva, secretKeyAES).toString();
   const cuota_adeudosAES = CryptoJS.AES.encrypt(cuota_adeudos, secretKeyAES).toString();
-  const sql = `INSERT INTO reciboCompleto (id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, mes_pago, concepto_pago, cuota_ordinaria, cuota_penalizacion, cuota_extraordinaria, cuota_reserva, cuota_adeudos, total_pagar, total_pagar_letra, id_administrador) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const sql = `INSERT INTO reciboCompleto (id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, fecha_formateada, mes_pago, concepto_pago, cuota_ordinaria, cuota_penalizacion, cuota_extraordinaria, cuota_reserva, cuota_adeudos, total_pagar, total_pagar_letra, id_administrador) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
   const values = [
-    id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilinoAES, no_recibo, fecha, mes_pago, concepto_pago, cuota_ordinariaAES, cuota_penalizacionAES, cuota_extraordinariaAES, cuota_reservaAES, cuota_adeudosAES, total_pagar, total_pagar_letra, id_administrador];
+    id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilinoAES, no_recibo, fecha, fecha_formateada, mes_pago, concepto_pago, cuota_ordinariaAES, cuota_penalizacionAES, cuota_extraordinariaAES, cuota_reservaAES, cuota_adeudosAES, total_pagar, total_pagar_letra, id_administrador];
   connection.query(sql, values, error => {
     if (error) console.log(error);
     res.send("200");
@@ -274,7 +274,7 @@ app.post('/api/enviarRecibosCorreoElectronico', (req, res) => {
         rc.id_departamento,
         rc.id_inquilino,
         rc.nombre_completo_inquilino,
-        rc.fecha,
+        rc.fecha_formateada,
         rc.mes_pago,
         rc.no_recibo,
         rc.concepto_pago,
@@ -310,7 +310,7 @@ app.post('/api/enviarRecibosCorreoElectronico', (req, res) => {
           id_departamento: results[0].id_departamento,
           id_inquilino: results[0].id_inquilino,
           nombre_completo_inquilino: CryptoJS.AES.decrypt(results[0].nombre_completo_inquilino, secretKey).toString(CryptoJS.enc.Utf8),
-          fecha: results[0].fecha,
+          fecha: results[0].fecha_formateada,
           mes_pago: results[0].mes_pago,
           no_recibo: results[0].no_recibo,
           concepto_pago: results[0].concepto_pago,
@@ -395,7 +395,7 @@ app.post('/api/generarPDFMasivo', async (req, res) => {
         rc.id_departamento,
         rc.id_inquilino,
         rc.nombre_completo_inquilino,
-        rc.fecha,
+        rc.fecha_formateada,
         rc.mes_pago,
         rc.no_recibo,
         rc.concepto_pago,
@@ -434,7 +434,7 @@ app.post('/api/generarPDFMasivo', async (req, res) => {
               id_departamento: results[0].id_departamento,
               id_inquilino: results[0].id_inquilino,
               nombre_completo_inquilino: CryptoJS.AES.decrypt(results[0].nombre_completo_inquilino, secretKey).toString(CryptoJS.enc.Utf8),
-              fecha: results[0].fecha,
+              fecha: results[0].fecha_formateada,
               mes_pago: results[0].mes_pago,
               no_recibo: results[0].no_recibo,
               concepto_pago: results[0].concepto_pago,

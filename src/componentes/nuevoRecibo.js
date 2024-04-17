@@ -16,6 +16,7 @@ function NuevoRecibo() {
     nombre_completo_inquilino:'',
     no_recibo:'',
     fecha:'',
+    fecha_formateada:'',
     mes_pago:'',	
     concepto_pago:'CUOTAS DE MANTENIMIENTO Y ADMINISTRACIÓN',
     cuota_ordinaria:'',
@@ -377,6 +378,17 @@ function NuevoRecibo() {
     }
   };
 
+  const mesesAbreviados = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  const formatearFecha = (fechaISO) => {
+    const fecha = new Date(fechaISO);
+    const isoString = fecha.toISOString();
+    const [year, month, day] = isoString.split('T')[0].split('-');
+    const mes = mesesAbreviados[parseInt(month) - 1];
+    const anio = year.slice(2);
+    return `${day}-${mes}-${anio}`;
+  };
+
+
   const handleChangeFecha = event => {
     const { value } = event.target;
     const fecha = new Date(value);
@@ -389,9 +401,14 @@ function NuevoRecibo() {
     const decenas = ["", "DIEZ", "VEINTE", "TREINTA", "CUARENTA", "CINCUENTA", "SESENTA", "SETENTA", "OCHENTA", "NOVENTA"];
     const centenas = ["", "CIEN", "DOSCIENTOS", "TRESCIENTOS", "CUATROCIENTOS", "QUINIENTOS", "SEISCIENTOS", "SETECIENTOS", "OCHOCIENTOS", "NOVECIENTOS"];
     const miles = ["", "MIL", "DOS MIL", "TRES MIL", "CUATRO MIL", "CINCO MIL", "SEIS MIL", "SIETE MIL", "OCHO MIL", "NUEVE MIL"];
+    const dmiles = ["", "DIEZ MIL", "VEINTE MIL", "TREINTA MIL", "CUARENTA MIL", "CINCUENTA MIL", "SESENTA MIL", "SETENTA MIL", "OCHENTA MIL", "NOVENTA MIL"];
     
     let letras = "";
 
+    if (numero >= 10000){
+      letras += dmiles[Math.floor(numero / 10000)] + " ";
+      numero %= 10000;
+    }
     if (numero >= 1000){
       letras += miles[Math.floor(numero / 1000)] + " ";
       numero %= 1000;
@@ -425,6 +442,8 @@ function NuevoRecibo() {
   const minDate = fechaActual.toISOString().split('T')[0];
   const maxDate = new Date().toISOString().split('T')[0];
 
+  
+
   const handleSubmit = async event => {
     event.preventDefault();
 
@@ -433,7 +452,6 @@ function NuevoRecibo() {
       return; 
     }
     
-
     try { 
       const respuesta = await axios.get(`http://localhost:4000/api/verificarRecibo/${formulario.id_condominio}/${formulario.no_recibo}`);
       if(respuesta.data.existe){
@@ -449,6 +467,7 @@ function NuevoRecibo() {
  
       formulario.total_pagar = ddd.toString();
       formulario.total_pagar_letra = importeEnLetra(ddd);
+      formulario.fecha_formateada = formatearFecha(formulario.fecha);
       const resultado = await axios.post('http://localhost:4000/api/registrarRecibo', formulario);
       if (resultado.data === 200) {
         setVisible(true);
