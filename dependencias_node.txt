@@ -25,3 +25,4 @@ npm i node-polyfill-webpack-plugin
 npm install @pdf-lib/fontkit
 npm install react-icons
 npm install concurrently --save-dev
+npm i xlsx

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import { Link, useNavigate} from 'react-router-dom';
 import axios from 'axios';
 
@@ -18,6 +18,14 @@ function RegistrarCuenta() {
     const [errors, setErrors] = useState({});
 
     const [errorMessage, setErrorMessage] = useState('');
+
+    useEffect(() => {
+      document.body.classList.add('body1');
+  
+          return () => {
+              document.body.classList.remove('body1');
+          };
+    });
 
     const handleSubmit = async event => {
       event.preventDefault();
@@ -99,7 +107,7 @@ function RegistrarCuenta() {
     };
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className='form'>
         <h1>Registrar Nueva Cuenta</h1>
         <div className="form-group">
               <input

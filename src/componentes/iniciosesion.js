@@ -105,7 +105,7 @@ function Formulario() {
     }
 
     return (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className='form'>
             <div className='divCenter'>
               <img className='imgLogo' src={logo} alt="Logo de la empresa" />
             </div>

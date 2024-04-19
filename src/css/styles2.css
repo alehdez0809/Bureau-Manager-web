@@ -93,6 +93,14 @@ html, body {
       align-items: center;
       height: 100vh;
     }  
+    .body2{
+      background-color: whitesmoke;
+      background-size: no-repeat;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
     h1,h2 {
       text-align: center;
       margin-bottom: 20px;
@@ -113,26 +121,29 @@ html, body {
     }
     
     input[type="text"], input[type="email"], input[type="password"]{
-      background-color: #f6f6f6;
-      border: none;
+      background-color: #e6e6e6;
+      border-color: #000000;
       border-radius: 5px;
+      border-width: 1px;
       padding: 20px; /* aumenta el padding para aumentar el tamaño */
       margin-bottom: 10px; /* agrega un margen inferior para separar los campos */
       width: calc(100% - 30px); /* resta el doble del padding a la anchura para ajustar el tamaño */
       transition: all 0.3s ease;
+      
     }  
     input[type="date"]{
-      background-color: #f6f6f6;
-      border: none;
+      background-color: #e6e6e6;
+      border-color: #000000;
       border-radius: 5px;
+      border-width: 1px;
       padding: 20px; /* aumenta el padding para aumentar el tamaño */
       margin-bottom: 10px; /* agrega un margen inferior para separar los campos */
       transition: all 0.3s ease;
       width: 160px;
     }
     input[type="month"]{
-      background-color: #f6f6f6;
-      border: none;
+      background-color: #e6e6e6;
+      border-color: #000000;
       border-radius: 5px;
       padding: 20px; /* aumenta el padding para aumentar el tamaño */
       margin-bottom: 10px; /* agrega un margen inferior para separar los campos */
@@ -215,9 +226,9 @@ html, body {
     select {
       font-size: 1rem;
       padding: 0.5rem 2rem 0.5rem 1rem;
-      border: none;
+      border-color: #000000;
       border-radius: 0.25rem;
-      background-color: #f3f3f3;
+      background-color: #e6e6e6;
       color: #333;
       appearance: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3E%3Cpath d='M14.8 4.2c-.4-.4-1-.4-1.4 0L8 9.6 2.6 4.2c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4l6 6c.2.2.5.3.7.3s.5-.1.7-.3l6-6c.4-.4.4-1 0-1.4z'/%3E%3C/svg%3E");
@@ -321,7 +332,7 @@ html, body {
       left: 0;
       width: 100%;
       z-index: 1000; 
-      background-color: #060b26;
+      background-color: #163C40;
       height: 50px;
       display: flex;
       justify-content: flex-start;
@@ -335,7 +346,7 @@ html, body {
     }
     
     .nav-menu {
-      background-color: #060b26;
+      background-color: #163C40;
       width: 250px;
       height: 100vh;
       display: flex;
@@ -374,7 +385,7 @@ html, body {
     }
     
     .nav-text a:hover {
-      background-color: #1a83ff;
+      background-color: #1B6953;
     }
     
     .nav-menu-items {
@@ -382,7 +393,7 @@ html, body {
     }
     
     .navbar-toggle {
-      background-color: #060b26;
+      background-color: #163C40;
       width: 100%;
       height: 80px;
       display: flex;
@@ -411,6 +422,7 @@ html, body {
       min-width: 50px;
       text-align: center;
     }
+    
     .div-espaciado{
       margin-top: 130px;
     }

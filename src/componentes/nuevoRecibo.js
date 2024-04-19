@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import e from 'connect-flash';
+import { SiMicrosoftexcel } from "react-icons/si";
 
 
 function NuevoRecibo() {
@@ -27,6 +28,13 @@ function NuevoRecibo() {
     total_pagar:'',
     total_pagar_letra:'',
     id_administrador: id_administrador,
+  });
+  const [formulario2, setFormulario2] = useState({
+    id_condominio: '',
+    id_edificio: '',
+    id_inquilino: '',
+    total_pagado: '',
+    fecha_pago: ''
   });
 
   const [visible, setVisible] = useState(false);
@@ -56,12 +64,22 @@ function NuevoRecibo() {
             ...prevState,
             id_condominio: 0,
             nombre_completo_inquilino:'',
-        }));}else{
+         }));
+          setFormulario2(prevState => ({
+            ...prevState,
+            id_condominio: 0,
+          }));
+        }else{
           setCondominios(response.data);
           setFormulario(prevState => ({
             ...prevState,
             id_condominio: response.data[0].id_condominio
           }));
+          setFormulario2(prevState => ({
+            ...prevState,
+            id_condominio: response.data[0].id_condominio
+          }));  
+          
           // Mueve el segundo axios.get() dentro del then() del primer axios.get()
         const selectedCondominio = response.data[0].id_condominio;
         const diccionario = {};
@@ -78,12 +96,20 @@ function NuevoRecibo() {
                 id_edificio: 0,
                 nombre_completo_inquilino:'',
               }));
+              setFormulario2(prevState => ({
+                ...prevState,
+                id_edificio: 0,
+              }));  
             } else {
               setEdificios(resultado.data);
               setFormulario(prevState => ({
                 ...prevState,
                 id_edificio: resultado.data[0].id_edificio,
               }));
+              setFormulario2(prevState => ({
+                ...prevState,
+                id_edificio: resultado.data[0].id_edificio,
+              }));  
 
               const selectedEdifcio = resultado.data[0].id_edificio;
               const diccionario2 = {};
@@ -99,12 +125,14 @@ function NuevoRecibo() {
                     id_departamento: 0,
                     nombre_completo_inquilino:'',
                   }));
+                  
                 } else {
                   setDepartamentos(resultado.data);
                   setFormulario(prevState => ({
                     ...prevState,
                     id_departamento: resultado.data[0].id_departamento,
                   }));
+                  
 
                   const selectedInquilino = resultado.data[0].id_departamento;
                   const diccionario3 = {};
@@ -119,12 +147,20 @@ function NuevoRecibo() {
                         id_inquilino: 0,
                         nombre_completo_inquilino:'',
                       }));
+                      setFormulario2(prevState => ({
+                        ...prevState,
+                        id_inquilino: 0,
+                      }));  
                     } else {
                       setInquilinos(resultado.data);
                       setFormulario(prevState => ({
                         ...prevState,
                         id_inquilino: resultado.data[0].id_inquilino,
                         nombre_completo_inquilino: resultado.data[0].nombre_inquilino+" "+resultado.data[0].apellino_paterno_inquilino+" "+resultado.data[0].apellino_materno_inquilino,
+                      }));
+                      setFormulario2(prevState => ({
+                        ...prevState,
+                        id_inquilino: resultado.data[0].id_inquilino,
                       }));
                     }
                   })
@@ -154,10 +190,10 @@ function NuevoRecibo() {
           alert('Error al obtener los condominios');
         }
       });
-        document.body.classList.add('body1');
+        document.body.classList.add('body2');
 
         return () => {
-            document.body.classList.remove('body1');
+            document.body.classList.remove('body2');
         };
   }, []);
   
@@ -187,9 +223,17 @@ function NuevoRecibo() {
                 id_edificio: 0,
                 nombre_completo_inquilino:'',
               }));
+              setFormulario2(prevState => ({
+                ...prevState,
+                id_edificio: 0,
+              }));
             } else {
               setEdificios(resultado.data);
               setFormulario(prevState => ({
+                ...prevState,
+                id_edificio: resultado.data[0].id_edificio,
+              }));
+              setFormulario2(prevState => ({
                 ...prevState,
                 id_edificio: resultado.data[0].id_edificio,
               }));
@@ -226,12 +270,20 @@ function NuevoRecibo() {
                         id_inquilino: 0,
                         nombre_completo_inquilino:'',
                       }));
+                      setFormulario2(prevState => ({
+                        ...prevState,
+                        id_inquilino: 0,
+                      }));
                     } else {
                       setInquilinos(resultado.data);
                       setFormulario(prevState => ({
                         ...prevState,
                         id_inquilino: resultado.data[0].id_inquilino,
                         nombre_completo_inquilino: resultado.data[0].nombre_inquilino+" "+resultado.data[0].apellino_paterno_inquilino+" "+resultado.data[0].apellino_materno_inquilino,
+                      }));
+                      setFormulario2(prevState => ({
+                        ...prevState,
+                        id_inquilino: resultado.data[0].id_inquilino,
                       }));
                     }
                   })
@@ -301,12 +353,20 @@ function NuevoRecibo() {
                         id_inquilino: 0,
                         nombre_completo_inquilino:'',
                       }));
+                      setFormulario2(prevState => ({
+                        ...prevState,
+                        id_inquilino: 0,
+                      }));
                     } else {
                       setInquilinos(resultado.data);
                       setFormulario(prevState => ({
                         ...prevState,
                         id_inquilino: resultado.data[0].id_inquilino,
                         nombre_completo_inquilino: resultado.data[0].nombre_inquilino+" "+resultado.data[0].apellino_paterno_inquilino+" "+resultado.data[0].apellino_materno_inquilino,
+                      }));
+                      setFormulario2(prevState => ({
+                        ...prevState,
+                        id_inquilino: resultado.data[0].id_inquilino,
                       }));
                     }
                   })
@@ -349,12 +409,20 @@ function NuevoRecibo() {
                         id_inquilino: 0,
                         nombre_completo_inquilino:'',
                       }));
+                      setFormulario2(prevState => ({
+                        ...prevState,
+                        id_inquilino: 0,
+                      }));
                     } else {
                       setInquilinos(resultado.data);
                       setFormulario(prevState => ({
                         ...prevState,
                         id_inquilino: resultado.data[0].id_inquilino,
                         nombre_completo_inquilino: resultado.data[0].nombre_inquilino+" "+resultado.data[0].apellino_paterno_inquilino+" "+resultado.data[0].apellino_materno_inquilino,
+                      }));
+                      setFormulario2(prevState => ({
+                        ...prevState,
+                        id_inquilino: resultado.data[0].id_inquilino,
                       }));
                     }
                   })
@@ -394,6 +462,7 @@ function NuevoRecibo() {
     const fecha = new Date(value);
     const mesPago = `${meses[fecha.getMonth()]} ${fecha.getFullYear()}`;
     setFormulario(prevState => ({ ...prevState, fecha: value, mes_pago: mesPago }));
+    setFormulario2(prevState => ({ ...prevState, fecha_pago: value }));
   };
 
   function numeroALetra(numero){
@@ -466,9 +535,11 @@ function NuevoRecibo() {
           + (parseFloat(formulario.cuota_adeudos) || 0);
  
       formulario.total_pagar = ddd.toString();
+      formulario2.total_pagado = ddd.toString();
       formulario.total_pagar_letra = importeEnLetra(ddd);
       formulario.fecha_formateada = formatearFecha(formulario.fecha);
       const resultado = await axios.post('http://localhost:4000/api/registrarRecibo', formulario);
+      const resultado2 = await axios.post('http://localhost:4000/api/registrarInfoPagos', formulario2);
       if (resultado.data === 200) {
         setVisible(true);
         //setFormulario(prevState => ({
@@ -595,10 +666,13 @@ function NuevoRecibo() {
     );
   }
 
-    return (
-        <div className='form-container'>
+    return (  
+        <div style={{marginTop: "210px"}}>
+          <h1>Crear un nuevo recibo</h1>
+          <Link to="/NuevoReciboExcel">
+            <button type="button" className="mi-boton2" style={{width: '260px'}}><SiMicrosoftexcel />  Generar recibos a partir de Excel</button>
+          </Link>
           <form className="fromInquilino" onSubmit={handleSubmit}>
-            <h2>Registrar un Nuevo Recibo</h2>
             <div className='select-container'>
                 <div className='select-item'>
                 <label className='labelInput'>Seleccione un condominio: </label>

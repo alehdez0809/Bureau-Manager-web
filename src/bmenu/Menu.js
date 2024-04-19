@@ -16,6 +16,7 @@ function Menu() {
         <Link to="#" className='menu-bars'>
             <FaIcons.FaBars onClick={mostrarSidebar}/>
         </Link>
+        <p style={{marginLeft: "15px", fontSize: "1.2rem", fontStyle: "italic", color: "whitesmoke"}}>Bureau-Manager</p>
       </div>
       <nav className={sidebar ? 'nav-menu active' : 'nav-menu'}>
         <ul className='nav-menu-items' onClick={mostrarSidebar}>
