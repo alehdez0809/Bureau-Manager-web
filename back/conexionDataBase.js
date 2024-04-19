@@ -272,6 +272,30 @@ app.post('/api/registrarInfoPagos', (req, res) => {
   })
 });
 
+app.post('/api/registrarInfoPagosAdeudos', (req, res) => {
+  console.log("-------------------------------")
+  console.log(req.body);
+  const { id_condominio, id_edificio, id_inquilino, adeudo, fecha_pago} = req.body;
+  const query = `INSERT INTO infopagos (id_condominio, id_edificio, id_inquilino, adeudo, fecha_pago) VALUES (?, ?, ?, ?, ?)`;
+  const values = [id_condominio, id_edificio, id_inquilino, adeudo, fecha_pago];
+  connection.query(query, values, error => {
+    if (error) console.log(error);
+    res.send("200");
+  })
+});
+
+app.post('/api/registrarInfoPagosCompleto', (req, res) => {
+  console.log("-------------------------------")
+  console.log(req.body);
+  const { id_condominio, id_edificio, id_inquilino, total_pagado,adeudo, fecha_pago} = req.body;
+  const query = `INSERT INTO infopagos (id_condominio, id_edificio, id_inquilino, total_pagado, adeudo, fecha_pago) VALUES (?, ?, ?, ?, ?, ?)`;
+  const values = [id_condominio, id_edificio, id_inquilino, total_pagado,adeudo, fecha_pago];
+  connection.query(query, values, error => {
+    if (error) console.log(error);
+    res.send("200");
+  })
+});
+
 app.post('/api/enviarRecibosCorreoElectronico', (req, res) => {
   console.log("-------------------------------")
   console.log(req.body);

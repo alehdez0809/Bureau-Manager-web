@@ -14,7 +14,7 @@ function VerRecibo() {
   const [mensajeAdvertencia, setMensajeAdvertencia] = useState('');
 
   const [paginaActual, setPaginaActual] = useState(1);
-  const [registrosPorPagina] = useState(5);
+  const [registrosPorPagina] = useState(10);
 
   const [condominios, setCondominios] = useState([]);
   const [edificios, setEdificios] = useState([]);
@@ -257,7 +257,7 @@ function VerRecibo() {
       </tr>
     ));
     return (
-        <div className='div-contenedor div-espaciado'>
+        <div className='div-contenedor div-espaciado' style={{marginTop: "150px"}}>
           <form className="fromRecibo" onSubmit={handleSubmit}>
 
             <h2>Seleccione los Recibos a enviar</h2>
@@ -326,9 +326,9 @@ function VerRecibo() {
             </div>
             <div className="mensaje-advertencia">{mensajeAdvertencia}</div>
             <div className='navegacion-pag'>
-              <button onClick={paginaAnterior} disabled={paginaActual === 1} className='btn-pag'><FaArrowCircleLeft/>  Anterior</button>
+              <button onClick={paginaAnterior} disabled={paginaActual === 1} className='btn-pag' type='button'><FaArrowCircleLeft/>  Anterior</button>
               <span className='span-pag'>Página {paginaActual}</span>
-              <button onClick={paginaSiguiente} disabled={paginaActual === Math.ceil(registros.length / registrosPorPagina)} className='btn-pag'>Siguiente  <FaArrowCircleRight/></button>
+              <button onClick={paginaSiguiente} disabled={paginaActual === Math.ceil(registros.length / registrosPorPagina)} className='btn-pag' type='button'>Siguiente  <FaArrowCircleRight/></button>
             </div>
           </form>   
         </div>

@@ -149,6 +149,18 @@ html, body {
       margin-bottom: 10px; /* agrega un margen inferior para separar los campos */
       transition: all 0.3s ease;
     }
+
+    input[type="file"] {
+      background-color: #e6e6e6;
+      border-color: #000000;
+      border-radius: 5px;
+      border-width: 1px;
+      padding: 20px; /* aumenta el padding para aumentar el tamaño */
+      margin-bottom: 10px; /* agrega un margen inferior para separar los campos */
+      width: 300px; /* resta el doble del padding a la anchura para ajustar el tamaño */
+      transition: all 0.3s ease;
+    }
+    
   
     button[type="submit"] {
       background-color: #4CAF50;
