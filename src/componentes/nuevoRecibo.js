@@ -190,10 +190,10 @@ function NuevoRecibo() {
           alert('Error al obtener los condominios');
         }
       });
-        document.body.classList.add('body2');
+        document.body.classList.add('body1');
 
         return () => {
-            document.body.classList.remove('body2');
+            document.body.classList.remove('body1');
         };
   }, []);
   

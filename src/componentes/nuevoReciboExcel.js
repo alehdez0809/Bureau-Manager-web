@@ -16,13 +16,6 @@ function NuevoReciboExcel() {
   const [archivo, setArchivo] = useState(null);
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
-  const [formulario2, setFormulario2] = useState({
-    id_condominio: '',
-    id_edificio: '',
-    id_inquilino: '',
-    total_pagado: '',
-    fecha_pago: ''
-  });
 
   useEffect(() => {
     axios.get(`http://localhost:4000/api/getCondominios/${id_administrador}`)
@@ -33,9 +26,9 @@ function NuevoReciboExcel() {
         console.error("Error al obtener condominios", error);
       });
 
-    document.body.classList.add('body2');
+    document.body.classList.add('body1');
     return () => {
-        document.body.classList.remove('body2');
+        document.body.classList.remove('body1');
     };
   }, []);
 
@@ -85,6 +78,7 @@ function NuevoReciboExcel() {
     event.preventDefault();
     if (!selectedCondominio || !selectedEdificio || !selectedMes || !archivo) {
       setError('Todos los campos son obligatorios, incluido el archivo Excel.');
+      setCargando(false);
       return;
     }
     try{
@@ -94,6 +88,7 @@ function NuevoReciboExcel() {
       const worksheet = workbook.Sheets[sheetName];
       if (!worksheet) {
         setError(`No se encontró una hoja llamada '${sheetName}' en el archivo.`);
+        setCargando(false);
         return;
       }
       const rango = XLSX.utils.decode_range(worksheet['!ref']);
@@ -105,18 +100,19 @@ function NuevoReciboExcel() {
         if (row[0] === undefined || row[0] === '' || !row[0]) break; 
         deptosExcel.push(row[0].toString().trim());
       }
-
-
+      
       const response = await axios.post('http://localhost:4000/api/getDepartamentosByEdificios', {id_edificio: selectedEdificio});
       const deptosBD = response.data;
       const deptosFaltantesEnExcel = deptosBD.filter(depto => !deptosExcel.map(d => d.toString()).includes(depto.numero_departamento.toString()));
       const deptosFaltantes = deptosExcel.filter(depto => !deptosBD.map(d => d.numero_departamento.toString()).includes(depto));
       if(deptosFaltantesEnExcel.length > 0){
         setError(`Los siguientes departamentos no están en el archivo Excel: ${deptosFaltantesEnExcel.map(depto => depto.numero_departamento).join(', ')}`);
+        setCargando(false);
         return;
       }  
       if (deptosFaltantes.length > 0) {
         setError(`Los siguientes departamentos no están registrados: ${deptosFaltantes.join(', ')}`);
+        setCargando(false);
         return;
       }
 
@@ -132,6 +128,21 @@ function NuevoReciboExcel() {
 
       if (deptosSinInquilinos.length > 0) {
         setError(`Los siguientes departamentos no tienen inquilinos registrados: ${deptosSinInquilinos.join(', ')}`);
+        setCargando(false);
+        return;
+      }
+      //verificar si el recibo ya existe en la base de datos
+      for (let fila of datos){
+        if (!fila[0] || fila[0] === '') break;
+        if(fila[10]){
+          let no_recibo = fila[10].toString().trim();
+          const response = await axios.get(`http://localhost:4000/api/verificarRecibo/${selectedCondominio}/${no_recibo}`);
+          if(response.data.existe){
+            setError(`El recibo número ${no_recibo} ya está registrado en la base de datos.`);
+            setCargando(false);
+            return;
+          }
+        }
       }
       const hoy = new Date().toISOString().split('T')[0];
       for (let fila of datos) {
@@ -146,17 +157,19 @@ function NuevoReciboExcel() {
             const responseInquilino = await axios.post('http://localhost:4000/api/getInquilinosbyDepartamento', {id_departamento: deptoEncontrado.id_departamento});
             if(responseInquilino.data.length > 0){
               let id_inquilino_select = responseInquilino.data[0].id_inquilino;
-              let adeudo_fila = fila[11]; // Suponiendo que la columna L es el index 11
+              let adeudo_fila = fila[11];
       
               if (adeudo_fila) {
                 const datosFormulario3 = {
                   id_condominio: selectedCondominio,
                   id_edificio: selectedEdificio,
                   id_inquilino: id_inquilino_select,
+                  total_pagado: '0',
                   adeudo: adeudo_fila,
                   fecha_pago: hoy
                 };
-                await axios.post('http://localhost:4000/api/registrarInfoPagosAdeudos', datosFormulario3);
+                console.log(datosFormulario3);
+                await axios.post('http://localhost:4000/api/registrarInfoPagosCompleto', datosFormulario3);
               }
             } else {
               console.log(`No hay inquilinos registrados para el departamento ${numero_departamento}`);
@@ -179,6 +192,11 @@ function NuevoReciboExcel() {
           let inquilino = inquilinos[0];
           let nombreCompletoInquilino = `${inquilino.nombre_inquilino} ${inquilino.apellino_paterno_inquilino} ${inquilino.apellino_materno_inquilino}`;
       
+          let adeudo = parseFloat(fila[11]);
+          /*if(adeudo <= 0){
+            adeudo = adeudo.toFixed(1);
+          }*/
+          
           let reciboData = {
             id_condominio: selectedCondominio,
             id_edificio: selectedEdificio,
@@ -194,13 +212,23 @@ function NuevoReciboExcel() {
             cuota_penalizacion: '',
             cuota_extraordinaria: '',
             cuota_reserva: '',
-            cuota_adeudos: fila[7] !== fila[2] ? (fila[7] - fila[2]).toString() : '', // Columna H menos Columna C si son diferentes
+            cuota_adeudos: fila[7] !== fila[2] ? (fila[7] - fila[2]).toFixed(1) : '', // Columna H menos Columna C si son diferentes
             total_pagar: fila[7].toString(), // Columna H
             total_pagar_letra: importeEnLetra(parseFloat(fila[7])),
             id_administrador: id_administrador
           };
-          
           await axios.post('http://localhost:4000/api/registrarRecibo', reciboData);
+
+          let info_pagos_form = {
+            id_condominio: selectedCondominio,
+            id_edificio: selectedEdificio,
+            id_inquilino: inquilino.id_inquilino,
+            total_pagado: fila[7].toString(),
+            adeudo: adeudo <= 0 ? '0' : adeudo.toFixed(1),
+            fecha_pago: convertirFechaExcel(fila[8])
+          }
+          console.log(info_pagos_form);
+          await axios.post('http://localhost:4000/api/registrarInfoPagosCompleto', info_pagos_form);
         }
       }
       
@@ -324,7 +352,7 @@ function NuevoReciboExcel() {
         <div className='select-container'>
           <div className='select-item'>
             <label>Seleccione un archivo Excel:</label>
-            <input type='file' onChange={handleArchivoChange} disabled={!selectedCondominio || !selectedEdificio || !selectedMes}/>
+            <input type='file' accept=".xlsx" onChange={handleArchivoChange} disabled={!selectedCondominio || !selectedEdificio || !selectedMes}/>
           </div>
         </div>
         <div className='error-message'>

@@ -609,6 +609,26 @@ app.post('/api/getAdmin', (req, res) => {
   );
 });
 
+app.get('/api/getAdmin/:id_administrador', (req, res) => {
+  const { id_administrador } = req.params;
+
+  connection.query(
+      'SELECT * FROM administrador WHERE id_administrador = ?',
+      [id_administrador],
+      (error, results) => {
+          if (error) {
+              console.error(error);
+              return res.status(500).send('Error al obtener los registros');
+          } else if (results.length > 0) {
+              const adminData = results[0];
+              res.json(adminData);
+          } else {
+              res.status(404).send('Administrador no encontrado');
+          }
+      }
+  );
+});
+
 app.get('/api/getRecibos/:id_administrador', (req, res) => {
   const id_administrador  = parseInt(req.params.id_administrador);
   const sql = `
