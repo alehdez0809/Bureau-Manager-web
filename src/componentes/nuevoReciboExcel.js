@@ -16,6 +16,9 @@ function NuevoReciboExcel() {
   const [archivo, setArchivo] = useState(null);
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
+  const datosAdeudos = [];
+  const datosInfoPagos = [];
+  const datosRecibo = [];
 
   useEffect(() => {
     axios.get(`http://localhost:4000/api/getCondominios/${id_administrador}`)
@@ -158,8 +161,9 @@ function NuevoReciboExcel() {
             if(responseInquilino.data.length > 0){
               let id_inquilino_select = responseInquilino.data[0].id_inquilino;
               let adeudo_fila = fila[11];
-      
+              
               if (adeudo_fila) {
+                
                 const datosFormulario3 = {
                   id_condominio: selectedCondominio,
                   id_edificio: selectedEdificio,
@@ -168,8 +172,8 @@ function NuevoReciboExcel() {
                   adeudo: adeudo_fila,
                   fecha_pago: hoy
                 };
-                console.log(datosFormulario3);
-                await axios.post('http://localhost:4000/api/registrarInfoPagosCompleto', datosFormulario3);
+                datosAdeudos.push(datosFormulario3);
+                
               }
             } else {
               console.log(`No hay inquilinos registrados para el departamento ${numero_departamento}`);
@@ -217,7 +221,8 @@ function NuevoReciboExcel() {
             total_pagar_letra: importeEnLetra(parseFloat(fila[7])),
             id_administrador: id_administrador
           };
-          await axios.post('http://localhost:4000/api/registrarRecibo', reciboData);
+          datosRecibo.push(reciboData);
+          
 
           let info_pagos_form = {
             id_condominio: selectedCondominio,
@@ -227,10 +232,17 @@ function NuevoReciboExcel() {
             adeudo: adeudo <= 0 ? '0' : adeudo.toFixed(1),
             fecha_pago: convertirFechaExcel(fila[8])
           }
-          console.log(info_pagos_form);
-          await axios.post('http://localhost:4000/api/registrarInfoPagosCompleto', info_pagos_form);
+          datosInfoPagos.push(info_pagos_form);
+          
         }
       }
+      console.log(datosAdeudos);
+      await axios.post('http://localhost:4000/api/registrarInfoPagosCompleto', datosAdeudos);
+      console.log(datosRecibo);
+      await axios.post('http://localhost:4000/api/registrarRecibo', datosRecibo);
+      console.log(datosInfoPagos);
+      await axios.post('http://localhost:4000/api/registrarInfoPagosCompleto', datosInfoPagos);
+
       
       setError('Proceso completado correctamente.');
       setCargando(false);

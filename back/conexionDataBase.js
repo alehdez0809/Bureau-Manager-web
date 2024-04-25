@@ -244,17 +244,18 @@ app.post('/api/registrarInquilino', (req, res) => {
 app.post('/api/registrarRecibo', (req, res) => {
   console.log("-------------------------------")
   console.log(req.body);
-  const { id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, fecha_formateada, mes_pago, concepto_pago, cuota_ordinaria, cuota_penalizacion, cuota_extraordinaria, cuota_reserva, cuota_adeudos, total_pagar, total_pagar_letra, id_administrador } = req.body;
-  const nombre_completo_inquilinoAES = CryptoJS.AES.encrypt(nombre_completo_inquilino, secretKeyAES).toString();
+  const recibos = Array.isArray(req.body) ? req.body : [req.body];
+  /*const nombre_completo_inquilinoAES = CryptoJS.AES.encrypt(nombre_completo_inquilino, secretKeyAES).toString();
   const cuota_ordinariaAES = CryptoJS.AES.encrypt(cuota_ordinaria, secretKeyAES).toString();
   const cuota_extraordinariaAES = CryptoJS.AES.encrypt(cuota_extraordinaria, secretKeyAES).toString();
   const cuota_penalizacionAES = CryptoJS.AES.encrypt(cuota_penalizacion, secretKeyAES).toString();
   const cuota_reservaAES = CryptoJS.AES.encrypt(cuota_reserva, secretKeyAES).toString();
-  const cuota_adeudosAES = CryptoJS.AES.encrypt(cuota_adeudos, secretKeyAES).toString();
-  const sql = `INSERT INTO reciboCompleto (id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, fecha_formateada, mes_pago, concepto_pago, cuota_ordinaria, cuota_penalizacion, cuota_extraordinaria, cuota_reserva, cuota_adeudos, total_pagar, total_pagar_letra, id_administrador) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-  const values = [
-    id_condominio, id_edificio,id_departamento, id_inquilino, nombre_completo_inquilinoAES, no_recibo, fecha, fecha_formateada, mes_pago, concepto_pago, cuota_ordinariaAES, cuota_penalizacionAES, cuota_extraordinariaAES, cuota_reservaAES, cuota_adeudosAES, total_pagar, total_pagar_letra, id_administrador];
-  connection.query(sql, values, error => {
+  const cuota_adeudosAES = CryptoJS.AES.encrypt(cuota_adeudos, secretKeyAES).toString();*/
+  const sql = `INSERT INTO reciboCompleto (id_condominio, id_edificio, id_departamento, id_inquilino, nombre_completo_inquilino, no_recibo, fecha, fecha_formateada, mes_pago, concepto_pago, cuota_ordinaria, cuota_penalizacion, cuota_extraordinaria, cuota_reserva, cuota_adeudos, total_pagar, total_pagar_letra, id_administrador) VALUES ?`;
+  const values = recibos.map(recibo => [
+    recibo.id_condominio, recibo.id_edificio, recibo.id_departamento, recibo.id_inquilino, recibo.nombre_completo_inquilino, recibo.no_recibo, recibo.fecha, recibo.fecha_formateada, recibo.mes_pago, recibo.concepto_pago, recibo.cuota_ordinaria, recibo.cuota_penalizacion, recibo.cuota_extraordinaria, recibo.cuota_reserva, recibo.cuota_adeudos, recibo.total_pagar, recibo.total_pagar_letra, recibo.id_administrador
+  ]);
+  connection.query(sql, [values], error => {
     if (error) console.log(error);
     res.send("200");
   });
@@ -287,10 +288,12 @@ app.post('/api/registrarInfoPagosAdeudos', (req, res) => {
 app.post('/api/registrarInfoPagosCompleto', (req, res) => {
   console.log("-------------------------------")
   console.log(req.body);
-  const { id_condominio, id_edificio, id_inquilino, total_pagado,adeudo, fecha_pago} = req.body;
-  const query = `INSERT INTO infopagos (id_condominio, id_edificio, id_inquilino, total_pagado, adeudo, fecha_pago) VALUES (?, ?, ?, ?, ?, ?)`;
-  const values = [id_condominio, id_edificio, id_inquilino, total_pagado,adeudo, fecha_pago];
-  connection.query(query, values, error => {
+  const pagos = Array.isArray(req.body) ? req.body : [req.body];
+  const query = `INSERT INTO infopagos (id_condominio, id_edificio, id_inquilino, total_pagado, adeudo, fecha_pago) VALUES ?`;
+  const values = pagos.map(pago => [
+    pago.id_condominio, pago.id_edificio, pago.id_inquilino, pago.total_pagado, pago.adeudo, pago.fecha_pago
+  ]);
+  connection.query(query, [values], error => {
     if (error) console.log(error);
     res.send("200");
   })
@@ -345,16 +348,22 @@ app.post('/api/enviarRecibosCorreoElectronico', (req, res) => {
           id_condominio: results[0].id_condominio,
           id_departamento: results[0].id_departamento,
           id_inquilino: results[0].id_inquilino,
-          nombre_completo_inquilino: CryptoJS.AES.decrypt(results[0].nombre_completo_inquilino, secretKey).toString(CryptoJS.enc.Utf8),
+          //nombre_completo_inquilino: CryptoJS.AES.decrypt(results[0].nombre_completo_inquilino, secretKey).toString(CryptoJS.enc.Utf8),
+          nombre_completo_inquilino: results[0].nombre_completo_inquilino,
           fecha: results[0].fecha_formateada,
           mes_pago: results[0].mes_pago,
           no_recibo: results[0].no_recibo,
           concepto_pago: results[0].concepto_pago,
-          cuota_ordinaria: CryptoJS.AES.decrypt(results[0].cuota_ordinaria, secretKey).toString(CryptoJS.enc.Utf8),
-          cuota_penalizacion: CryptoJS.AES.decrypt(results[0].cuota_penalizacion, secretKey).toString(CryptoJS.enc.Utf8),
-          cuota_extraordinaria: CryptoJS.AES.decrypt(results[0].cuota_extraordinaria, secretKey).toString(CryptoJS.enc.Utf8),
-          cuota_reserva: CryptoJS.AES.decrypt(results[0].cuota_reserva, secretKey).toString(CryptoJS.enc.Utf8),
-          cuota_adeudos: CryptoJS.AES.decrypt(results[0].cuota_adeudos, secretKey).toString(CryptoJS.enc.Utf8),
+          //cuota_ordinaria: CryptoJS.AES.decrypt(results[0].cuota_ordinaria, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_ordinaria: results[0].cuota_ordinaria,
+          //cuota_penalizacion: CryptoJS.AES.decrypt(results[0].cuota_penalizacion, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_penalizacion: results[0].cuota_penalizacion,
+          //cuota_extraordinaria: CryptoJS.AES.decrypt(results[0].cuota_extraordinaria, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_extraordinaria: results[0].cuota_extraordinaria,
+          //cuota_reserva: CryptoJS.AES.decrypt(results[0].cuota_reserva, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_reserva: results[0].cuota_reserva,
+          //cuota_adeudos: CryptoJS.AES.decrypt(results[0].cuota_adeudos, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_adeudos: results[0].cuota_adeudos,
           total_pagar: results[0].total_pagar,
           total_pagar_letra: results[0].total_pagar_letra,
           nombre_condominio: results[0].nombre_condominio,
@@ -469,16 +478,22 @@ app.post('/api/generarPDFMasivo', async (req, res) => {
               id_condominio: results[0].id_condominio,
               id_departamento: results[0].id_departamento,
               id_inquilino: results[0].id_inquilino,
-              nombre_completo_inquilino: CryptoJS.AES.decrypt(results[0].nombre_completo_inquilino, secretKey).toString(CryptoJS.enc.Utf8),
+              //nombre_completo_inquilino: CryptoJS.AES.decrypt(results[0].nombre_completo_inquilino, secretKey).toString(CryptoJS.enc.Utf8),
+              nombre_completo_inquilino: results[0].nombre_completo_inquilino,
               fecha: results[0].fecha_formateada,
               mes_pago: results[0].mes_pago,
               no_recibo: results[0].no_recibo,
               concepto_pago: results[0].concepto_pago,
-              cuota_ordinaria: CryptoJS.AES.decrypt(results[0].cuota_ordinaria, secretKey).toString(CryptoJS.enc.Utf8),
-              cuota_penalizacion: CryptoJS.AES.decrypt(results[0].cuota_penalizacion, secretKey).toString(CryptoJS.enc.Utf8),
-              cuota_extraordinaria: CryptoJS.AES.decrypt(results[0].cuota_extraordinaria, secretKey).toString(CryptoJS.enc.Utf8),
-              cuota_reserva: CryptoJS.AES.decrypt(results[0].cuota_reserva, secretKey).toString(CryptoJS.enc.Utf8),
-              cuota_adeudos: CryptoJS.AES.decrypt(results[0].cuota_adeudos, secretKey).toString(CryptoJS.enc.Utf8),
+              //cuota_ordinaria: CryptoJS.AES.decrypt(results[0].cuota_ordinaria, secretKey).toString(CryptoJS.enc.Utf8),
+              cuota_ordinaria: results[0].cuota_ordinaria,
+              //cuota_penalizacion: CryptoJS.AES.decrypt(results[0].cuota_penalizacion, secretKey).toString(CryptoJS.enc.Utf8),
+              cuota_penalizacion: results[0].cuota_penalizacion,
+              //cuota_extraordinaria: CryptoJS.AES.decrypt(results[0].cuota_extraordinaria, secretKey).toString(CryptoJS.enc.Utf8),
+              cuota_extraordinaria: results[0].cuota_extraordinaria,
+              //cuota_reserva: CryptoJS.AES.decrypt(results[0].cuota_reserva, secretKey).toString(CryptoJS.enc.Utf8),
+              cuota_reserva: results[0].cuota_reserva,
+              //cuota_adeudos: CryptoJS.AES.decrypt(results[0].cuota_adeudos, secretKey).toString(CryptoJS.enc.Utf8),
+              cuota_adeudos: results[0].cuota_adeudos,
               total_pagar: results[0].total_pagar,
               total_pagar_letra: results[0].total_pagar_letra,
               nombre_condominio: results[0].nombre_condominio,
@@ -646,12 +661,18 @@ app.get('/api/getRecibos/:id_administrador', (req, res) => {
       const recibosDesencriptados = results.map((recibo) => {
         return {
           ...recibo,
-          nombre_completo_inquilino: CryptoJS.AES.decrypt(recibo.nombre_completo_inquilino, secretKey).toString(CryptoJS.enc.Utf8),
-          cuota_ordinaria: CryptoJS.AES.decrypt(recibo.cuota_ordinaria, secretKey).toString(CryptoJS.enc.Utf8),
-          cuota_extraordinaria: CryptoJS.AES.decrypt(recibo.cuota_extraordinaria, secretKey).toString(CryptoJS.enc.Utf8),
-          cuota_penalizacion: CryptoJS.AES.decrypt(recibo.cuota_penalizacion, secretKey).toString(CryptoJS.enc.Utf8),
-          cuota_reserva: CryptoJS.AES.decrypt(recibo.cuota_reserva, secretKey).toString(CryptoJS.enc.Utf8),
-          cuota_adeudos: CryptoJS.AES.decrypt(recibo.cuota_adeudos, secretKey).toString(CryptoJS.enc.Utf8),
+          //nombre_completo_inquilino: CryptoJS.AES.decrypt(recibo.nombre_completo_inquilino, secretKey).toString(CryptoJS.enc.Utf8),
+          nombre_completo_inquilino: recibo.nombre_completo_inquilino,
+          //cuota_ordinaria: CryptoJS.AES.decrypt(recibo.cuota_ordinaria, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_ordinaria: recibo.cuota_ordinaria,
+          //cuota_extraordinaria: CryptoJS.AES.decrypt(recibo.cuota_extraordinaria, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_extraordinaria: recibo.cuota_extraordinaria,
+          //cuota_penalizacion: CryptoJS.AES.decrypt(recibo.cuota_penalizacion, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_penalizacion: recibo.cuota_penalizacion,
+          //cuota_reserva: CryptoJS.AES.decrypt(recibo.cuota_reserva, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_reserva: recibo.cuota_reserva,
+          //cuota_adeudos: CryptoJS.AES.decrypt(recibo.cuota_adeudos, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_adeudos: recibo.cuota_adeudos,
           tiene_correo: recibo.tiene_correo === 1
         };
       });  
@@ -791,12 +812,18 @@ app.get('/api/getRecibosFiltrados/:id_administrador', (req, res) => {
       const recibosDesencriptados = results.map((recibo) => {
         return {
           ...recibo,
-          nombre_completo_inquilino: CryptoJS.AES.decrypt(recibo.nombre_completo_inquilino, secretKey).toString(CryptoJS.enc.Utf8),
-          cuota_ordinaria: CryptoJS.AES.decrypt(recibo.cuota_ordinaria, secretKey).toString(CryptoJS.enc.Utf8),
-          cuota_extraordinaria: CryptoJS.AES.decrypt(recibo.cuota_extraordinaria, secretKey).toString(CryptoJS.enc.Utf8),
-          cuota_penalizacion: CryptoJS.AES.decrypt(recibo.cuota_penalizacion, secretKey).toString(CryptoJS.enc.Utf8),
-          cuota_reserva: CryptoJS.AES.decrypt(recibo.cuota_reserva, secretKey).toString(CryptoJS.enc.Utf8),
-          cuota_adeudos: CryptoJS.AES.decrypt(recibo.cuota_adeudos, secretKey).toString(CryptoJS.enc.Utf8),
+          //nombre_completo_inquilino: CryptoJS.AES.decrypt(recibo.nombre_completo_inquilino, secretKey).toString(CryptoJS.enc.Utf8),
+          nombre_completo_inquilino: recibo.nombre_completo_inquilino,
+          //cuota_ordinaria: CryptoJS.AES.decrypt(recibo.cuota_ordinaria, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_ordinaria: recibo.cuota_ordinaria,
+          //cuota_extraordinaria: CryptoJS.AES.decrypt(recibo.cuota_extraordinaria, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_extraordinaria: recibo.cuota_extraordinaria,
+          //cuota_penalizacion: CryptoJS.AES.decrypt(recibo.cuota_penalizacion, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_penalizacion: recibo.cuota_penalizacion,
+          //cuota_reserva: CryptoJS.AES.decrypt(recibo.cuota_reserva, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_reserva: recibo.cuota_reserva,
+          //cuota_adeudos: CryptoJS.AES.decrypt(recibo.cuota_adeudos, secretKey).toString(CryptoJS.enc.Utf8),
+          cuota_adeudos: recibo.cuota_adeudos,
           tiene_correo: recibo.tiene_correo === 1
         };
       });
