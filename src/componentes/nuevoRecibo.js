@@ -30,9 +30,11 @@ function NuevoRecibo() {
     id_administrador: id_administrador,
   });
   const [formulario2, setFormulario2] = useState({
+    id_administrador: id_administrador,
     id_condominio: '',
     id_edificio: '',
     id_inquilino: '',
+    no_recibo: '',
     total_pagado: '',
     adeudo: '0',
     fecha_pago: ''
@@ -539,6 +541,7 @@ function NuevoRecibo() {
       formulario2.total_pagado = ddd.toString();
       formulario.total_pagar_letra = importeEnLetra(ddd);
       formulario.fecha_formateada = formatearFecha(formulario.fecha);
+      formulario2.no_recibo = formulario.no_recibo;
       const datosRecibo = [formulario];
       const datosInfoPagos = [formulario2];
       const resultado = await axios.post('http://localhost:4000/api/registrarRecibo', datosRecibo);

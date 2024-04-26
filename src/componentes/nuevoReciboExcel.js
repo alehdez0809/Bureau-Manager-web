@@ -165,6 +165,7 @@ function NuevoReciboExcel() {
               if (adeudo_fila) {
                 
                 const datosFormulario3 = {
+                  id_administrador: id_administrador,
                   id_condominio: selectedCondominio,
                   id_edificio: selectedEdificio,
                   id_inquilino: id_inquilino_select,
@@ -225,9 +226,11 @@ function NuevoReciboExcel() {
           
 
           let info_pagos_form = {
+            id_administrador: id_administrador,
             id_condominio: selectedCondominio,
             id_edificio: selectedEdificio,
             id_inquilino: inquilino.id_inquilino,
+            no_recibo: fila[10],
             total_pagado: fila[7].toString(),
             adeudo: adeudo <= 0 ? '0' : adeudo.toFixed(1),
             fecha_pago: convertirFechaExcel(fila[8])
@@ -236,11 +239,8 @@ function NuevoReciboExcel() {
           
         }
       }
-      console.log(datosAdeudos);
       await axios.post('http://localhost:4000/api/registrarInfoPagosCompleto', datosAdeudos);
-      console.log(datosRecibo);
       await axios.post('http://localhost:4000/api/registrarRecibo', datosRecibo);
-      console.log(datosInfoPagos);
       await axios.post('http://localhost:4000/api/registrarInfoPagosCompleto', datosInfoPagos);
 
       

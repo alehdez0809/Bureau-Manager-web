@@ -33,12 +33,11 @@ html, body {
       width: 800px;
     }
     .fromRecibo{
-      width: 830px;
+      width: 890px;
     }
     .div-contenedor {
       max-width: 150%;
       height: 100vh;
-      overflow: auto;
     }
     .div-espaciado {
       margin-top: 100px; 
@@ -217,7 +216,7 @@ html, body {
 
     }
 
-    .mi-boton2[type="submit"]{
+    .mi-boton2[type="submit"], .mi-boton2[type="button"]{
       width: 150px;;
       height:45px;
       margin-left: 45px;

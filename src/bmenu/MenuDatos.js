@@ -38,7 +38,7 @@ export const MenuDatos = [
     },
     {
         title: 'Consultar pagos',
-        path: '#',
+        path: '/InfoPagos',
         icon: <MdIcons.MdOutlinePayments />,
         cName: 'nav-text'
     },

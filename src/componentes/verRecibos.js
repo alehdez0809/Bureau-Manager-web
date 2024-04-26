@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { FaArrowCircleLeft, FaArrowCircleRight, FaFilter} from "react-icons/fa";
+import { FaArrowCircleLeft, FaArrowCircleRight, FaFilter, FaTrash} from "react-icons/fa";
 
 
 function VerRecibo() {
@@ -237,6 +236,25 @@ function VerRecibo() {
     }
   };
 
+  const handleEliminarRecibos = async () => {
+    if (recibosSeleccionados.length === 0) {
+        alert('No hay recibos seleccionados para eliminar');
+        return;
+    }
+
+    if (window.confirm('¿Estás seguro de querer eliminar los recibos seleccionados?')) {
+        try {
+            await axios.post('http://localhost:4000/api/eliminarRecibos', { ids: recibosSeleccionados });
+            alert('Recibos eliminados correctamente');
+            setRecibosSeleccionados([]);
+            cargarRecibos();  // Recargar los recibos después de eliminar
+        } catch (error) {
+            console.error('Error al eliminar recibos:', error);
+            alert('Error al eliminar recibos');
+        }
+    }
+};
+
 
   let opcionesRegistro = registrosActuales.length === 0 
     ? <tr><td colSpan="6">No hay registros disponibles</td></tr> 
@@ -313,21 +331,22 @@ function VerRecibo() {
             </table>
             <div className='Aceptado' style={{ display: visible ? 'block' : 'none' }}>Recibo descargado</div>
             <div className='mensajeExito' style={{ display: visible ? 'block' : 'none' }}>{mensajeExito}</div>
+            <br/>
             <div className='select-container'>
-            <div className="botones-container"> 
-              <Link to="/MenuPrincipal">
-                <button className="mi-boton2">Regresar</button>
-              </Link>
-            <button className="mi-boton2" type='submit' value="correo" disabled={recibosSeleccionados.length === 0 ||
-                recibosSeleccionados.some(idRecibo =>
-                !registros.find(registro => registro.id_recibo === idRecibo)?.tiene_correo)}>Enviar por Correo</button>
-            <button className="mi-boton2" type='submit' value="PDF" disabled={recibosSeleccionados.length === 0}>Hacer PDF de Recibos</button>
-            </div>
+              <div className="botones-container"> 
+                <button className="mi-boton2" type='submit' value="correo" disabled={recibosSeleccionados.length === 0 ||
+                    recibosSeleccionados.some(idRecibo =>
+                    !registros.find(registro => registro.id_recibo === idRecibo)?.tiene_correo)}>Enviar por Correo</button>
+                <button className="mi-boton2" type='submit' value="PDF" disabled={recibosSeleccionados.length === 0}>Hacer PDF de Recibos</button>
+                <button onClick={handleEliminarRecibos} type="button" className="mi-boton2" disabled={recibosSeleccionados.length === 0}>
+                    <FaTrash /> Eliminar Recibos
+                </button>
+              </div>
             </div>
             <div className="mensaje-advertencia">{mensajeAdvertencia}</div>
             <div className='navegacion-pag'>
               <button onClick={paginaAnterior} disabled={paginaActual === 1} className='btn-pag' type='button'><FaArrowCircleLeft/>  Anterior</button>
-              <span className='span-pag'>Página {paginaActual}</span>
+              <span className='span-pag'>Página {paginaActual} de {Math.ceil(registros.length / registrosPorPagina)}</span>
               <button onClick={paginaSiguiente} disabled={paginaActual === Math.ceil(registros.length / registrosPorPagina)} className='btn-pag' type='button'>Siguiente  <FaArrowCircleRight/></button>
             </div>
           </form>   

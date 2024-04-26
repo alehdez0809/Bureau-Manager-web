@@ -14,8 +14,8 @@ const secretKey = 'tu_clave_secreta';
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
-const CryptoJS = require("crypto-js");
-const secretKeyAES = "tu_clave_secreta";
+//const CryptoJS = require("crypto-js");
+//const secretKeyAES = "tu_clave_secreta";
 
 app.use(cors());
 
@@ -261,37 +261,14 @@ app.post('/api/registrarRecibo', (req, res) => {
   });
 });
 
-app.post('/api/registrarInfoPagos', (req, res) => {
-  console.log("-------------------------------")
-  console.log(req.body);
-  const { id_condominio, id_edificio, id_inquilino, total_pagado, fecha_pago} = req.body;
-  const query = `INSERT INTO infopagos (id_condominio, id_edificio, id_inquilino, total_pagado, fecha_pago) VALUES (?, ?, ?, ?, ?)`;
-  const values = [id_condominio, id_edificio, id_inquilino, total_pagado, fecha_pago];
-  connection.query(query, values, error => {
-    if (error) console.log(error);
-    res.send("200");
-  })
-});
-
-app.post('/api/registrarInfoPagosAdeudos', (req, res) => {
-  console.log("-------------------------------")
-  console.log(req.body);
-  const { id_condominio, id_edificio, id_inquilino, adeudo, fecha_pago} = req.body;
-  const query = `INSERT INTO infopagos (id_condominio, id_edificio, id_inquilino, adeudo, fecha_pago) VALUES (?, ?, ?, ?, ?)`;
-  const values = [id_condominio, id_edificio, id_inquilino, adeudo, fecha_pago];
-  connection.query(query, values, error => {
-    if (error) console.log(error);
-    res.send("200");
-  })
-});
 
 app.post('/api/registrarInfoPagosCompleto', (req, res) => {
   console.log("-------------------------------")
   console.log(req.body);
   const pagos = Array.isArray(req.body) ? req.body : [req.body];
-  const query = `INSERT INTO infopagos (id_condominio, id_edificio, id_inquilino, total_pagado, adeudo, fecha_pago) VALUES ?`;
+  const query = `INSERT INTO infopagos (id_administrador, id_condominio, id_edificio, id_inquilino, no_recibo, total_pagado, adeudo, fecha_pago) VALUES ?`;
   const values = pagos.map(pago => [
-    pago.id_condominio, pago.id_edificio, pago.id_inquilino, pago.total_pagado, pago.adeudo, pago.fecha_pago
+    pago.id_administrador, pago.id_condominio, pago.id_edificio, pago.id_inquilino, pago.no_recibo,pago.total_pagado, pago.adeudo, pago.fecha_pago
   ]);
   connection.query(query, [values], error => {
     if (error) console.log(error);
@@ -775,6 +752,32 @@ app.get('/api/getInfoCondominio', (req, res) => {
   );
 });
 
+app.get('/api/getInfoPagos/:id_administrador', (req, res) => {
+  const id_administrador = parseInt(req.params.id_administrador);
+  const sql = `
+    SELECT
+      c.nombre_condominio,
+      d.numero_departamento,
+      p.total_pagado,
+      p.adeudo,
+      p.fecha_pago
+    FROM infopagos p
+    INNER JOIN inquilino i ON p.id_inquilino = i.id_inquilino
+    INNER JOIN departamento d ON i.id_departamento = d.id_departamento
+    INNER JOIN condominio c ON p.id_condominio = c.id_condominio
+    WHERE p.id_administrador = ?
+  `;
+
+  connection.query(sql, [id_administrador], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Error al obtener los registros de la tabla');
+    } else {
+      res.json(results);
+    }
+  });
+});
+
 app.get('/api/getRecibosFiltrados/:id_administrador', (req, res) => {
   const id_administrador = parseInt(req.params.id_administrador);
   const { condominio, edificio, departamento, mes, anio } = req.query;
@@ -848,6 +851,25 @@ app.get('/api/verificarRecibo/:id_condominio/:no_recibo', (req, res) => {
     }
   });
 });
+
+app.post('/api/eliminarRecibos', (req, res) => {
+  const { ids } = req.body;
+  if (ids.length === 0) {
+      return res.status(400).send('No se proporcionaron IDs de recibos.');
+  }
+
+  const placeholders = ids.map(() => '?').join(',');
+  const sql = `DELETE FROM recibocompleto WHERE id_recibo IN (${placeholders})`;
+
+  connection.query(sql, ids, (error, results) => {
+      if (error) {
+          console.error('Error al eliminar recibos:', error);
+          return res.status(500).send('Error al eliminar recibos');
+      }
+      res.send('Recibos eliminados correctamente');
+  });
+});
+
 
 
 const PORT = 4000;
