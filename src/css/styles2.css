@@ -42,12 +42,52 @@ html, body {
     .div-espaciado {
       margin-top: 100px; 
     }
+
+    .container {
+      display: flex;
+    }
+    
+    .main-content {
+      flex: 1;
+      margin-right: 5px;
+    }
+    
+    .side-content {
+      display: flex;
+      flex-direction: column;
+      width: 50%;
+    }
+    
+    .side-div {
+      margin-bottom: 20px;
+      padding: 10px;
+      height: 100px;
+      box-sizing: border-box;
+    }
+    
+
     .form-container {
-      max-height: 500px; /* ajusta este valor según sea necesario */
+      max-height: 500px; 
       overflow-y: auto;
       overflow: auto;
       overflow-x: auto;
     }
+
+    .div_alineados{
+      float: left;
+    }
+
+    .condominio-adeudo {
+      width: 320px;
+      margin-left: 15px;
+      padding: 20px;
+      background-color: white;
+      border-radius: 5px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+      position: sticky;
+      top: 20px;
+  }
+  
     
     form::before {
       content: '';

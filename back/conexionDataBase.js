@@ -835,6 +835,47 @@ app.get('/api/getRecibosFiltrados/:id_administrador', (req, res) => {
   });
 });
 
+app.get('/api/getInfoPagosFiltrados/:id_administrador', (req, res) => {
+  const { condominio, edificio, anio, mes } = req.query;
+  let query = `
+    SELECT
+      c.nombre_condominio,
+      d.numero_departamento,
+      p.total_pagado,
+      p.adeudo,
+      p.fecha_pago
+    FROM infopagos p
+    INNER JOIN inquilino i ON p.id_inquilino = i.id_inquilino
+    INNER JOIN departamento d ON i.id_departamento = d.id_departamento
+    INNER JOIN condominio c ON p.id_condominio = c.id_condominio
+    WHERE p.id_administrador = ?
+  `;
+  let params = [req.params.id_administrador];
+
+  if (condominio) {
+      query += " AND c.id_condominio = ?";
+      params.push(condominio);
+  }
+  if (edificio) {
+      query += " AND p.id_edificio = ?";
+      params.push(edificio);
+  }
+  if (anio && mes) {
+      query += " AND YEAR(p.fecha_pago) = ? AND MONTH(p.fecha_pago) = ?";
+      params.push(anio, mes);
+  }
+
+  connection.query(query, params, (error, results) => {
+      if (error) {
+          console.error('Error al obtener datos filtrados:', error);
+          res.status(500).send('Error al obtener datos filtrados');
+      } else {
+          res.json(results);
+      }
+  });
+});
+
+
 app.get('/api/verificarRecibo/:id_condominio/:no_recibo', (req, res) => {
   const { id_condominio, no_recibo } = req.params;
   const sql = `
@@ -852,6 +893,25 @@ app.get('/api/verificarRecibo/:id_condominio/:no_recibo', (req, res) => {
   });
 });
 
+app.get('/api/obtenerUltimoNumeroRecibo/:id_condominio', async (req, res) => {
+  try {
+    const id_condominio = req.params.id_condominio;
+    const query = `SELECT MAX(no_recibo) AS ultimoNumeroRecibo FROM recibocompleto WHERE id_condominio = ?`;
+    connection.query(query, [id_condominio], (error, results) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send('Error al obtener el último número de recibo');
+      } else {
+        res.json(results[0]);
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error en el servidor');
+  }
+});
+
+
 app.post('/api/eliminarRecibos', (req, res) => {
   const { ids } = req.body;
   if (ids.length === 0) {
@@ -859,14 +919,68 @@ app.post('/api/eliminarRecibos', (req, res) => {
   }
 
   const placeholders = ids.map(() => '?').join(',');
-  const sql = `DELETE FROM recibocompleto WHERE id_recibo IN (${placeholders})`;
+  const selectSql = `
+    SELECT no_recibo, id_condominio 
+    FROM recibocompleto 
+    WHERE id_recibo IN (${placeholders})
+  `;
 
-  connection.query(sql, ids, (error, results) => {
-      if (error) {
-          console.error('Error al eliminar recibos:', error);
-          return res.status(500).send('Error al eliminar recibos');
-      }
-      res.send('Recibos eliminados correctamente');
+  connection.beginTransaction((err) => {
+    if (err) {
+      return res.status(500).send('Error al iniciar transacción');
+    }
+
+    connection.query(selectSql, ids, (error, results) => {
+        if (error) {
+            return connection.rollback(() => {
+                console.error('Error al recuperar recibos:', error);
+                res.status(500).send('Error al recuperar recibos');
+            });
+        }
+
+        // Preparamos los datos para eliminar en infopagos
+        const infopagosDeletes = results.map(row => [row.no_recibo, row.id_condominio]);
+        if (infopagosDeletes.length > 0) {
+            const deleteInfopagosSql = `
+                DELETE FROM infopagos 
+                WHERE (no_recibo, id_condominio) IN (?)
+            `;
+            connection.query(deleteInfopagosSql, [infopagosDeletes], (error) => {
+                if (error) {
+                    return connection.rollback(() => {
+                        console.error('Error al eliminar en infopagos:', error);
+                        res.status(500).send('Error al eliminar en infopagos');
+                    });
+                }
+
+                // Eliminación en recibocompleto
+                const deleteReciboCompletoSql = `DELETE FROM recibocompleto WHERE id_recibo IN (${placeholders})`;
+                connection.query(deleteReciboCompletoSql, ids, (error) => {
+                    if (error) {
+                        return connection.rollback(() => {
+                            console.error('Error al eliminar recibos completos:', error);
+                            res.status(500).send('Error al eliminar recibos completos');
+                        });
+                    }
+
+                    // Si todo fue bien, hacemos commit
+                    connection.commit((err) => {
+                        if (err) {
+                            return connection.rollback(() => {
+                                console.error('Error al hacer commit de la transacción:', err);
+                                res.status(500).send('Error al finalizar la transacción');
+                            });
+                        }
+                        res.send('Recibos eliminados correctamente');
+                    });
+                });
+            });
+        } else {
+            connection.rollback(() => {
+                res.status(404).send('No se encontraron datos para eliminar en infopagos');
+            });
+        }
+    });
   });
 });
 

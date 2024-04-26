@@ -19,6 +19,7 @@ function NuevoReciboExcel() {
   const datosAdeudos = [];
   const datosInfoPagos = [];
   const datosRecibo = [];
+  const meses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
 
   useEffect(() => {
     axios.get(`http://localhost:4000/api/getCondominios/${id_administrador}`)
@@ -327,7 +328,7 @@ function NuevoReciboExcel() {
   };
 
   return (
-    <div>
+    <div className='div-contenedor div-espaciado'>
       <h1>Crear recibos a partir de Excel</h1>
       <Link to="/NuevoRecibo">
         <button type="button" className="mi-boton2" style={{width: '260px'}}><IoIosCreate /> Generar recibos manualmente</button>

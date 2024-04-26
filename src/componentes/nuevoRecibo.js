@@ -50,6 +50,8 @@ function NuevoRecibo() {
 
   const [errorNumero, setErrorNumero] = useState('');
 
+  const [siguienteNumeroRecibo, setSiguienteNumeroRecibo] = useState(null);
+
   const meses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
 
 
@@ -81,12 +83,14 @@ function NuevoRecibo() {
           setFormulario2(prevState => ({
             ...prevState,
             id_condominio: response.data[0].id_condominio
-          }));  
+          }));
+          obtenerUltimoNumeroRecibo(response.data[0].id_condominio);  
           
           // Mueve el segundo axios.get() dentro del then() del primer axios.get()
         const selectedCondominio = response.data[0].id_condominio;
         const diccionario = {};
         diccionario['id_condominio'] = parseInt(selectedCondominio);
+        
   
         axios.post(`http://localhost:4000/api/getEdificiosbyCondominio`,diccionario)
           .then(resultado => {
@@ -184,6 +188,7 @@ function NuevoRecibo() {
             alert('Error al obtener los edificios');
           });
         }
+        
       })
       .catch(error => {
         console.log(error);
@@ -199,11 +204,29 @@ function NuevoRecibo() {
             document.body.classList.remove('body1');
         };
   }, []);
+
+  const obtenerUltimoNumeroRecibo = async (id_condominio) => {
+    try {
+      const response = await axios.get(`http://localhost:4000/api/obtenerUltimoNumeroRecibo/${id_condominio}`);
+      if(response.data.ultimoNumeroRecibo === null){
+        setSiguienteNumeroRecibo(1);
+      }else{
+        setSiguienteNumeroRecibo(parseInt(response.data.ultimoNumeroRecibo) + 1);
+      }  
+    } catch (error) {
+      console.error("Error al obtener el último número de recibo:", error);
+    }
+  };
   
 
   const handleChange = event => {
     const { name, value } = event.target;
     setFormulario(prevState => ({ ...prevState, [name]: value }));
+  };
+
+  const handleChange2 = event => {
+    const { name, value } = event.target;
+    setFormulario2(prevState => ({ ...prevState, [name]: value }));
   };
 
   
@@ -214,6 +237,7 @@ function NuevoRecibo() {
     if (selectedCondominio) {
         const diccionario = {};
         diccionario['id_condominio'] = selectedCondominio.id_condominio;
+        
   
         axios.post(`http://localhost:4000/api/getEdificiosbyCondominio`,diccionario)
           .then(resultado => {
@@ -315,6 +339,7 @@ function NuevoRecibo() {
         ...prevState,
         id_condominio: selectedCondominio.id_condominio
       }));
+      obtenerUltimoNumeroRecibo(selectedCondominio.id_condominio);
     }
   };
 
@@ -582,13 +607,20 @@ function NuevoRecibo() {
   function contieneLetras(dato) {
     return /[a-zA-Z]/.test(dato); 
   }
+
+  function esEntero(valor){
+    const esEntero = Number.isInteger(Number(valor));
+    return esEntero && Math.sign(valor) !== -1;
+  }
   
   const validarCampos = () => {
     let erroresTemp = {};
     if (!formulario.no_recibo.trim()) {
       erroresTemp.no_recibo = 'Este campo es obligatorio';
     }else if(!esNumero(formulario.no_recibo)){
-      erroresTemp.no_recibo = 'Este dato debe ser un número';
+      erroresTemp.no_recibo = 'Este dato debe ser un número positivo';
+    }else if(!esEntero(formulario.no_recibo)){
+      erroresTemp.no_recibo = 'Este dato debe ser un número entero';
     }  
     
     if (!formulario.fecha.trim()) {
@@ -603,30 +635,35 @@ function NuevoRecibo() {
     if (!formulario.cuota_ordinaria.trim()) {
       erroresTemp.cuota_ordinaria = 'Este campo es obligatorio';
     }else if (!esNumero(formulario.cuota_ordinaria)) {
-      erroresTemp.cuota_ordinaria = 'Este dato debe ser un número';
+      erroresTemp.cuota_ordinaria = 'Este dato debe ser un número positivo';
     }
     
     if (formulario.cuota_penalizacion.trim() !== '') {
       if(!esNumero(formulario.cuota_penalizacion)){
-        erroresTemp.cuota_penalizacion = 'Este dato debe ser un número';
+        erroresTemp.cuota_penalizacion = 'Este dato debe ser un número positivo';
       }
     }  
 
     if(formulario.cuota_extraordinaria.trim() !== ''){
       if (!esNumero(formulario.cuota_extraordinaria)) {
-        erroresTemp.cuota_extraordinaria = 'Este dato debe ser un número';
+        erroresTemp.cuota_extraordinaria = 'Este dato debe ser un número positivo';
       }
     }  
 
     if (formulario.cuota_reserva.trim() !== '') {
       if (!esNumero(formulario.cuota_reserva)) {
-        erroresTemp.cuota_reserva = 'Este dato debe ser un número';
+        erroresTemp.cuota_reserva = 'Este dato debe ser un número positivo';
       }
     }
 
     if (formulario.cuota_adeudos.trim() !== '') { 
       if (!esNumero(formulario.cuota_adeudos)) {
-        erroresTemp.cuota_adeudos = 'Este dato debe ser un número';
+        erroresTemp.cuota_adeudos = 'Este dato debe ser un número positivo';
+      }
+    }
+    if (formulario2.adeudo.trim() !== '') { 
+      if (!esNumero(formulario2.adeudo)) {
+        erroresTemp.adeudo = 'Este dato debe ser un número positivo';
       }
     }
   
@@ -673,12 +710,12 @@ function NuevoRecibo() {
   }
 
     return (  
-        <div style={{marginTop: "210px"}}>
+        <div className='div-contenedor div-espaciado'>
           <h1>Crear un nuevo recibo</h1>
           <Link to="/NuevoReciboExcel">
             <button type="button" className="mi-boton2" style={{width: '260px'}}><SiMicrosoftexcel />  Generar recibos a partir de Excel</button>
           </Link>
-          <form className="fromInquilino" onSubmit={handleSubmit}>
+          <form className="fromInquilino" onSubmit={handleSubmit} style={{width: "900px"}}>
             <div className='select-container'>
                 <div className='select-item'>
                 <label className='labelInput'>Seleccione un condominio: </label>
@@ -712,7 +749,7 @@ function NuevoRecibo() {
                       type="text"
                       id="no_recibo"
                       name="no_recibo"
-                      placeholder="No. Recibo"
+                      placeholder={siguienteNumeroRecibo !== null ? siguienteNumeroRecibo.toString() : 'Cargando...'}
                       value={formulario.no_recibo}
                       onChange={handleChange}
                     />
@@ -757,6 +794,7 @@ function NuevoRecibo() {
                       placeholder="$"
                       value={formulario.cuota_ordinaria}
                       onChange={handleChange}
+                      maxLength="4"
                     />
                     <div className="error-message">{errores.cuota_ordinaria}</div>
                 </div>
@@ -772,6 +810,7 @@ function NuevoRecibo() {
                       placeholder="$"
                       value={formulario.cuota_penalizacion}
                       onChange={handleChange}
+                      maxLength="4"
                     />
                     <div className="error-message">{errores.cuota_penalizacion}</div>
                 </div>
@@ -784,6 +823,7 @@ function NuevoRecibo() {
                       placeholder="$"
                       value={formulario.cuota_extraordinaria}
                       onChange={handleChange}
+                      maxLength="4"
                     />
                     <div className="error-message">{errores.cuota_extraordinaria}</div>
                 </div>
@@ -796,6 +836,7 @@ function NuevoRecibo() {
                       placeholder="$"
                       value={formulario.cuota_reserva}
                       onChange={handleChange}
+                      maxLength="4"
                     />
                     <div className="error-message">{errores.cuota_reserva}</div>
                 </div>
@@ -808,9 +849,23 @@ function NuevoRecibo() {
                       placeholder="$"
                       value={formulario.cuota_adeudos}
                       onChange={handleChange}
+                      maxLength="4"
                     />
                     <div className="error-message">{errores.cuota_adeudos}</div>
                 </div>
+                
+            </div>
+            <div className='select-item' style={{width: "40%"}}>
+                  <label className='labelInput'>Adeudo(opcional): </label>
+                  <input
+                      type="text"
+                      id="adeudo"
+                      name="adeudo"
+                      placeholder="$"
+                      onChange={handleChange2}
+                      maxLength="6"
+                    />
+                <div className="error-message">{errores.adeudo}</div>
             </div>
 
             <div className='Aceptado' style={{ display: visible ? 'block' : 'none' }}>Registro exitoso</div>

@@ -27,10 +27,10 @@ function VerRecibo() {
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
   useEffect(() => {
-        document.body.classList.add('body1');
+        document.body.classList.add('body2');
 
         return () => {
-            document.body.classList.remove('body1');
+            document.body.classList.remove('body2');
         };
     
   }, []);
@@ -247,7 +247,7 @@ function VerRecibo() {
             await axios.post('http://localhost:4000/api/eliminarRecibos', { ids: recibosSeleccionados });
             alert('Recibos eliminados correctamente');
             setRecibosSeleccionados([]);
-            cargarRecibos();  // Recargar los recibos después de eliminar
+            cargarRecibos();
         } catch (error) {
             console.error('Error al eliminar recibos:', error);
             alert('Error al eliminar recibos');
@@ -276,6 +276,7 @@ function VerRecibo() {
     ));
     return (
         <div className='div-contenedor div-espaciado' style={{marginTop: "150px"}}>
+          <h1>Descargar y enviar recibos</h1>
           <form className="fromRecibo" onSubmit={handleSubmit}>
 
             <h2>Seleccione los Recibos a enviar</h2>
