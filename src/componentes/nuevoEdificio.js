@@ -38,10 +38,10 @@ function NuevoEdificio() {
           alert('Error al obtener los condominios');
         }
       });
-        document.body.classList.add('body1');
+        document.body.classList.add('body2');
 
         return () => {
-            document.body.classList.remove('body1');
+            document.body.classList.remove('body2');
         };
 
   }, []);
@@ -122,9 +122,6 @@ function NuevoEdificio() {
               <div className="error-message">{errorEdificio}</div>
             </div>
             <div className="botones-container">
-              <Link to="/EdicionyRegistro">
-                <button className="mi-boton2">Regresar</button>
-              </Link>
             <button className="mi-boton2" type='submit'>Registrar</button>
             </div>
             <div style={{ display: visible ? 'block' : 'none' }} >Registro exitoso</div>

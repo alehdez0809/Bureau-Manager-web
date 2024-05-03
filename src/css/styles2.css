@@ -7,6 +7,7 @@
   font-family: 'Lato', sans-serif;
 }
 html, body {
+
   width: 100%;
   height: 100%;
 }
@@ -26,7 +27,7 @@ html, body {
     }
 
     .fromMenu{
-      width: 600px;
+      width: 1000px;
     }
 
     .fromInquilino{
@@ -46,6 +47,12 @@ html, body {
     .container {
       display: flex;
     }
+
+    .container2 {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-start;
+    }
     
     .main-content {
       flex: 1;
@@ -61,7 +68,6 @@ html, body {
     .side-div {
       margin-bottom: 20px;
       padding: 10px;
-      height: 100px;
       box-sizing: border-box;
     }
     
@@ -497,4 +503,6 @@ html, body {
       width: 50px;
       align-items: left;
     }
+
+    
     

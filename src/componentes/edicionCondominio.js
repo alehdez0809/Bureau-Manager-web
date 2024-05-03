@@ -53,10 +53,10 @@ function EditoCondominio() {
         });
     }
 
-      document.body.classList.add('body1');
+      document.body.classList.add('body2');
 
       return () => {
-          document.body.classList.remove('body1');
+          document.body.classList.remove('body2');
       };
 
   }, [id_administrador]);
@@ -185,9 +185,6 @@ function EditoCondominio() {
             </div>
             <br/>
             <div className="botones-container">
-              <Link to="/EdicionyRegistro">
-                <button className="mi-boton2">Regresar</button>
-              </Link>
             <button className="mi-boton2" type='submit'>Actualizar</button>
             </div>
             <div style={{ display: visible ? 'block' : 'none' }}>Actualizacion exitosa</div>

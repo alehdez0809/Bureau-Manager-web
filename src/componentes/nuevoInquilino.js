@@ -13,6 +13,7 @@ function NuevoInquilino() {
     apellino_paterno_inquilino: '',
     apellino_materno_inquilino: '',
     correo_inquilino: '',
+    codigo_inquilino: ''
   });
 
   const [visible, setVisible] = useState(false);
@@ -27,6 +28,31 @@ function NuevoInquilino() {
   const [errorApellidoP, setErrorApellidoP] = useState('');
   const [errorApellidoM, setErrorApellidoM] = useState('');
   const [errorInquilino, setErrorInquilino] = useState('');
+
+  let numeros = "0123456789";
+  let letras = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  let todo = numeros + letras;
+
+  const generarCodigo = (longitud) => {
+    let codigo = "";
+    for (let x = 0; x < longitud; x++){
+      let posicion = Math.floor(Math.random() * todo.length);
+      codigo += todo.charAt(posicion);
+    }
+    return codigo;
+  };
+
+  const verificarYGenerarCodigo = async () => {
+    let codigoUnico = false;
+    let codigo_inquilino = '';
+    while (!codigoUnico) {
+      codigo_inquilino = generarCodigo(8);
+      const respuestaCodigo = await axios.get(`http://localhost:4000/api/verificarCodigoInquilino/${codigo_inquilino}`);
+      codigoUnico = !respuestaCodigo.data.existe;
+    }
+    return codigo_inquilino;
+  };
+  
 
   useEffect(() => {
     const authData = JSON.parse(localStorage.getItem('authData'));
@@ -259,7 +285,9 @@ function NuevoInquilino() {
         setErrorInquilino('Ya existe un inquilino asignado a este departamento');
         return;
       }
-      const resultado = await axios.post('http://localhost:4000/api/registrarInquilino', formulario);
+      const codigo = await verificarYGenerarCodigo();
+      const nuevoFormulario = { ...formulario, codigo_inquilino: codigo };
+      const resultado = await axios.post('http://localhost:4000/api/registrarInquilino', nuevoFormulario);
       if (resultado.data === 200) {
         setVisible(true);
       } else {
@@ -267,7 +295,7 @@ function NuevoInquilino() {
       }
     } catch (error) {
       console.error(error);
-      alert('Error al agregar al inquilino');
+      alert('Error al agregar al inquilino'+error);
     }
   };
 

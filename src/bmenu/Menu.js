@@ -1,14 +1,23 @@
 import React, {useState} from 'react'
 import * as FaIcons from 'react-icons/fa';
 import * as AiIcons from 'react-icons/ai';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { MenuDatos } from './MenuDatos.js';
 import { IconContext } from 'react-icons';
+import { useAuth } from '../AuthContext';
 
 function Menu() {
-  const [sidebar, setSidebar] = useState(false)
+  const [sidebar, setSidebar] = useState(false);
+  const navigate = useNavigate();
+  const { logout } = useAuth();
 
-  const mostrarSidebar = () => setSidebar(!sidebar)
+  const mostrarSidebar = () => setSidebar(!sidebar);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+    setSidebar(false); // Cierra el menú lateral también
+  };
   return (
     <>
     <IconContext.Provider value={{color: 'whitesmoke'}}>

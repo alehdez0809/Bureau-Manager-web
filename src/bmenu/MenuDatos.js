@@ -4,10 +4,12 @@ import * as AiIcons from 'react-icons/ai';
 import * as IoIcons from 'react-icons/io';
 import * as BsIcons from 'react-icons/bs';
 import * as MdIcons from 'react-icons/md';
+import { RiLogoutBoxLine } from "react-icons/ri";
 
 export const MenuDatos = [
+    
     {
-        title: 'Home',
+        title: 'Inicio',
         path: '/MenuPrincipal',
         icon: <AiIcons.AiFillHome />,
         cName: 'nav-text'
@@ -52,6 +54,12 @@ export const MenuDatos = [
         title: 'Soporte',
         path: '#',
         icon: <MdIcons.MdContactSupport />,
+        cName: 'nav-text'
+    },
+    {
+        title: 'Cerrar sesión',
+        path: '#',
+        icon: <RiLogoutBoxLine />,
         cName: 'nav-text'
     },
 ]

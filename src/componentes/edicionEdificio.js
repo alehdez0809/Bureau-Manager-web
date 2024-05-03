@@ -73,10 +73,10 @@ function EditoEdificio() {
           alert('Error al obtener los condominios');
         }
       });
-        document.body.classList.add('body1');
+        document.body.classList.add('body2');
 
         return () => {
-            document.body.classList.remove('body1');
+            document.body.classList.remove('body2');
         };
 
   }, []);
@@ -216,9 +216,6 @@ function EditoEdificio() {
             <div className='error-message'>{errorEdificio2}</div>
             </div>
             <div className="botones-container">
-              <Link to="/EdicionyRegistro">
-                <button className="mi-boton2">Regresar</button>
-              </Link>
             <button className="mi-boton2" type='submit'>Registrar</button>
             </div>
             <div style={{ display: visible ? 'block' : 'none' }}>Actualizacion exitosa</div>

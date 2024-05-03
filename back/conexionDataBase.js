@@ -7,15 +7,16 @@ const fs = require('fs');
 const app = express();
 const path = require('path');
 const fontkit = require('@pdf-lib/fontkit');
+require('dotenv').config();
 
 const jwt = require('jsonwebtoken');
-const secretKey = 'tu_clave_secreta';
+const secretKey = process.env.SECRET_KEY;
 
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
 //const CryptoJS = require("crypto-js");
-//const secretKeyAES = "tu_clave_secreta";
+//const secretKeyAES = process.env.SECRET_KEY;
 
 app.use(cors());
 
@@ -232,9 +233,9 @@ app.post('/api/registrarEdificio', (req, res) => {
 app.post('/api/registrarInquilino', (req, res) => {
   console.log("-------------------------------")
   console.log(req.body);
-  const { id_departamento, nombre_inquilino, apellino_paterno_inquilino, apellino_materno_inquilino, correo_inquilino } = req.body;
-  const sql = `INSERT INTO inquilino (id_departamento, nombre_inquilino, apellino_paterno_inquilino, apellino_materno_inquilino, correo_inquilino) VALUES (?, ?, ?, ?, ?)`;
-  const values = [id_departamento, nombre_inquilino, apellino_paterno_inquilino, apellino_materno_inquilino, correo_inquilino];
+  const { id_departamento, nombre_inquilino, apellino_paterno_inquilino, apellino_materno_inquilino, correo_inquilino, codigo_inquilino } = req.body;
+  const sql = `INSERT INTO inquilino (id_departamento, nombre_inquilino, apellino_paterno_inquilino, apellino_materno_inquilino, correo_inquilino, codigo_inquilino) VALUES (?, ?, ?, ?, ?, ?)`;
+  const values = [id_departamento, nombre_inquilino, apellino_paterno_inquilino, apellino_materno_inquilino, correo_inquilino, codigo_inquilino];
   connection.query(sql, values, error => {
     if (error) console.log(error);
     res.send("200");
@@ -893,6 +894,21 @@ app.get('/api/verificarRecibo/:id_condominio/:no_recibo', (req, res) => {
   });
 });
 
+app.get('/api/verificarCodigoInquilino/:codigo_inquilino', (req, res) => {
+  const { codigo_inquilino } = req.params;
+  const sql = `
+    SELECT COUNT(*) AS count FROM inquilino WHERE codigo_inquilino = ?
+  `;
+  connection.query(sql, [codigo_inquilino], (error, results) => {
+    if (error){
+      console.error(error);
+      res.status(500).send('Error al verificar el código del inquilino');
+    } else {
+      res.json({ existe: results[0].count > 0 });
+    }
+  });
+});
+
 app.get('/api/obtenerUltimoNumeroRecibo/:id_condominio', async (req, res) => {
   try {
     const id_condominio = req.params.id_condominio;
@@ -986,7 +1002,7 @@ app.post('/api/eliminarRecibos', (req, res) => {
 
 
 
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, '0.0.0.0',() => {
   console.log(`Servidor iniciado en http://0.0.0.0:${PORT}`);
 });

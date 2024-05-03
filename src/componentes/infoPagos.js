@@ -7,6 +7,7 @@ function InfoPagos() {
     const id_administrador = parseInt(authData?.id);
 
     const [datosPagos, setDatosPagos] = useState([]);
+    const [datosPagosTotal, setDatosPagosTotal] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -26,6 +27,12 @@ function InfoPagos() {
     const [condominioMayorAdeudo, setCondominioMayorAdeudo] = useState({ nombre: '', adeudo: 0 });
     const [totalAdeudos, setTotalAdeudos] = useState(0);
     const [condominioMenorAdeudo, setCondominioMenorAdeudo] = useState({ nombre: '', adeudo: 0 });
+    const fechaActual = new Date(); 
+    const mesAnterior = new Date(fechaActual.getFullYear(), fechaActual.getMonth() - 1, 1);
+
+    const anioMesAnterior = mesAnterior.getFullYear(); 
+    const mesAnteriorNumero = mesAnterior.getMonth() + 1; 
+
 
     useEffect(() => {
         document.body.classList.add('body1');
@@ -79,7 +86,9 @@ function InfoPagos() {
 
         try {
             const response = await axios.get(`http://localhost:4000/api/getInfoPagosFiltrados/${id_administrador}`, { params });
+            const pagos = await axios.get(`http://localhost:4000/api/getInfoPagos/${id_administrador}`);
             setDatosPagos(response.data);
+            setDatosPagosTotal(pagos.data);
             setPaginaActual(1);
         } catch (error) {
             setError('Error al filtrar los datos');
@@ -89,18 +98,25 @@ function InfoPagos() {
     };
 
     useEffect(() => {
-        if (datosPagos.length) {
+        if (datosPagosTotal.length) {
             calcularAdeudosCondominios();
         }
-    }, [datosPagos]);
+    }, [datosPagosTotal]);
 
     const calcularAdeudosCondominios = () => {
+        const fechaActual = new Date();
+        const mesAnterior = new Date(fechaActual.getFullYear(), fechaActual.getMonth() - 1, 1);
+        const anioMesAnterior = mesAnterior.getFullYear();
+        const mesAnteriorFormato = mesAnterior.getMonth() + 1;
         const adeudos = {};
         let total = 0;
-        datosPagos.forEach(pago => {
-            const adeudo = parseFloat(pago.adeudo);
-            adeudos[pago.nombre_condominio] = (adeudos[pago.nombre_condominio] || 0) + parseFloat(pago.adeudo);
-            total += adeudo;
+        datosPagosTotal.forEach(pago => {
+            const [anio, mes] = pago.fecha_pago.split('-');
+            if (parseInt(anio) === anioMesAnterior && parseInt(mes) === mesAnteriorFormato) {
+                const adeudo = parseFloat(pago.adeudo);
+                adeudos[pago.nombre_condominio] = (adeudos[pago.nombre_condominio] || 0) + parseFloat(pago.adeudo);
+                total += adeudo;
+            }
         });
         setCondominiosAdeudos(adeudos);
         setTotalAdeudos(total);
@@ -216,17 +232,17 @@ function InfoPagos() {
                 </div>   
                 <div className='side-content'>
                     <div className="condominio-adeudo div_alineados side-div">
-                        <h3>Condominio con más adeudos</h3>
+                        <h3>Condominio con más adeudos del mes {mesAnteriorNumero}/{anioMesAnterior}</h3>
                         <br/>
                         <p>{condominioMayorAdeudo.nombre}: ${condominioMayorAdeudo.adeudo.toFixed(2)}</p>
                     </div>
                     <div className="condominio-adeudo div_alineados side-div">
-                        <h3>Condominio con menos adeudos</h3>
+                        <h3>Condominio con menos adeudos del mes {mesAnteriorNumero}/{anioMesAnterior}</h3>
                         <br/>
                         <p>{condominioMenorAdeudo.nombre}: ${condominioMenorAdeudo.adeudo.toFixed(2)}</p>
                     </div>
                     <div className="condominio-adeudo side-div" style={{clear: "both", float: "left"}}>
-                        <h3>Total adeudos</h3>
+                        <h3>Total adeudos del mes {mesAnteriorNumero}/{anioMesAnterior}</h3>
                         <br/>
                         <p>${totalAdeudos.toFixed(2)}</p>
 

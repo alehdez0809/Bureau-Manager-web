@@ -21,10 +21,10 @@ function NuevoCondominio() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    document.body.classList.add('body1');
+    document.body.classList.add('body2');
 
     return () => {
-        document.body.classList.remove('body1');
+        document.body.classList.remove('body2');
     };
 }, []);
 
@@ -117,9 +117,6 @@ function NuevoCondominio() {
             </div>
             <br/>
             <div className="botones-container">
-              <Link to="/EdicionyRegistro">
-                <button className="mi-boton2">Regresar</button>
-              </Link>
             <button className="mi-boton2" type='submit'>Registrar</button>
             </div>
             <div className='Aceptado' style={{ display: visible ? 'block' : 'none' }}>Registro exitoso</div>

@@ -339,6 +339,10 @@ function NuevoRecibo() {
         ...prevState,
         id_condominio: selectedCondominio.id_condominio
       }));
+      setFormulario2(prevState => ({
+        ...prevState,
+        id_condominio: selectedCondominio.id_condominio
+      }));
       obtenerUltimoNumeroRecibo(selectedCondominio.id_condominio);
     }
   };
@@ -413,6 +417,10 @@ function NuevoRecibo() {
         ...prevState,
         id_edificio: selectedEdificio.id_edificio
       }));
+      setFormulario2(prevState => ({
+        ...prevState,
+        id_edificio: selectedEdificio.id_edificio
+      }));  
     }
   };
 
@@ -470,6 +478,10 @@ function NuevoRecibo() {
         ...prevState,
         id_departamento: selectedInquilino.id_inquilino,
         nombre_completo_inquilino: selectedInquilino.nombre_inquilino+" "+selectedInquilino.apellino_paterno_inquilino+" "+selectedInquilino.apellino_materno_inquilino,
+      }));
+      setFormulario2(prevState => ({
+        ...prevState,
+        id_inquilino: selectedInquilino.id_inquilino,
       }));
     }
   };
