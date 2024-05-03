@@ -23,6 +23,7 @@ import NuevoReciboExcel from "./componentes/nuevoReciboExcel.js";
 import InfoPagos from './componentes/infoPagos.js';
 import ComponenteCED from './componentes/componentesCED.js';
 import ComponenteInquilino from './componentes/componentesInquilino.js';
+import GestionCondominios from './componentes/gestionCondominios.js';
 
 
 function PrivateRoute({ children }) {
@@ -55,8 +56,9 @@ function App() {
             <Route path="/VerRecibo" element={<PrivateRoute> <Layout><VerRecibo /></Layout> </PrivateRoute>}  />
             <Route path="/NuevoReciboExcel" element={<PrivateRoute> <Layout><NuevoReciboExcel /></Layout> </PrivateRoute>}  />
             <Route path="/InfoPagos" element={<PrivateRoute> <Layout><InfoPagos /></Layout> </PrivateRoute>}  />
-            <Route path="/ComponentesCED" element={<Layout><ComponenteCED/></Layout>}/>
+            <Route path="/ComponentesCED" element={<PrivateRoute><Layout><ComponenteCED/></Layout></PrivateRoute>}/>
             <Route path="/ComponenteInquilino" element={<PrivateRoute><Layout><ComponenteInquilino/></Layout></PrivateRoute>} />
+            <Route path="/GestionCondominios" element={<PrivateRoute><Layout><GestionCondominios/></Layout></PrivateRoute>} />
           </Routes>
       
       </Router>

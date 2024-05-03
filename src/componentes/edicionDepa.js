@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 function EditoDepartamento() {
@@ -154,6 +153,7 @@ function EditoDepartamento() {
       const resultado = await axios.post('http://localhost:4000/api/actualizarDepartamento', formulario);
       if (resultado.data === 200) {
         setVisible(true);
+        window.location.reload();
       } else {
         alert(resultado.data);
       }
@@ -191,7 +191,7 @@ function EditoDepartamento() {
   }
 
     return (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className='formulario2'>
             <h1>Editar Departamento</h1>
             <div className="form-group">
               <label className='labelInput'>Seleccione un Condominio: </label>

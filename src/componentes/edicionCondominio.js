@@ -126,6 +126,7 @@ function EditoCondominio() {
       const resultado = await axios.post('http://localhost:4000/api/actualizarCondominio', formulario);
       if (resultado.data === 200) {
         setVisible(true);
+        window.location.reload();
       } else {
         alert(resultado.data);
       }

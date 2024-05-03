@@ -159,6 +159,7 @@ function EditoEdificio() {
       const resultado = await axios.post('http://localhost:4000/api/actualizarEdificio', formulario);
       if (resultado.data === 200) {
         setVisible(true);
+        window.location.reload();
       } else {
         alert(resultado.data);
       }
@@ -187,7 +188,7 @@ function EditoEdificio() {
     );
   }
     return (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className='formulario2'>
             <h1>Editar Edificio</h1>
             <div class="form-group">
             <label className='labelInput'>Seleccione un condominio: </label>
@@ -216,7 +217,7 @@ function EditoEdificio() {
             <div className='error-message'>{errorEdificio2}</div>
             </div>
             <div className="botones-container">
-            <button className="mi-boton2" type='submit'>Registrar</button>
+            <button className="mi-boton2" type='submit'>Actualizar</button>
             </div>
             <div style={{ display: visible ? 'block' : 'none' }}>Actualizacion exitosa</div>
           </form>   

@@ -17,24 +17,24 @@ function ComponenteCED() {
     }, []);
     return (
         
-        <div style={{marginTop: "610px"}}>
-            <h1>Registro y edición de C/E/D</h1>
+        <div style={{marginTop: "730px"}}>
+            <h1 style={{color: "#163C40"}}>Registro y edición de C/E/D</h1>
             <div className='container2'>
-                <div className="nuevoCondominio" style={{marginRight: "20px"}}>
+                <div className="nuevoCondominio" style={{marginRight: "40px"}}>
                     <NuevoCondominio />
                 </div>
-                <div className="edicionCondominio" style={{marginRight: "20px"}}>
+                <div className="edicionCondominio" style={{marginRight: "40px"}}>
                     <NuevoEdificio />
                 </div>
                 <div>
                     <NuevoDepartamento />
                 </div>
             </div>
-            <div className='container2' style={{marginTop: "20px"}}>
-                <div>
+            <div className='container2' style={{marginTop: "30px"}}>
+                <div style={{marginRight: "40px"}}>
                     <EdicionCondominio />
                 </div>
-                <div>
+                <div style={{marginRight: "40px"}}>
                     <EdicionEdificio />
                 </div>
                 <div>

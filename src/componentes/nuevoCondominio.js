@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 
@@ -65,6 +64,7 @@ function NuevoCondominio() {
 
           formulario.nombre_condominio='';
           formulario.direccion_condominio='';
+          window.location.reload();
 
         } else {
           alert(resultado.data);

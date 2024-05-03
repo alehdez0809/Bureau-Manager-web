@@ -16,7 +16,7 @@ function Menu() {
   const handleLogout = () => {
     logout();
     navigate('/');
-    setSidebar(false); // Cierra el menú lateral también
+    setSidebar(false);
   };
   return (
     <>

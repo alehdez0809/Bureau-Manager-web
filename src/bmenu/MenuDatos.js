@@ -16,7 +16,7 @@ export const MenuDatos = [
     },
     {
         title: 'Registro y Edición',
-        path: '/EdicionyRegistro',
+        path: '/ComponentesCED',
         icon: <FaIcons.FaRegEdit />,
         cName: 'nav-text'
     },
@@ -46,7 +46,7 @@ export const MenuDatos = [
     },
     {
         title: 'Información de condominios',
-        path: '#',
+        path: '/GestionCondominios',
         icon: <FaIcons.FaBuilding />,
         cName: 'nav-text'
     },

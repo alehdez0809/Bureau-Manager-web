@@ -129,6 +129,7 @@ function EditoEdificio() {
       const resultado = await axios.post('http://localhost:4000/api/registrarDepartamento', formulario);
       if (resultado.data === 200) {
         setVisible(true);
+        window.location.reload();
       } else {
         alert(resultado.data);
       }
@@ -154,7 +155,7 @@ function EditoEdificio() {
     );
   }
     return (
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className='formulario'>
             <h1>Nuevo Departamento</h1>
             <div class="form-group">
               <label className='labelInput'>Seleccione un Condominio: </label>

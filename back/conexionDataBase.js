@@ -721,6 +721,27 @@ app.post('/api/getInquilinosbyDepartamento', (req, res) => {
   });
 });
 
+app.get('/api/getInquilinosByCondominio', (req, res) => {
+  const { id_condominio } = req.query;
+  const query = `
+    SELECT i.nombre_inquilino, i.apellino_paterno_inquilino, i.apellino_materno_inquilino, 
+    i.correo_inquilino, i.codigo_inquilino, d.numero_departamento, e.nombre_edificio
+    FROM inquilino i
+    JOIN departamento d ON i.id_departamento = d.id_departamento
+    JOIN edificio e ON d.id_edificio = e.id_edificio
+    WHERE e.id_condominio = ?;
+  `;
+  connection.query(query, [id_condominio], (error, results) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send('Error al obtener los registros de la tabla');
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+
 app.get('/api/getEdificios', (req, res) => {
   console.log("-------------------------------")
   connection.query('SELECT * FROM edificio', (error, results) => {

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 
@@ -89,6 +88,7 @@ function NuevoEdificio() {
       if (resultado.data === 200) {
         setVisible(true);
         setError('');
+        window.location.reload();
       } else {
         alert(resultado.data);
       }
@@ -99,8 +99,7 @@ function NuevoEdificio() {
   };
 
   return (
-
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className='formulario'>
             <h1>Registro de nuevo Edificio</h1>
             <div class="form-group">
             <label className='labelInput'>Seleccione un condominio: </label>
