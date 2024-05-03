@@ -22,7 +22,7 @@ export const MenuDatos = [
     },
     {
         title: 'Administrar Inquilinos',
-        path: '/MenuInquilino',
+        path: '/ComponenteInquilino',
         icon: <BsIcons.BsPersonSquare />,
         cName: 'nav-text'
     },

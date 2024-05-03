@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 
@@ -149,10 +148,10 @@ function EditoInquilino() {
           alert('Error al obtener los condominios');
         }
       });
-        document.body.classList.add('body1');
+        document.body.classList.add('body2');
 
         return () => {
-            document.body.classList.remove('body1');
+            document.body.classList.remove('body2');
         };
   }, []);
   
@@ -426,6 +425,7 @@ function EditoInquilino() {
       const resultado = await axios.post('http://localhost:4000/api/actualizarInquilino', formulario);
       if (resultado.data === 200) {
         setVisible(true);
+        window.location.reload();
       } else {
         alert(resultado.data);
       }
@@ -556,14 +556,12 @@ function EditoInquilino() {
                       placeholder="Correo electrónico"
                       value={formulario.correo_inquilino}
                       onChange={handleChange}
+                      style={{ width: '240px' }}
                     />
                 </div>
             </div>
             <div style={{ display: visible ? 'block' : 'none' }}>Actualizacion exitosa</div>
             <div className="botones-container"> 
-              <Link to="/MenuInquilino">
-                <button className="mi-boton2">Regresar</button>
-              </Link>
             <button className="mi-boton2" type='submit'>Actualizar</button>
             </div>
           </form>   
