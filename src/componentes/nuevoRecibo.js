@@ -884,12 +884,10 @@ function NuevoRecibo() {
             <div className='error-message'>{errorNumero}</div>
             <br/>
             <div className="botones-container"> 
-              <Link to="/MenuPrincipal">
-                <button className="mi-boton2">Regresar</button>
-              </Link>
             <button className="mi-boton2" type='submit'>Registrar</button>
             </div>
-          </form>   
+          </form> 
+          <br/><br/>  
         </div>
     );
   }

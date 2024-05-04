@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { IoIosArrowDown } from "react-icons/io";
 import { IoIosArrowUp } from "react-icons/io";
+import { FaArrowCircleLeft, FaArrowCircleRight } from "react-icons/fa";
 
 function CondominiosComponent() {
     const authData = JSON.parse(localStorage.getItem('authData'));
@@ -11,6 +12,9 @@ function CondominiosComponent() {
     const [selectedCondominio, setSelectedCondominio] = useState(null);
     const [selectedEdificio, setSelectedEdificio] = useState(null);
     const [inquilinos, setInquilinos] = useState([]);
+
+    const [paginaActual, setPaginaActual] = useState(1);
+    const [registrosPorPagina] = useState(10);
 
     useEffect(() => {
         fetchCondominios();

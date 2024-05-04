@@ -27,7 +27,7 @@ html, body {
     }
 
     .fromMenu{
-      width: 1000px;
+      width: 600px;
     }
 
     .fromInquilino{
@@ -600,4 +600,14 @@ html, body {
   }
   
       
+  .menuinfo {
+    width: 275px;
+    padding-bottom: 7px;
+  }
+  .menudiv {
+    width: 550px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
       

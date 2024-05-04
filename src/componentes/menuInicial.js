@@ -40,14 +40,36 @@ function MenuInicial() {
         };
     }, []);
     return (
-          <form className='fromMenu'>
+        <>
+        <form className='fromMenu' style={{marginTop: "50px"}}>
             <h1>Bienvenido administrador(a):</h1>
             <h1>{adminName}</h1>
 
+            <div><h1>¿Que puedes hacer?</h1></div>
+            <div className='menudiv'>
+                <div className='menuinfo'>
+                    <h2>Creacion y envio de recibos</h2>
+                    <p>Crea o importa los recibos que necesites y envialos a los inquilinos correspondientes de forma rapida y sencilla</p>
+                </div>
+                <div className='menuinfo'>
+                    <h2>Administracion de datos</h2>
+                    <p>Revisa, controla y edita la toda la informacion sobre tus condominios e inquilinos de manera sencilla gracias al formato integrado</p>
+                </div>
+                <div className='menuinfo'>
+                    <h2>Importar datos desde excel</h2>
+                    <p>Importa tus hojas de excel con la informacion que quieres administrar para poder crear tus recibos de forma rapida</p>
+                </div>
+                <div className='menuinfo'>
+                    <h2>Consulta de datos</h2>
+                    <p>Consulta los datos sobre los estados de tus condominios, revisa la informacion sobre los pagos realizados y los adeudos</p>
+                </div>
+            </div>
+            <br/>
             <button type="submit" onClick={handleLogout}>Cerrar Sesion</button>
 
 
-          </form>   
+        </form>
+        </>   
     );
   }
   export default MenuInicial;
