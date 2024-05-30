@@ -69,8 +69,9 @@ async function crearPDFImagen(datos){
   const textwidthdir = font.widthOfTextAtSize(datos.direccion_condominio || '', 8);
   const textwidthNC = font.widthOfTextAtSize(`${datos.nombre_condominio} - ${datos.nombre_edificio}` || '', 11);
   const textwidthTPL = font.widthOfTextAtSize(`SON: (${datos.total_pagar_letra})` || '', 9);
+  const nombre_completo_inquilino = datos.nombre_inquilino + ' ' + datos.apellino_paterno_inquilino + ' ' + datos.apellino_materno_inquilino;
 
-  page.drawText(datos.nombre_completo_inquilino || '', {x: 125,y: height - 133,size: 13,color: fontColor,font: font});
+  page.drawText(nombre_completo_inquilino || '', {x: 125,y: height - 133,size: 13,color: fontColor,font: font});
   page.drawText(datos.direccion_condominio || '', {x: width-textwidthdir-20,y: height - 76,size: 8,color: fontColor,font: font});
   page.drawText(datos.no_recibo || '', {x: 532,y: height - 63,size: 13,color: colorRed,font: font});
   page.drawText(`${datos.nombre_condominio} - ${datos.nombre_edificio}` || '', {x: width-textwidthNC-20,y: height - 89,size: 11,color: fontColor,font: font});
@@ -117,6 +118,7 @@ async function crearPDFImagenMultiple(datosList){
     const textwidthdir = font.widthOfTextAtSize(datos.direccion_condominio || '', 8);
     const textwidthNC = font.widthOfTextAtSize(`${datos.nombre_condominio} - ${datos.nombre_edificio}` || '', 11);
     const textwidthTPL = font.widthOfTextAtSize(`SON: (${datos.total_pagar_letra})` || '', 9);
+    const nombre_completo_inquilino = datos.nombre_inquilino + ' ' + datos.apellino_paterno_inquilino + ' ' + datos.apellino_materno_inquilino;
 
     page.drawImage(imagen,{
       x:0,
@@ -125,7 +127,7 @@ async function crearPDFImagenMultiple(datosList){
       height:imagen.height*scale,
     });
 
-    page.drawText(datos.nombre_completo_inquilino || '', {x: 125,y: height - 133,size: 13,color: fontColor,font: font});
+    page.drawText(nombre_completo_inquilino || '', {x: 125,y: height - 133,size: 13,color: fontColor,font: font});
     page.drawText(datos.direccion_condominio || '', {x: width-textwidthdir-20,y: height - 76,size: 8,color: fontColor,font: font});
     page.drawText(datos.no_recibo || '', {x: 532,y: height - 63,size: 13,color: colorRed,font: font});
     page.drawText(`${datos.nombre_condominio} - ${datos.nombre_edificio}` || '', {x: width-textwidthNC-20,y: height - 89,size: 11,color: fontColor,font: font});
@@ -190,11 +192,7 @@ app.post('/api/registrarCuenta', (req, res) => {
 });
 
 
-app.post('/api/registrarDepartamento', (req, res) => {
-  connection.connect(error => {
-    if (error) throw error;
-    console.log('Conexión a la base de datos MySQL establecida');
-  });  
+app.post('/api/registrarDepartamento', (req, res) => { 
   console.log("-------------------------------")
   console.log(req.body);
   const { id_edificio, numero_departamento } = req.body;
@@ -306,12 +304,16 @@ app.post('/api/enviarRecibosCorreoElectronico', (req, res) => {
         c.direccion_condominio,
         c.admin_condominio,
         e.nombre_edificio,
-        d.numero_departamento 
+        d.numero_departamento,
+        i.nombre_inquilino,
+        i.apellino_paterno_inquilino,
+        i.apellino_materno_inquilino
       FROM 
         reciboCompleto AS rc 
       INNER JOIN departamento AS d ON rc.id_departamento = d.id_departamento 
       INNER JOIN edificio AS e ON d.id_edificio = e.id_edificio 
       INNER JOIN condominio AS c ON e.id_condominio = c.id_condominio 
+      INNER JOIN inquilino AS i ON rc.id_inquilino = i.id_inquilino
       WHERE
         rc.id_recibo = ?
     `;
@@ -348,7 +350,9 @@ app.post('/api/enviarRecibosCorreoElectronico', (req, res) => {
           direccion_condominio: results[0].direccion_condominio,
           admin_condominio: results[0].admin_condominio,
           nombre_edificio: results[0].nombre_edificio,
-          numero_departamento: results[0].numero_departamento
+          numero_departamento: results[0].numero_departamento,
+          apellido_paterno_inquilino: results[0].apellino_paterno_inquilino,
+          apellido_materno_inquilino: results[0].apellino_materno_inquilino
 
         };
         console.log(datos);
@@ -433,12 +437,16 @@ app.post('/api/generarPDFMasivo', async (req, res) => {
         c.direccion_condominio,
         c.admin_condominio,
         e.nombre_edificio,
-        d.numero_departamento 
+        d.numero_departamento,
+        i.nombre_inquilino,
+        i.apellino_paterno_inquilino,
+        i.apellino_materno_inquilino
       FROM 
         reciboCompleto AS rc 
       INNER JOIN departamento AS d ON rc.id_departamento = d.id_departamento 
       INNER JOIN edificio AS e ON d.id_edificio = e.id_edificio 
       INNER JOIN condominio AS c ON e.id_condominio = c.id_condominio 
+      INNER JOIN inquilino AS i ON rc.id_inquilino = i.id_inquilino
       WHERE
         rc.id_recibo = ?
     `;
@@ -478,7 +486,10 @@ app.post('/api/generarPDFMasivo', async (req, res) => {
               direccion_condominio: results[0].direccion_condominio,
               admin_condominio: results[0].admin_condominio,
               nombre_edificio: results[0].nombre_edificio,
-              numero_departamento: results[0].numero_departamento
+              numero_departamento: results[0].numero_departamento,
+              nombre_inquilino: results[0].nombre_inquilino,
+              apellino_paterno_inquilino: results[0].apellino_paterno_inquilino,
+              apellino_materno_inquilino: results[0].apellino_materno_inquilino
             };
             superDatos.push(datos);
             resolve();
