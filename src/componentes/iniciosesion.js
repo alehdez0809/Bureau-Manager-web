@@ -111,7 +111,7 @@ function Formulario() {
             </div>
             <h1>Bureau-Manager</h1>
             <h2>Iniciar Sesión</h2>
-            <div class="form-group">
+            <div className="form-group">
             <input
                 type="email"
                 id="correo_administrador"
@@ -122,7 +122,7 @@ function Formulario() {
               />
             {<div className="error-message">{errorCorreo}</div>}
             </div>
-            <div class="form-group">
+            <div className="form-group">
             <input
                 type="password"
                 id="contraseña_administrador"

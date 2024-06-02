@@ -345,6 +345,11 @@ function NuevoReciboExcel() {
         <button type="button" className="mi-boton2" style={{width: '260px'}}><IoIosCreate /> Generar recibos manualmente</button>
       </Link>
       <form className='fromInquilino' onSubmit={handleSubmit}>
+        <p style={{textAlign: 'justify'}}><b> NOTA:</b> Para poder utilizar esta función y llevar a cabo este proceso, es necesario 
+          que se hayan registrado todos los departamentos pertenecientes al condominio y 
+          edificio seleccionados, así como los inquilinos correspondientes a cada departamento.
+        </p>
+        <br/>
         <div className='select-container'>
           <div className='select-item'>
             <label>Seleccione un condominio:</label>

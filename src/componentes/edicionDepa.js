@@ -200,21 +200,21 @@ function EditoDepartamento() {
               </select>
               <div className='error-message'>{error}</div>
             </div>
-            <div class="form-group">
+            <div className="form-group">
             <label className='labelInput'>Seleccione un Edificio: </label>
             <select id="opciones" onChange={handleChangeSelect}>
                 {opcionesEdificio}
               </select>
               <div className='error-message'>{errorEdificio}</div>
             </div>
-            <div class="form-group">
+            <div className="form-group">
             <label className='labelInput'>Seleccione un Departamento: </label>
             <select id="opciones" onChange={handleChangeSelectDepartamentos}>
                 {opcionesDepartamento}
               </select>
               <div className='error-message'>{errorDepartamento}</div>
             </div>
-            <div class="form-group">
+            <div className="form-group">
               <label className='labelInput'>Nombre/Numero del Departamento: </label>
               <input
                 type="text"

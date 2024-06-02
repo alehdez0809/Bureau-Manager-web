@@ -79,7 +79,7 @@ function NuevoCondominio() {
     return (
           <form onSubmit={handleSubmit}>
             <h1>Registro de nuevo Condominio</h1>
-            <div class="form-group">
+            <div className="form-group">
               <label className='labelInput'>Nombre del condominio: </label>
               <input
                 type="text"
@@ -91,7 +91,7 @@ function NuevoCondominio() {
               />
             {<div className="error-message">{errorCorreo}</div>}
             </div>
-            <div class="form-group">
+            <div className="form-group">
               <label className='labelInput'>Direccion del condominio: </label>
               <input
                 type="text"
@@ -103,7 +103,7 @@ function NuevoCondominio() {
               />
               {<div className="error-message">{errorContraseña}</div>}
             </div>
-            <div class="form-group">
+            <div className="form-group">
               <label className='labelInput'>Administrador a cargo:</label>
               <select
                 id="admin_condominio"

@@ -3,7 +3,7 @@ import React from 'react';
 function GestionCuotas() {
     return (
         <div>
-            {/* Aquí va el contenido de tu componente */}
+            <h1>Gestión de cuotas</h1>
         </div>
     );
 }

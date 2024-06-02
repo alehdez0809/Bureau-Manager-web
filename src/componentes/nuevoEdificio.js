@@ -101,14 +101,14 @@ function NuevoEdificio() {
   return (
           <form onSubmit={handleSubmit} className='formulario'>
             <h1>Registro de nuevo Edificio</h1>
-            <div class="form-group">
+            <div className="form-group">
             <label className='labelInput'>Seleccione un condominio: </label>
             <select id="opciones"  onChange={handleChangeSelect}>
                 {opciones}
               </select>
             </div>
             <div className="error-message">{error}</div>
-            <div class="form-group">
+            <div className="form-group">
               <label className='labelInput'>Nombre del Edificio: </label>
               <input
                 type="text"
