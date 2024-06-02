@@ -11,6 +11,7 @@ function VerRecibo() {
 
   const [mensajeExito, setMensajeExito] = useState('');
   const [mensajeAdvertencia, setMensajeAdvertencia] = useState('');
+  const [mensajeError, setMensajeError] = useState('');
 
   const [paginaActual, setPaginaActual] = useState(1);
   const [registrosPorPagina] = useState(10);
@@ -152,16 +153,21 @@ function VerRecibo() {
     if (buttonValue==='correo'){
         try {
             const resultado = await axios.post('http://localhost:4000/api/enviarRecibosCorreoElectronico', recibosSeleccionados);
-            if (resultado.data === 200) {
+            if (resultado.data === 200 || resultado.status === 200) {
               setVisible(true);
               setMensajeExito('Recibos enviados correctamente');
+              setMensajeError('');
               setRecibosSeleccionados([]);
             } else {
-              alert(resultado.data);
+              alert('Error al enviar correos');
+              setMensajeError('Error al enviar correos');
+              setMensajeExito('');
             }
             } catch (error) {
             console.error(error);
-            alert('Error al rcrear correos');
+            alert('Error al enviar correos');
+            setMensajeError('Error al enviar correos');
+            setMensajeExito('');
         }
     }
     else{
@@ -179,9 +185,14 @@ function VerRecibo() {
           
             setVisible(true);
             setRecibosSeleccionados([]);
+            setMensajeExito('PDF generado correctamente');
+            setMensajeError('');
+
           } catch (error) {
             console.error(error);
             alert('Error al crear el PDF');
+            setMensajeError('Error al crear el PDF');
+            setMensajeExito('');
           }
           
     }
@@ -330,8 +341,9 @@ function VerRecibo() {
                 {opcionesRegistro}
                 </tbody>
             </table>
-            <div className='Aceptado' style={{ display: visible ? 'block' : 'none' }}>Recibo descargado</div>
-            <div className='mensajeExito' style={{ display: visible ? 'block' : 'none' }}>{mensajeExito}</div>
+            <br/>
+            <div className='Aceptado' style={{ display: visible ? 'block' : 'none' }}>{mensajeExito}</div>
+            <div className='error-message' style={{ display: visible ? 'block' : 'none' }}>{mensajeError}</div>
             <br/>
             <div className='select-container'>
               <div className="botones-container"> 

@@ -96,7 +96,18 @@ function NuevoReciboExcel() {
         return;
       }
       const rango = XLSX.utils.decode_range(worksheet['!ref']);
-      rango.s.r = 7;
+
+      let startRow = 0;
+      for(let row = rango.s.r; row <= rango.e.r; row++){
+        const celdaDir = { c: 0, r: row};
+        const celdaRef = XLSX.utils.encode_cell(celdaDir);
+        const celda = worksheet[celdaRef];
+        if(celda && celda.v){
+          startRow = row + 1;
+          break;
+        } 
+      }
+      rango.s.r = startRow;
       rango.e.c = 12;
       const datos = XLSX.utils.sheet_to_json(worksheet, {header: 1, range: rango});
       const deptosExcel = [];

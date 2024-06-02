@@ -391,8 +391,10 @@ app.post('/api/enviarRecibosCorreoElectronico', (req, res) => {
 
               transporter.sendMail(mailOptions, (error, info) => {
                 if (error) {
+                  res.status(500).send('Error al enviar los correos');
                   console.error('Error al enviar el correo:', error);
                 } else {
+                  res.status(200).send('Correo enviado exitosamente');
                   console.log('Correo enviado:', info.response);
                 }
               });
@@ -402,6 +404,7 @@ app.post('/api/enviarRecibosCorreoElectronico', (req, res) => {
           });
         })
         .catch((error) => {
+          res.status(500).send('Error al enviar los correos');
           console.error('Error al crear el PDF:', error);
         });
         
