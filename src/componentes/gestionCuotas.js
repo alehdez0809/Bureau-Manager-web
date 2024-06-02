@@ -2,7 +2,7 @@ import React from 'react';
 
 function GestionCuotas() {
     return (
-        <div>
+        <div className=''>
             <h1>Gestión de cuotas</h1>
         </div>
     );

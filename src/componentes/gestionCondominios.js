@@ -16,6 +16,12 @@ function CondominiosComponent() {
     const [paginaActual, setPaginaActual] = useState(1);
     const [registrosPorPagina] = useState(10);
 
+    const indiceUltimoRegistro = paginaActual * registrosPorPagina;
+    const indicePrimerRegistro = indiceUltimoRegistro - registrosPorPagina;
+    const inquilinosActuales = inquilinos.slice(indicePrimerRegistro, indiceUltimoRegistro); 
+
+    const cambiarPagina = (numeroPagina) => setPaginaActual(numeroPagina);
+
     useEffect(() => {
         fetchCondominios();
     }, []);
@@ -62,6 +68,7 @@ function CondominiosComponent() {
         try {
           const response = await axios.get(`http://localhost:4000/api/getInquilinosByCondominio?id_condominio=${id_condominio}`);
           setInquilinos(response.data);
+          setPaginaActual(1);
         } catch (error) {
           console.error('Error al obtener inquilinos', error);
         }
@@ -119,18 +126,19 @@ function CondominiosComponent() {
                     <h4>Inquilinos: </h4>
                     <br/>
                     {inquilinos.length > 0 && (
+                        <div>
                             <table>
                                 <thead>
                                     <tr>
-                                    <th>Nombre Completo</th>
-                                    <th>Correo</th>
-                                    <th>Código</th>
-                                    <th>Departamento</th>
-                                    <th>Edificio</th>
+                                      <th>Nombre Completo</th>
+                                      <th>Correo</th>
+                                      <th>Código</th>
+                                      <th>Departamento</th>
+                                      <th>Edificio</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {inquilinos.map(inquilino => (
+                                    {inquilinosActuales.map(inquilino => (
                                     <tr key={inquilino.id_inquilino}>
                                         <td>{`${inquilino.nombre_inquilino} ${inquilino.apellino_paterno_inquilino} ${inquilino.apellino_materno_inquilino}`}</td>
                                         <td>{inquilino.correo_inquilino}</td>
@@ -141,6 +149,18 @@ function CondominiosComponent() {
                                     ))}
                                 </tbody>
                             </table>
+                            {inquilinos.length > registrosPorPagina && (
+                              <div className='navegacion-pag'>
+                                <button onClick={() => cambiarPagina(paginaActual - 1)} disabled={paginaActual === 1} className='btn-pag'>
+                                  <FaArrowCircleLeft /> Anterior
+                                </button>
+                                <span className='span-pag'>Página {paginaActual} de {Math.ceil(inquilinos.length / registrosPorPagina)}</span>
+                                <button onClick={() => cambiarPagina(paginaActual + 1)} disabled={paginaActual === Math.ceil(inquilinos.length / registrosPorPagina)} className='btn-pag'>
+                                  Siguiente <FaArrowCircleRight />
+                                </button>
+                              </div>
+                            )}
+                          </div>  
                         )}
                 </div>
               )}
