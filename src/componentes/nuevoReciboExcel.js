@@ -352,7 +352,7 @@ function NuevoReciboExcel() {
         <br/>
         <div className='select-container'>
           <div className='select-item'>
-            <label>Seleccione un condominio:</label>
+            <label className='labelInput'>Seleccione un condominio:</label>
             <select onChange={handleCondominioChange} value={selectedCondominio}>
               <option value="">Seleccione un condominio</option>
               {condominios.map((condominio) => (
@@ -363,7 +363,7 @@ function NuevoReciboExcel() {
             </select>
           </div>
           <div className='select-item'>
-            <label>Seleccione un edificio:</label>
+            <label className='labelInput'>Seleccione un edificio:</label>
             <select onChange={handleEdificioChange} value={selectedEdificio} disabled={!selectedCondominio}>
               <option value="">Seleccione un edificio</option>
               {edificios.map((edificio) => (
@@ -374,13 +374,13 @@ function NuevoReciboExcel() {
             </select>
           </div>
           <div className='select-item'>
-            <label>Mes en el que se hicieron los pagos:</label>
+            <label className='labelInput'>Mes en el que se hicieron los pagos:</label>
             <input type='month' onChange={handleMesChange} value={selectedMes}/>
           </div>
         </div>
         <div className='select-container'>
           <div className='select-item'>
-            <label>Seleccione un archivo Excel:</label>
+            <label className='labelInput'>Seleccione un archivo Excel:</label>
             <input type='file' accept=".xlsx" onChange={handleArchivoChange} disabled={!selectedCondominio || !selectedEdificio || !selectedMes}/>
           </div>
         </div>

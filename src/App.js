@@ -24,6 +24,8 @@ import InfoPagos from './componentes/infoPagos.js';
 import ComponenteCED from './componentes/componentesCED.js';
 import ComponenteInquilino from './componentes/componentesInquilino.js';
 import GestionCondominios from './componentes/gestionCondominios.js';
+import RegistrarCuota from './componentes/registrarCuota.js';
+import EditarCuota from './componentes/editarCuota.js';
 
 
 function PrivateRoute({ children }) {
@@ -59,6 +61,8 @@ function App() {
             <Route path="/ComponentesCED" element={<PrivateRoute><Layout><ComponenteCED/></Layout></PrivateRoute>}/>
             <Route path="/ComponenteInquilino" element={<PrivateRoute><Layout><ComponenteInquilino/></Layout></PrivateRoute>} />
             <Route path="/GestionCondominios" element={<PrivateRoute><Layout><GestionCondominios/></Layout></PrivateRoute>} />
+            <Route path="/RegistrarCuotas" element={<PrivateRoute><Layout><RegistrarCuota/></Layout></PrivateRoute>} />
+            <Route path="/EditarCuotas" element={<PrivateRoute><Layout><EditarCuota/></Layout></PrivateRoute>} />
           </Routes>
       
       </Router>

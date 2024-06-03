@@ -64,6 +64,24 @@ html, body {
       flex-direction: column;
       width: 50%;
     }
+
+    .container-cuotas{
+      display: flex;
+      padding: 10px;
+    }
+
+    .column-cuotas {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin: 0 20px;
+      padding: 20px;
+  }
+
+  .item-cuotas {
+    margin: 10px 0;
+    padding: 5px;
+  }
     
     .side-div {
       margin-bottom: 20px;
@@ -185,6 +203,16 @@ html, body {
       margin-bottom: 10px; /* agrega un margen inferior para separar los campos */
       transition: all 0.3s ease;
       width: 160px;
+    }
+    input[type="number"]{
+      background-color: #e6e6e6;
+      border-color: #000000;
+      border-radius: 0.25rem;
+      border-width: 0.5px;
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+      width: 200px;
+      padding: 0.5rem 2rem 0.5rem 1rem;
     }
     input[type="month"]{
       background-color: #e6e6e6;
@@ -407,12 +435,25 @@ html, body {
       width: 250px;
       height: 100vh;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      justify-content: flex-start;
       position: fixed;
       top: 0;
       left: -100%;
       transition: 850ms;
       z-index: 1500;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #1B6953 #163C40;
+    }
+
+    .nav-menu::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .nav-menu::-webkit-scrollbar-thumb {
+      background-color: #1B6953;
+      border-radius: 10px; 
     }
     
     .nav-menu.active {
