@@ -97,7 +97,7 @@ function EditarCuotas() {
 
     const handleInputChange = (event) => {
         const { id, value } = event.target;
-        setFormulario({ ...formulario, [id]: parseInt(value.trim()) });
+        setFormulario({ ...formulario, [id]: parseFloat(value.trim()) });
     };
 
     const handleSubmit = async (event) => {
@@ -174,7 +174,7 @@ function EditarCuotas() {
                         <div className='item-cuotas'>
                             <label htmlFor="cuota_extra" className='labelInput'>Ingrese la nueva cuota por estacionamiento (opcional):</label>
                             <br/>
-                            <input type='number' id='cuota_extra' min={0} max={10000} placeholder='$' onChange={handleInputChange} value={formulario.cuota_extra}/>
+                            <input type='number' id='cuota_extra' min={0} max={10000} step='any' placeholder='$' onChange={handleInputChange} value={formulario.cuota_extra}/>
                         </div>
                     </div>
                 </div>

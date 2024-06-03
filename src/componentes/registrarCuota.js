@@ -82,7 +82,7 @@ function RegistrarCuotas() {
 
     const handleInputChange = (event) => {
         const { id, value } = event.target;
-        setFormulario({ ...formulario, [id]: parseInt(value.trim()) });
+        setFormulario({ ...formulario, [id]: parseFloat(value.trim()) });
     };
 
     const handleSubmit = async (event) => {
