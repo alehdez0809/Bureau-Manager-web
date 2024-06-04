@@ -19,7 +19,8 @@ function NuevoReciboExcel() {
   const datosAdeudos = [];
   const datosInfoPagos = [];
   const datosRecibo = [];
-  const meses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+
+  const [cuotas, setCuotas] = useState([]);
 
   useEffect(() => {
     axios.get(`http://localhost:4000/api/getCondominios/${id_administrador}`)
@@ -34,7 +35,7 @@ function NuevoReciboExcel() {
     return () => {
         document.body.classList.remove('body1');
     };
-  }, []);
+  },);
 
   useEffect(() => {
     if (selectedCondominio) {
@@ -49,14 +50,27 @@ function NuevoReciboExcel() {
     }
   }, [selectedCondominio]);
 
+  const obtenerCuotas = (id_edificio) => {
+    axios.get(`http://localhost:4000/api/obtenerCuota/${id_edificio}`)
+      .then(response => {
+        setCuotas(response.data);
+        console.log(cuotas);
+      })
+      .catch(error => {
+        console.error("Error al obtener las cuotas", error);
+      });
+  };  
+
   const handleCondominioChange = (event) => {
     setSelectedCondominio(event.target.value);
     setError('');
   };
 
   const handleEdificioChange = (event) => {
-    setSelectedEdificio(event.target.value);
+    const edificioId = event.target.value;
+    setSelectedEdificio(edificioId);
     setError('');
+    obtenerCuotas(edificioId);
   };
 
   const handleMesChange = (event) => {
@@ -69,14 +83,6 @@ function NuevoReciboExcel() {
     setError('');
   };
 
-  function convertirFecha(fechaStr){
-    const partes = fechaStr.split('/');
-    const dia = partes[0];
-    const mes = partes[1];
-    let anio = '20'+partes[2];
-
-    return `${anio}-${mes}-${dia.padStart(2, '0')}`;
-  }
   const handleSubmit = async (event) => {
     setCargando(true);
     event.preventDefault();
@@ -85,7 +91,7 @@ function NuevoReciboExcel() {
       setCargando(false);
       return;
     }
-    try{
+    try {
       const data = await archivo.arrayBuffer();
       const workbook = XLSX.read(data);
       const sheetName = convertirMesALetra(selectedMes);
@@ -146,25 +152,21 @@ function NuevoReciboExcel() {
         setCargando(false);
         return;
       }
-      //verificar si el recibo ya existe en la base de datos
-      for (let fila of datos){
-        if (!fila[0] || fila[0] === '') break;
-        if(fila[10]){
-          let no_recibo = fila[10].toString().trim();
-          const response = await axios.get(`http://localhost:4000/api/verificarRecibo/${selectedCondominio}/${no_recibo}`);
-          if(response.data.existe){
-            setError(`El recibo número ${no_recibo} ya está registrado en la base de datos.`);
-            setCargando(false);
-            return;
-          }
-        }
+      if(cuotas.length <= 0){
+        setError(`No se han asignado cuotas para este edificio, por favor, asigne las cuotas en el apartado 'Administrar Cuotas'`);
+        setCargando(false);
+        return;
       }
+
+      // Obtener las cuotas del edificio seleccionado
+      const cuota = cuotas.find(c => c.id_edificio === parseInt(selectedEdificio));
+      const cuotaBase = parseFloat(cuota.cuota_base);
+      const cuotaExtra = cuota.cuota_extra ? parseFloat(cuota.cuota_extra) : null;
+
       const hoy = new Date().toISOString().split('T')[0];
       for (let fila of datos) {
-        // Verifica si la celda de la columna A (index 0) está vacía y detiene el bucle
         if (!fila[0] || fila[0] === '') break;
-      
-        if (fila[7] === undefined || fila[7] === '') {
+        if(fila[7] === undefined || fila[7] === ''){
           let numero_departamento = fila[0].toString().trim();
           const deptoEncontrado = deptosBD.find(depto => depto.numero_departamento === numero_departamento);
       
@@ -188,54 +190,83 @@ function NuevoReciboExcel() {
                 datosAdeudos.push(datosFormulario3);
                 
               }
-            } else {
-              console.log(`No hay inquilinos registrados para el departamento ${numero_departamento}`);
             }
-          } else {
-            console.log(`No se encontró el departamento ${numero_departamento} en la base de datos`);
           }
-        } else if (fila[7] !== undefined && fila[7] !== '') {
+        }else{
           if (fila[8].toString().includes(',')) continue;
-      
           let departamento = fila[0].toString().trim();
           let deptoEncontrado = deptosBD.find(d => d.numero_departamento === departamento);
           if (!deptoEncontrado) continue;
-      
+
           const inquilinos = await axios.post('http://localhost:4000/api/getInquilinosbyDepartamento', {id_departamento: deptoEncontrado.id_departamento})
             .then(res => res.data);
-      
+
           if (inquilinos.length === 0) continue;
-      
+
           let inquilino = inquilinos[0];
           let nombreCompletoInquilino = `${inquilino.nombre_inquilino} ${inquilino.apellino_paterno_inquilino} ${inquilino.apellino_materno_inquilino}`;
-      
-          let adeudo = parseFloat(fila[11]);
-          /*if(adeudo <= 0){
-            adeudo = adeudo.toFixed(1);
-          }*/
           
+          let cuotaOrdinaria, cuotaAdeudos;
+          let totalPagar = parseFloat(fila[7]);
+
+          if (cuotaExtra === null) {
+            if (totalPagar === cuotaBase) {
+              cuotaOrdinaria = cuotaBase.toString();
+              cuotaAdeudos = '';
+            } else if (totalPagar < cuotaBase) {
+              cuotaOrdinaria = totalPagar.toString();
+              cuotaAdeudos = '';
+            } else {
+              cuotaOrdinaria = cuotaBase.toString();
+              cuotaAdeudos = (totalPagar - cuotaBase).toFixed(1).toString();
+            }
+          } else {
+            if (!fila[1]) {
+              if (totalPagar === cuotaBase) {
+                cuotaOrdinaria = cuotaBase.toString();
+                cuotaAdeudos = '';
+              } else if (totalPagar < cuotaBase) {
+                cuotaOrdinaria = totalPagar.toString();
+                cuotaAdeudos = '';
+              } else {
+                cuotaOrdinaria = cuotaBase.toString();
+                cuotaAdeudos = (totalPagar - cuotaBase).toFixed(1).toString();
+              }
+            } else {
+              if (totalPagar === cuotaExtra) {
+                cuotaOrdinaria = cuotaExtra.toString();
+                cuotaAdeudos = '';
+              } else if (totalPagar < cuotaExtra) {
+                cuotaOrdinaria = totalPagar.toString();
+                cuotaAdeudos = '';
+              } else {
+                cuotaOrdinaria = cuotaExtra.toString();
+                cuotaAdeudos = (totalPagar - cuotaExtra).toFixed(1).toString();
+              }
+            }
+          }
+
           let reciboData = {
             id_condominio: selectedCondominio,
             id_edificio: selectedEdificio,
             id_departamento: deptoEncontrado.id_departamento,
             id_inquilino: inquilino.id_inquilino,
             nombre_completo_inquilino: nombreCompletoInquilino,
-            no_recibo: fila[10], // Columna K
-            fecha: convertirFechaExcel(fila[8]), // Columna I
-            fecha_formateada: formatearFecha(convertirFechaExcel(fila[8])), // Columna I
+            no_recibo: fila[10],
+            fecha: convertirFechaExcel(fila[8]),
+            fecha_formateada: formatearFecha(convertirFechaExcel(fila[8])),
             mes_pago: sheetName,
             concepto_pago: 'CUOTAS DE MANTENIMIENTO Y ADMINISTRACIÓN',
-            cuota_ordinaria: fila[2].toString(), // Columna C
+            cuota_ordinaria: cuotaOrdinaria,
             cuota_penalizacion: '',
             cuota_extraordinaria: '',
             cuota_reserva: '',
-            cuota_adeudos: fila[7] !== fila[2] ? (fila[7] - fila[2]).toFixed(1) : '', // Columna H menos Columna C si son diferentes
-            total_pagar: fila[7].toString(), // Columna H
-            total_pagar_letra: importeEnLetra(parseFloat(fila[7])),
+            cuota_adeudos: cuotaAdeudos,
+            total_pagar: totalPagar.toString(),
+            total_pagar_letra: importeEnLetra(totalPagar),
             id_administrador: id_administrador
           };
           datosRecibo.push(reciboData);
-          
 
           let info_pagos_form = {
             id_administrador: id_administrador,
@@ -243,28 +274,35 @@ function NuevoReciboExcel() {
             id_edificio: selectedEdificio,
             id_inquilino: inquilino.id_inquilino,
             no_recibo: fila[10],
-            total_pagado: fila[7].toString(),
-            adeudo: adeudo <= 0 ? '0' : adeudo.toFixed(1),
+            total_pagado: totalPagar.toString(),
+            adeudo: totalPagar <= 0 ? '0' : totalPagar.toFixed(1),
             fecha_pago: convertirFechaExcel(fila[8])
           }
           datosInfoPagos.push(info_pagos_form);
-          
-        }
+        }  
       }
+      /*console.log('---------------');
+      console.log('--------Adeudos---------');
+      console.log(datosAdeudos);
+      console.log('---------------');
+      console.log('--------Recibos---------');
+      console.log(datosRecibo);
+      console.log('---------------');
+      console.log('--------Info Pagos---------');
+      console.log(datosInfoPagos);*/
       await axios.post('http://localhost:4000/api/registrarInfoPagosCompleto', datosAdeudos);
       await axios.post('http://localhost:4000/api/registrarRecibo', datosRecibo);
       await axios.post('http://localhost:4000/api/registrarInfoPagosCompleto', datosInfoPagos);
 
-      
       setError('Proceso completado correctamente.');
       setCargando(false);
-    }catch (err){
+    } catch (err) {
       console.error(err);
       setError('Error al procesar el archivo Excel.');
       setCargando(false);
     }
-    // Aquí agregarías la lógica para procesar el archivo Excel
-  };
+};
+
 
   const convertirMesALetra = (fecha) => {
     const meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];

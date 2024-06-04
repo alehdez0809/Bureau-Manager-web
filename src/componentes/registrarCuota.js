@@ -17,7 +17,7 @@ function RegistrarCuotas() {
         id_condominio: '',
         id_edificio: '',
         cuota_base: '',
-        cuota_extra: ''
+        cuota_extra: null
     });
 
     useEffect(() => {

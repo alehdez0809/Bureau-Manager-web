@@ -15,7 +15,7 @@ function EditarCuotas() {
 
     const [formulario, setFormulario] = useState({
         cuota_base: '',
-        cuota_extra: '',
+        cuota_extra: null,
         id_edificio: ''
     });
 

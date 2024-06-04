@@ -278,7 +278,10 @@ app.post('/api/registrarInfoPagosCompleto', (req, res) => {
 
 app.post('/api/registrarCuotas', (req, res) => {
   console.log(req.body);
-  const { id_condominio, id_edificio, cuota_base, cuota_extra } = req.body;
+  let { id_condominio, id_edificio, cuota_base, cuota_extra } = req.body;
+  if(cuota_extra === ''){
+    cuota_extra = null;
+  }
   const sql = 'INSERT INTO admin_cuotas (id_condominio, id_edificio, cuota_base, cuota_extra) VALUES (?, ?, ?, ?)';
   const values = [id_condominio, id_edificio, cuota_base, cuota_extra];
   connection.query(sql, values, error => {
@@ -595,7 +598,10 @@ app.post('/api/actualizarInquilino', (req, res) => {
 
 app.post('/api/actualizarCuotas', (req, res) => {
   console.log(req.body);
-  const { cuota_base, cuota_extra, id_edificio } = req.body;
+  let { cuota_base, cuota_extra, id_edificio } = req.body;
+  if(cuota_extra === ''){
+    cuota_extra = null;
+  }
   const sql = 'UPDATE admin_cuotas SET cuota_base = ?, cuota_extra = ? WHERE id_edificio = ?';
   const values = [cuota_base, cuota_extra, id_edificio];
   connection.query(sql, values, error => {
