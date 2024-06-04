@@ -59,7 +59,7 @@ export const MenuDatos = [
     },
     {
         title: 'Soporte',
-        path: '#',
+        path: 'http://bureau-manager.mx',
         icon: <MdIcons.MdContactSupport />,
         cName: 'nav-text'
     },

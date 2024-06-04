@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import e from 'connect-flash';
 import { SiMicrosoftexcel } from "react-icons/si";
 
 
@@ -45,6 +44,8 @@ function NuevoRecibo() {
   const [condominios, setCondominios] = useState([]);
   const [edificios, setEdificios] = useState([]);
   const [inquilinos, setInquilinos] = useState([]);
+  const [cuotas, setCuotas] = useState([]);
+
 
   const [errores, setErrores] = useState({});
 
@@ -60,7 +61,7 @@ function NuevoRecibo() {
     const id_administrador = parseInt(authData?.id);
     axios.get(`http://localhost:4000/api/getCondominios/${id_administrador}`)
       .then(response => {
-        if(response.data.length === 0){
+        if (response.data.length === 0) {
           setEdificios([]);
           setDepartamentos([]);
           setCondominios([]);
@@ -68,142 +69,81 @@ function NuevoRecibo() {
           setFormulario(prevState => ({
             ...prevState,
             id_condominio: 0,
-            nombre_completo_inquilino:'',
-         }));
+            nombre_completo_inquilino: '',
+          }));
           setFormulario2(prevState => ({
             ...prevState,
             id_condominio: 0,
           }));
-        }else{
+        } else {
           setCondominios(response.data);
+          const selectedCondominio = response.data[0].id_condominio;
           setFormulario(prevState => ({
             ...prevState,
-            id_condominio: response.data[0].id_condominio
+            id_condominio: selectedCondominio,
           }));
           setFormulario2(prevState => ({
             ...prevState,
-            id_condominio: response.data[0].id_condominio
+            id_condominio: selectedCondominio,
           }));
-          obtenerUltimoNumeroRecibo(response.data[0].id_condominio);  
-          
-          // Mueve el segundo axios.get() dentro del then() del primer axios.get()
-        const selectedCondominio = response.data[0].id_condominio;
-        const diccionario = {};
-        diccionario['id_condominio'] = parseInt(selectedCondominio);
-        
+          obtenerUltimoNumeroRecibo(selectedCondominio);
   
-        axios.post(`http://localhost:4000/api/getEdificiosbyCondominio`,diccionario)
-          .then(resultado => {
-            if (resultado.data.length === 0) {
-              setEdificios([]);
-              setDepartamentos([]);
-              setInquilinos([]);
-              setFormulario(prevState => ({
-                ...prevState,
-                id_edificio: 0,
-                nombre_completo_inquilino:'',
-              }));
-              setFormulario2(prevState => ({
-                ...prevState,
-                id_edificio: 0,
-              }));  
-            } else {
-              setEdificios(resultado.data);
-              setFormulario(prevState => ({
-                ...prevState,
-                id_edificio: resultado.data[0].id_edificio,
-              }));
-              setFormulario2(prevState => ({
-                ...prevState,
-                id_edificio: resultado.data[0].id_edificio,
-              }));  
-
-              const selectedEdifcio = resultado.data[0].id_edificio;
-              const diccionario2 = {};
-              diccionario2['id_edificio'] = parseInt(selectedEdifcio);
-              
-              axios.post(`http://localhost:4000/api/getDepartamentosbyEdificios`,diccionario2)
-              .then(resultado => {
-                if (resultado.data.length === 0) {
-                  setDepartamentos([]);
-                  setInquilinos([]);
-                  setFormulario(prevState => ({
-                    ...prevState,
-                    id_departamento: 0,
-                    nombre_completo_inquilino:'',
-                  }));
-                  
-                } else {
-                  setDepartamentos(resultado.data);
-                  setFormulario(prevState => ({
-                    ...prevState,
-                    id_departamento: resultado.data[0].id_departamento,
-                  }));
-                  
-
-                  const selectedInquilino = resultado.data[0].id_departamento;
-                  const diccionario3 = {};
-                  diccionario3['id_departamento'] = parseInt(selectedInquilino);
-
-                  axios.post(`http://localhost:4000/api/getInquilinosbyDepartamento`,diccionario3)
-                  .then(resultado => {
-                    if (resultado.data.length === 0) {
-                      setInquilinos([]);
-                      setFormulario(prevState => ({
-                        ...prevState,
-                        id_inquilino: 0,
-                        nombre_completo_inquilino:'',
-                      }));
-                      setFormulario2(prevState => ({
-                        ...prevState,
-                        id_inquilino: 0,
-                      }));  
-                    } else {
-                      setInquilinos(resultado.data);
-                      setFormulario(prevState => ({
-                        ...prevState,
-                        id_inquilino: resultado.data[0].id_inquilino,
-                        nombre_completo_inquilino: resultado.data[0].nombre_inquilino+" "+resultado.data[0].apellino_paterno_inquilino+" "+resultado.data[0].apellino_materno_inquilino,
-                      }));
-                      setFormulario2(prevState => ({
-                        ...prevState,
-                        id_inquilino: resultado.data[0].id_inquilino,
-                      }));
-                    }
-                  })
-                  .catch(error => {
-                    console.error(error);
-                    alert('Error al obtener los inquilinos');
-                  });
-                }
-              })
-              .catch(error => {
-                console.error(error);
-                alert('Error al obtener los departamentos');
-              });
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            alert('Error al obtener los edificios');
-          });
+          const diccionario = { id_condominio: selectedCondominio };
+          axios.post(`http://localhost:4000/api/getEdificiosbyCondominio`, diccionario)
+            .then(resultado => {
+              if (resultado.data.length === 0) {
+                setEdificios([]);
+                setDepartamentos([]);
+                setInquilinos([]);
+                setFormulario(prevState => ({
+                  ...prevState,
+                  id_edificio: 0,
+                  nombre_completo_inquilino: '',
+                }));
+                setFormulario2(prevState => ({
+                  ...prevState,
+                  id_edificio: 0,
+                }));
+              } else {
+                const selectedEdificio = resultado.data[0].id_edificio;
+                setEdificios(resultado.data);
+                setFormulario(prevState => ({
+                  ...prevState,
+                  id_edificio: selectedEdificio,
+                }));
+                setFormulario2(prevState => ({
+                  ...prevState,
+                  id_edificio: selectedEdificio,
+                }));
+  
+                // Obtener departamentos e inquilinos
+                obtenerDepartamentosEInquilinos(selectedEdificio);
+                
+                // Obtener cuotas
+                obtenerCuotas(selectedEdificio);
+              }
+            })
+            .catch(error => {
+              console.error(error);
+              alert('Error al obtener los edificios');
+            });
         }
-        
       })
       .catch(error => {
         console.log(error);
         if (error.response && error.response.status === 404) {   
-          ///
+          // Manejo de error
         } else {
           alert('Error al obtener los condominios');
         }
       });
-        document.body.classList.add('body1');
-
-        return () => {
-            document.body.classList.remove('body1');
-        };
+  
+    document.body.classList.add('body1');
+    return () => {
+      document.body.classList.remove('body1');
+    };
   }, []);
+  
 
   const obtenerUltimoNumeroRecibo = async (id_condominio) => {
     try {
@@ -231,7 +171,11 @@ function NuevoRecibo() {
 
   
   const handleChangeSelect = event => {
-    const elegido=parseInt(event.target.value)
+    const elegido=parseInt(event.target.value);
+    if (!elegido) {
+      alert('Debe seleccionar un condominio');
+      return;
+    }
     const selectedCondominio = condominios.find(c => c.id_condominio === elegido);
 
     if (selectedCondominio) {
@@ -347,85 +291,157 @@ function NuevoRecibo() {
     }
   };
 
-  const handleChangeSelectEdificios = event => {
-    const elegido=parseInt(event.target.value)
+  const handleChangeSelectEdificios = async event => {
+    const elegido = parseInt(event.target.value);
+    if (!elegido) {
+      alert('Debe seleccionar un edificio');
+      return;
+    }
     const selectedEdificio = edificios.find(c => c.id_edificio === elegido);
-
-    if (selectedEdificio) {
-        const diccionario = {};
-        diccionario['id_edificio'] = selectedEdificio.id_edificio;
   
-        axios.post(`http://localhost:4000/api/getDepartamentosbyEdificios`,diccionario)
-          .then(resultado => {
-            if (resultado.data.length === 0) {
-              setDepartamentos([]);
-              setInquilinos([]);
-              setFormulario(prevState => ({
-                ...prevState,
-                id_departamento: 0,
-                nombre_completo_inquilino:'',
-                
-              }));
-            } else {
-              setDepartamentos(resultado.data);
-              setFormulario(prevState => ({
-                ...prevState,
-                id_departamento: resultado.data[0].id_departamento
-              }));
-                  const selectedInquilino = resultado.data[0].id_departamento;
-                  const diccionario3 = {};
-                  diccionario3['id_departamento'] = parseInt(selectedInquilino);
-
-                  axios.post(`http://localhost:4000/api/getInquilinosbyDepartamento`,diccionario3)
-                  .then(resultado => {
-                    if (resultado.data.length === 0) {
-                      setInquilinos([]);
-                      setFormulario(prevState => ({
-                        ...prevState,
-                        id_inquilino: 0,
-                        nombre_completo_inquilino:'',
-                      }));
-                      setFormulario2(prevState => ({
-                        ...prevState,
-                        id_inquilino: 0,
-                      }));
-                    } else {
-                      setInquilinos(resultado.data);
-                      setFormulario(prevState => ({
-                        ...prevState,
-                        id_inquilino: resultado.data[0].id_inquilino,
-                        nombre_completo_inquilino: resultado.data[0].nombre_inquilino+" "+resultado.data[0].apellino_paterno_inquilino+" "+resultado.data[0].apellino_materno_inquilino,
-                      }));
-                      setFormulario2(prevState => ({
-                        ...prevState,
-                        id_inquilino: resultado.data[0].id_inquilino,
-                      }));
-                    }
-                  })
-                  .catch(error => {
-                    console.error(error);
-                    alert('Error al obtener los inquilinos');
-                  });
-            }
-          })
-          .catch(error => {
-            console.error(error);
-            alert('Error al obtener los departamentos');
-          });
-
-      setFormulario(prevState => ({
-        ...prevState,
-        id_edificio: selectedEdificio.id_edificio
-      }));
-      setFormulario2(prevState => ({
-        ...prevState,
-        id_edificio: selectedEdificio.id_edificio
-      }));  
+    if (selectedEdificio) {
+      const diccionario = { id_edificio: selectedEdificio.id_edificio };
+  
+      try {
+        const resultadoDepartamentos = await axios.post(`http://localhost:4000/api/getDepartamentosbyEdificios`, diccionario);
+        if (resultadoDepartamentos.data.length === 0) {
+          setDepartamentos([]);
+          setInquilinos([]);
+          setFormulario(prevState => ({
+            ...prevState,
+            id_departamento: 0,
+            nombre_completo_inquilino: '',
+          }));
+        } else {
+          const selectedDepartamento = resultadoDepartamentos.data[0].id_departamento;
+          setDepartamentos(resultadoDepartamentos.data);
+          setFormulario(prevState => ({
+            ...prevState,
+            id_departamento: selectedDepartamento,
+          }));
+          
+          const diccionarioInquilinos = { id_departamento: selectedDepartamento };
+          const resultadoInquilinos = await axios.post(`http://localhost:4000/api/getInquilinosbyDepartamento`, diccionarioInquilinos);
+          if (resultadoInquilinos.data.length === 0) {
+            setInquilinos([]);
+            setFormulario(prevState => ({
+              ...prevState,
+              id_inquilino: 0,
+              nombre_completo_inquilino: '',
+            }));
+            setFormulario2(prevState => ({
+              ...prevState,
+              id_inquilino: 0,
+            }));
+          } else {
+            setInquilinos(resultadoInquilinos.data);
+            setFormulario(prevState => ({
+              ...prevState,
+              id_inquilino: resultadoInquilinos.data[0].id_inquilino,
+              nombre_completo_inquilino: `${resultadoInquilinos.data[0].nombre_inquilino} ${resultadoInquilinos.data[0].apellino_paterno_inquilino} ${resultadoInquilinos.data[0].apellino_materno_inquilino}`,
+            }));
+            setFormulario2(prevState => ({
+              ...prevState,
+              id_inquilino: resultadoInquilinos.data[0].id_inquilino,
+            }));
+          }
+        }
+  
+        setFormulario(prevState => ({
+          ...prevState,
+          id_edificio: selectedEdificio.id_edificio,
+        }));
+        setFormulario2(prevState => ({
+          ...prevState,
+          id_edificio: selectedEdificio.id_edificio,
+        }));
+  
+        // Obtener cuotas
+        obtenerCuotas(selectedEdificio.id_edificio);
+      } catch (error) {
+        console.error(error);
+        alert('Error al obtener los datos');
+      }
     }
   };
+  
+  const obtenerCuotas = async (id_edificio) => {
+    try {
+      const resultadoCuotas = await axios.get(`http://localhost:4000/api/obtenerCuota/${id_edificio}`);
+      const cuotasSeparadas = [];
+      resultadoCuotas.data.forEach(cuota => {
+        cuotasSeparadas.push({ tipo: 'Cuota base', valor: cuota.cuota_base });
+        if (cuota.cuota_extra) {
+          cuotasSeparadas.push({ tipo: 'Cuota extra', valor: cuota.cuota_extra });
+        }
+      });
+      setCuotas(cuotasSeparadas);
+    } catch (error) {
+      console.error('Error al obtener las cuotas:', error);
+    }
+  };
+  
+  
+  const obtenerDepartamentosEInquilinos = async (id_edificio) => {
+    const diccionario2 = { id_edificio: id_edificio };
+    try {
+      const resultadoDepartamentos = await axios.post(`http://localhost:4000/api/getDepartamentosbyEdificios`, diccionario2);
+      if (resultadoDepartamentos.data.length === 0) {
+        setDepartamentos([]);
+        setInquilinos([]);
+        setFormulario(prevState => ({
+          ...prevState,
+          id_departamento: 0,
+          nombre_completo_inquilino: '',
+        }));
+      } else {
+        const selectedDepartamento = resultadoDepartamentos.data[0].id_departamento;
+        setDepartamentos(resultadoDepartamentos.data);
+        setFormulario(prevState => ({
+          ...prevState,
+          id_departamento: selectedDepartamento,
+        }));
+  
+        const diccionarioInquilinos = { id_departamento: selectedDepartamento };
+        const resultadoInquilinos = await axios.post(`http://localhost:4000/api/getInquilinosbyDepartamento`, diccionarioInquilinos);
+        if (resultadoInquilinos.data.length === 0) {
+          setInquilinos([]);
+          setFormulario(prevState => ({
+            ...prevState,
+            id_inquilino: 0,
+            nombre_completo_inquilino: '',
+          }));
+          setFormulario2(prevState => ({
+            ...prevState,
+            id_inquilino: 0,
+          }));
+        } else {
+          setInquilinos(resultadoInquilinos.data);
+          setFormulario(prevState => ({
+            ...prevState,
+            id_inquilino: resultadoInquilinos.data[0].id_inquilino,
+            nombre_completo_inquilino: `${resultadoInquilinos.data[0].nombre_inquilino} ${resultadoInquilinos.data[0].apellino_paterno_inquilino} ${resultadoInquilinos.data[0].apellino_materno_inquilino}`,
+          }));
+          setFormulario2(prevState => ({
+            ...prevState,
+            id_inquilino: resultadoInquilinos.data[0].id_inquilino,
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Error al obtener departamentos e inquilinos:', error);
+      alert('Error al obtener los departamentos');
+    }
+  };
+  
+  
 
   const handleChangeSelectDepartamentos = event => {
-    const elegido=parseInt(event.target.value)
+    const elegido=parseInt(event.target.value);
+    if (!elegido) {
+      alert('Debe seleccionar un departamento');
+      return;
+    }
     const selectedDepartamento = departamentos.find(c => c.id_departamento === elegido);
 
     if (selectedDepartamento) {
@@ -470,7 +486,11 @@ function NuevoRecibo() {
   };
 
   const handleChangeSelectInquilino = event => {
-    const elegido=parseInt(event.target.value)
+    const elegido=parseInt(event.target.value);
+    if (!elegido) {
+      alert('Debe seleccionar un inquilino');
+      return;
+    }
     const selectedInquilino = inquilinos.find(c => c.id_inquilino === elegido);
 
     if (selectedInquilino) {
@@ -583,7 +603,7 @@ function NuevoRecibo() {
       const datosInfoPagos = [formulario2];
       const resultado = await axios.post('http://localhost:4000/api/registrarRecibo', datosRecibo);
       const resultado2 = await axios.post('http://localhost:4000/api/registrarInfoPagosCompleto', datosInfoPagos);
-      if (resultado.data === 200) {
+      if (resultado.data === 200 && resultado2.data === 200) {
         setVisible(true);
         //setFormulario(prevState => ({
         //  ...prevState,
@@ -627,6 +647,18 @@ function NuevoRecibo() {
   
   const validarCampos = () => {
     let erroresTemp = {};
+    if(formulario.id_condominio === '' || formulario.id_condominio === 0 || formulario.id_condominio === 'Defecto'){
+      erroresTemp.condominio = 'Este campo es obligatorio';
+    }
+    if(formulario.id_edificio === '' || formulario.id_edificio === 0 || formulario.id_edificio === 'Defecto'){
+      erroresTemp.edificio = 'Este campo es obligatorio';
+    }
+    if(formulario.id_departamento === '' || formulario.id_departamento === 0 || formulario.id_departamento === 'Defecto'){
+      erroresTemp.departamento = 'Este campo es obligatorio';
+    }
+    if(formulario.id_inquilino === '' || formulario.id_inquilino === 0 || formulario.id_inquilino === 'Defecto'){
+      erroresTemp.inquilino = 'Este campo es obligatorio';
+    }
     if (!formulario.no_recibo.trim()) {
       erroresTemp.no_recibo = 'Este campo es obligatorio';
     }else if(!esNumero(formulario.no_recibo)){
@@ -721,175 +753,179 @@ function NuevoRecibo() {
     );
   }
 
-    return (  
-        <div className='div-contenedor div-espaciado'>
-          <h1>Crear un nuevo recibo</h1>
-          <Link to="/NuevoReciboExcel">
-            <button type="button" className="mi-boton2" style={{width: '260px'}}><SiMicrosoftexcel />  Generar recibos a partir de Excel</button>
-          </Link>
-          <form className="fromInquilino" onSubmit={handleSubmit} style={{width: "900px"}}>
-            <div className='select-container'>
-                <div className='select-item'>
-                <label className='labelInput'>Seleccione un condominio: </label>
-                <select id="opciones" onChange={handleChangeSelect}>
-                  {opcionesCondominio}
-                </select>
-                </div>
-            <div className='select-item'>
-                <label className='labelInput'>Seleccione un Edificio: </label>
-                <select id="opciones" onChange={handleChangeSelectEdificios}>
-                    {opcionesEdificio}
-                  </select>
-            </div>
-            <div className='select-item'>
-                <label className='labelInput'>Seleccione un Departamento: </label>
-                <select id="opciones" onChange={handleChangeSelectDepartamentos}>
-                {opcionesDepartamento}
-              </select>
-            </div>
-            </div>
-            <div className='select-container'>
-                <div className='select-item'>
-                    <label className='labelInput'>Seleccione un Inquilino: </label>
-                    <select id="opciones" onChange={handleChangeSelectInquilino}>
-                      {opcionesInquilino}
-                    </select>
-                </div>
-                <div className='select-item'>
-                    <label className='labelInput'>Numero Del Recibo: </label>
-                    <input
-                      type="text"
-                      id="no_recibo"
-                      name="no_recibo"
-                      placeholder={siguienteNumeroRecibo !== null ? siguienteNumeroRecibo.toString() : 'Cargando...'}
-                      value={formulario.no_recibo}
-                      onChange={handleChange}
-                    />
-                    <div className="error-message">{errores.no_recibo}</div>
-                </div>
-                <div className='select-item'>
-                    <label className='labelInput'>Fecha Del Recibo: </label>
-                    <input
-                      type="date"
-                      id="fecha"
-                      name="fecha"
-                      value={formulario.fecha}
-                      onChange={handleChangeFecha}
-                      min={minDate}
-                      max={maxDate}
-                    />
-                    <div className="error-message">{errores.fecha}</div>
-                </div>
-            </div>
-            
-            <div className='select-container' style={{ marginBottom: '10px' }}>
-                <div className='select-item'>
-                    <label className='labelInput'>Concepto de pago: </label>
-                    <input
-                      style={{ width: '360px' }}
-                      type="text"
-                      id="concepto_pago"
-                      name="concepto_pago"
-                      placeholder="CUOTAS DE MANTENIMIENTO Y ADMINISTRACIÓN"
-                      value={formulario.concepto_pago}
-                      onChange={handleChange}
-                      disabled
-                    />
-                    <div className="error-message">{errores.concepto_pago}</div>
-                </div>
-                <div className='select-item'>
-                    <label className='labelInput'>Cuota Ordinaria($): </label>
-                    <input
-                      type="text"
-                      id="cuota_ordinaria"
-                      name="cuota_ordinaria"
-                      placeholder="$"
-                      value={formulario.cuota_ordinaria}
-                      onChange={handleChange}
-                      maxLength="4"
-                    />
-                    <div className="error-message">{errores.cuota_ordinaria}</div>
-                </div>
-            </div>
-
-            <div className='select-container' style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <div className='select-item' style={{ flex: 1 }}>
-                    <label className='labelInput'>Cuota de Penalizacion($): </label>
-                    <input
-                      type="text"
-                      id="cuota_penalizacion"
-                      name="cuota_penalizacion"
-                      placeholder="$"
-                      value={formulario.cuota_penalizacion}
-                      onChange={handleChange}
-                      maxLength="4"
-                    />
-                    <div className="error-message">{errores.cuota_penalizacion}</div>
-                </div>
-                <div className='select-item' style={{ flex: 1 }}>
-                    <label className='labelInput'>Cuota Extraordinaria($): </label>
-                    <input
-                      type="text"
-                      id="cuota_extraordinaria"
-                      name="cuota_extraordinaria"
-                      placeholder="$"
-                      value={formulario.cuota_extraordinaria}
-                      onChange={handleChange}
-                      maxLength="4"
-                    />
-                    <div className="error-message">{errores.cuota_extraordinaria}</div>
-                </div>
-                <div className='select-item' style={{ flex: 1 }}>
-                    <label className='labelInput'>Cuota de Reserva($): </label>
-                    <input
-                      type="text"
-                      id="cuota_reserva"
-                      name="cuota_reserva"
-                      placeholder="$"
-                      value={formulario.cuota_reserva}
-                      onChange={handleChange}
-                      maxLength="4"
-                    />
-                    <div className="error-message">{errores.cuota_reserva}</div>
-                </div>
-                <div className='select-item' style={{ flex: 1 }}>
-                    <label className='labelInput'>Cuota de Adeudos($): </label>
-                    <input
-                      type="text"
-                      id="cuota_adeudos"
-                      name="cuota_adeudos"
-                      placeholder="$"
-                      value={formulario.cuota_adeudos}
-                      onChange={handleChange}
-                      maxLength="4"
-                    />
-                    <div className="error-message">{errores.cuota_adeudos}</div>
-                </div>
-                
-            </div>
-            <div className='select-item' style={{width: "40%"}}>
-                  <label className='labelInput'>Adeudo(opcional): </label>
-                  <input
-                      type="text"
-                      id="adeudo"
-                      name="adeudo"
-                      placeholder="$"
-                      onChange={handleChange2}
-                      maxLength="6"
-                    />
-                <div className="error-message">{errores.adeudo}</div>
-            </div>
-
-            <div className='Aceptado' style={{ display: visible ? 'block' : 'none' }}>Registro exitoso</div>
-            <div className='error-message'>{errorNumero}</div>
-            <br/>
-            <div className="botones-container"> 
-            <button className="mi-boton2" type='submit'>Registrar</button>
-            </div>
-          </form> 
-          <br/><br/>  
+  return (
+    <div className='div-contenedor div-espaciado'>
+      <h1>Crear un nuevo recibo</h1>
+      <Link to="/NuevoReciboExcel">
+        <button type="button" className="mi-boton2" style={{width: '260px'}}><SiMicrosoftexcel />  Generar recibos a partir de Excel</button>
+      </Link>
+      <form className="fromInquilino" onSubmit={handleSubmit} style={{width: "900px"}}>
+        <div className='select-container'>
+          <div className='select-item'>
+            <label className='labelInput'>Seleccione un condominio: </label>
+            <select id="opciones" onChange={handleChangeSelect} required>
+              {opcionesCondominio}
+            </select>
+            <div className="error-message">{errores.condominio}</div>
+          </div>
+          <div className='select-item'>
+            <label className='labelInput'>Seleccione un Edificio: </label>
+            <select id="opciones" onChange={handleChangeSelectEdificios} required>
+              {opcionesEdificio}
+            </select>
+            <div className="error-message">{errores.edificio}</div>
+          </div>
+          <div className='select-item'>
+            <label className='labelInput'>Seleccione un Departamento: </label>
+            <select id="opciones" onChange={handleChangeSelectDepartamentos} required>
+              {opcionesDepartamento}
+            </select>
+            <div className="error-message">{errores.departamento}</div>
+          </div>
         </div>
-    );
+        <div className='select-container'>
+          <div className='select-item'>
+            <label className='labelInput'>Seleccione un Inquilino: </label>
+            <select id="opciones" onChange={handleChangeSelectInquilino} required>
+              {opcionesInquilino}
+            </select>
+            <div className="error-message">{errores.inquilino}</div>
+          </div>
+          <div className='select-item'>
+            <label className='labelInput'>Numero Del Recibo: </label>
+            <input
+              type="text"
+              id="no_recibo"
+              name="no_recibo"
+              placeholder={siguienteNumeroRecibo !== null ? siguienteNumeroRecibo.toString() : 'Cargando...'}
+              value={formulario.no_recibo}
+              onChange={handleChange}
+            />
+            <div className="error-message">{errores.no_recibo}</div>
+          </div>
+          <div className='select-item'>
+            <label className='labelInput'>Fecha Del Recibo: </label>
+            <input
+              type="date"
+              id="fecha"
+              name="fecha"
+              value={formulario.fecha}
+              onChange={handleChangeFecha}
+              min={minDate}
+              max={maxDate}
+            />
+            <div className="error-message">{errores.fecha}</div>
+          </div>
+        </div>
+        
+        <div className='select-container' style={{ marginBottom: '10px' }}>
+          <div className='select-item'>
+            <label className='labelInput'>Concepto de pago: </label>
+            <input
+              style={{ width: '360px' }}
+              type="text"
+              id="concepto_pago"
+              name="concepto_pago"
+              placeholder="CUOTAS DE MANTENIMIENTO Y ADMINISTRACIÓN"
+              value={formulario.concepto_pago}
+              onChange={handleChange}
+              disabled
+            />
+            <div className="error-message">{errores.concepto_pago}</div>
+          </div>
+          <div className='select-item'>
+            <label className='labelInput'>Cuota Ordinaria($): </label>
+            <select id="cuota_ordinaria" name="cuota_ordinaria" value={formulario.cuota_ordinaria} onChange={handleChange}>
+              <option value="">Seleccione una cuota</option>
+              {cuotas.map((cuota, index) => (
+                <option key={index} value={cuota.valor}>
+                    {cuota.tipo}: {cuota.valor}
+                </option>
+              ))}
+            </select>
+            <div className="error-message">{errores.cuota_ordinaria}</div>
+          </div>
+        </div>
+  
+        <div className='select-container' style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div className='select-item' style={{ flex: 1 }}>
+            <label className='labelInput'>Cuota de Penalizacion($): </label>
+            <input
+              type="text"
+              id="cuota_penalizacion"
+              name="cuota_penalizacion"
+              placeholder="$"
+              value={formulario.cuota_penalizacion}
+              onChange={handleChange}
+              maxLength="4"
+            />
+            <div className="error-message">{errores.cuota_penalizacion}</div>
+          </div>
+          <div className='select-item' style={{ flex: 1 }}>
+            <label className='labelInput'>Cuota Extraordinaria($): </label>
+            <input
+              type="text"
+              id="cuota_extraordinaria"
+              name="cuota_extraordinaria"
+              placeholder="$"
+              value={formulario.cuota_extraordinaria}
+              onChange={handleChange}
+              maxLength="4"
+            />
+            <div className="error-message">{errores.cuota_extraordinaria}</div>
+          </div>
+          <div className='select-item' style={{ flex: 1 }}>
+            <label className='labelInput'>Cuota de Reserva($): </label>
+            <input
+              type="text"
+              id="cuota_reserva"
+              name="cuota_reserva"
+              placeholder="$"
+              value={formulario.cuota_reserva}
+              onChange={handleChange}
+              maxLength="4"
+            />
+            <div className="error-message">{errores.cuota_reserva}</div>
+          </div>
+          <div className='select-item' style={{ flex: 1 }}>
+            <label className='labelInput'>Cuota de Adeudos($): </label>
+            <input
+              type="text"
+              id="cuota_adeudos"
+              name="cuota_adeudos"
+              placeholder="$"
+              value={formulario.cuota_adeudos}
+              onChange={handleChange}
+              maxLength="4"
+            />
+            <div className="error-message">{errores.cuota_adeudos}</div>
+          </div>
+          
+        </div>
+        <div className='select-item' style={{width: "40%"}}>
+          <label className='labelInput'>Adeudo(opcional): </label>
+          <input
+            type="text"
+            id="adeudo"
+            name="adeudo"
+            placeholder="$"
+            onChange={handleChange2}
+            maxLength="6"
+          />
+          <div className="error-message">{errores.adeudo}</div>
+        </div>
+  
+        <div className='Aceptado' style={{ display: visible ? 'block' : 'none' }}>Registro exitoso</div>
+        <div className='error-message'>{errorNumero}</div>
+        <br/>
+        <div className="botones-container"> 
+          <button className="mi-boton2" type='submit'>Registrar</button>
+        </div>
+      </form> 
+      <br/><br/>  
+    </div>
+  );
+  
   }
   export default NuevoRecibo;
   

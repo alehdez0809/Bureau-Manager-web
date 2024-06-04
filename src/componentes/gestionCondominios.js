@@ -12,6 +12,7 @@ function CondominiosComponent() {
     const [selectedCondominio, setSelectedCondominio] = useState(null);
     const [selectedEdificio, setSelectedEdificio] = useState(null);
     const [inquilinos, setInquilinos] = useState([]);
+    const [cuotas, setCuotas] = useState([]);
 
     const [paginaActual, setPaginaActual] = useState(1);
     const [registrosPorPagina] = useState(10);
@@ -24,7 +25,7 @@ function CondominiosComponent() {
 
     useEffect(() => {
         fetchCondominios();
-    }, []);
+    },);
 
     const fetchCondominios = async () => {
         try {
@@ -58,9 +59,20 @@ function CondominiosComponent() {
             try {
                 const response = await axios.post('http://localhost:4000/api/getDepartamentosbyEdificios', { id_edificio: edificio.id_edificio });
                 setSelectedEdificio({...edificio, departamentos: response.data});
+                fetchCuotasByEdificio(edificio.id_edificio);
             } catch (error) {
                 console.error('Error al obtener departamentos', error);
             }
+        }
+    };
+
+    const fetchCuotasByEdificio = async (id_edificio) => {
+        try {
+            const results = await axios.get(`http://localhost:4000/api/obtenerCuota/${id_edificio}`);
+            setCuotas(results.data[0]);
+            console.log(cuotas);
+        } catch (error) {
+            console.error('Error al obtener las cuotas', error);
         }
     };
 
@@ -104,9 +116,11 @@ function CondominiosComponent() {
                         </button>
                         {selectedEdificio && selectedEdificio.id_edificio === edificio.id_edificio && (
                           <div>
+                            <p style={{textAlign: "left"}}>Cuota ordinaria base: ${cuotas.cuota_base}</p>
+                            <p style={{textAlign: "left"}}>Cuota ordinaria por estacionamiento: ${cuotas.cuota_extra}</p>
+                             <br/> 
                             <p style={{textAlign: "left"}}>Número de departamentos en este edificio: {selectedEdificio.departamentos.length}</p>
                             <br/>
-                            
                             <div className="departamentos-lista">
                                 <h4>Departamentos: </h4>
                                 <br/>
