@@ -28,7 +28,7 @@ html, body {
 
     .fromMenu{
       width: 600px;
-      background-color: #ffffff7e
+      background-color: #ffffff
     }
 
     .fromInquilino{
@@ -149,7 +149,7 @@ html, body {
     
     
     .body1 {
-      background-image: url('/src/img/imagenp.png');
+      background-image: url('/src/img/backk.jpg');
       background-repeat: no-repeat;
       background-size: cover;
       display: flex;
@@ -166,7 +166,6 @@ html, body {
       align-items: center;
     }
     .body3 {
-      background-image: url('/src/img/fondoedificios.jpg');
       background-repeat: no-repeat;
       background-size: cover;
       display: flex;
