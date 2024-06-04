@@ -28,6 +28,7 @@ html, body {
 
     .fromMenu{
       width: 600px;
+      background-color: #ffffff7e
     }
 
     .fromInquilino{
@@ -148,7 +149,7 @@ html, body {
     
     
     .body1 {
-      background-image: url('/src/img/backk.jpg');
+      background-image: url('/src/img/imagenp.png');
       background-repeat: no-repeat;
       background-size: cover;
       display: flex;
@@ -163,6 +164,15 @@ html, body {
       display: flex;
       justify-content: center;
       align-items: center;
+    }
+    .body3 {
+      background-image: url('/src/img/fondoedificios.jpg');
+      background-repeat: no-repeat;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
     h1,h2 {
       text-align: center;
@@ -566,6 +576,14 @@ html, body {
       max-width: 500px;
     }
 
+    .modal-content11 {
+      background-color: #fefefe;
+      margin: 4% auto 15% auto;
+      border: 1px solid #000000;
+      width: 400px;
+      padding-bottom: 30px;
+      border-radius: 18px; 
+    }
 
   .condominio-btn {
     display: block;
@@ -652,3 +670,13 @@ html, body {
     flex-wrap: wrap;
   }
       
+  .inputtt {
+    width: calc(100% - 24px);
+    padding: 12px 20px;
+    margin: 8px;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-size: 16px;
+    border-radius: 8px;
+  }

@@ -30,10 +30,10 @@ function Formulario() {
           }
         }
 
-          document.body.classList.add('body1');
+          document.body.classList.add('body3');
   
           return () => {
-              document.body.classList.remove('body1');
+              document.body.classList.remove('body3');
           };
 
     }, [navigate]);
@@ -105,14 +105,17 @@ function Formulario() {
     }
 
     return (
-          <form onSubmit={handleSubmit} className='form'>
+      <>
+        <div className='modal-wrapper'>
+          <form onSubmit={handleSubmit} className='modal-content11'>
             <div className='divCenter'>
               <img className='imgLogo' src={logo} alt="Logo de la empresa" />
             </div>
             <h1>Bureau-Manager</h1>
-            <h2>Iniciar Sesión</h2>
-            <div className="form-group">
+            <h2 className='fontt'>Iniciar Sesión</h2>
+            <div class="container">
             <input
+                className='inputtt'
                 type="email"
                 id="correo_administrador"
                 name="correo_administrador"
@@ -120,10 +123,11 @@ function Formulario() {
                 value={formulario.correo_administrador}
                 onChange={handleChange}
               />
-            {<div className="error-message">{errorCorreo}</div>}
             </div>
-            <div className="form-group">
+            {<div className="error-message">{errorCorreo}</div>}
+            <div class="container">
             <input
+                className='inputtt'
                 type="password"
                 id="contraseña_administrador"
                 name="contraseña_administrador"
@@ -131,14 +135,15 @@ function Formulario() {
                 value={formulario.contraseña_administrador}
                 onChange={handleChange}
               />
-            {<div className="error-message">{errorContraseña}</div>}
             </div>
+            {<div className="error-message">{errorContraseña}</div>}
             {<div className="error-message">{errorCuenta}</div>}
             <button type="submit">Iniciar Sesión</button>
             <div className="error-message" style={{ display: visible ? 'block' : 'none' }}>Correo electrónico o contraseña incorrectos</div>
             <p>¿No te has registrado? <Link to="/RegistrarCuenta">Crear Cuenta</Link></p>
-          </form>   
+          </form> 
+        </div>  
+      </>
     );
   }
   export default Formulario;
-  
