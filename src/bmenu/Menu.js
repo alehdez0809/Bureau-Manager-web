@@ -7,12 +7,10 @@ import { IconContext } from 'react-icons';
 import { useAuth } from '../AuthContext';
 import logob from '../img/loguito2.png';
 
-
 function Menu() {
   const [sidebar, setSidebar] = useState(false);
   const navigate = useNavigate();
   const { logout } = useAuth();
-
 
   const mostrarSidebar = () => setSidebar(!sidebar);
 
@@ -53,6 +51,13 @@ function Menu() {
                       {item.icon}
                       <span>{item.title}</span>
                     </a>
+                  </li>
+                );
+              } else if (item.action === 'logout') {
+                return (
+                  <li key={index} className={item.cName} onClick={handleLogout}>
+                    {item.icon}
+                    <span>{item.title}</span>
                   </li>
                 );
               } else {

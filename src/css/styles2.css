@@ -421,6 +421,16 @@ html, body {
       text-align: left;
     }
 
+    .logout-item{
+      color: whitesmoke;
+    }
+    
+    .logout-item:hover{
+        background-color: #1B6953;
+        cursor: pointer;
+    }
+  
+
     .navbar {
       position: fixed; 
       left: 0;

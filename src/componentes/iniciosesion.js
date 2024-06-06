@@ -140,7 +140,9 @@ function Formulario() {
             {<div className="error-message">{errorCuenta}</div>}
             <button type="submit">Iniciar Sesión</button>
             <div className="error-message" style={{ display: visible ? 'block' : 'none' }}>Correo electrónico o contraseña incorrectos</div>
-            <p>¿No te has registrado? <Link to="/RegistrarCuenta">Crear Cuenta</Link></p>
+            <p>Consulta los <a href="/terminos.html" target="_blank" rel="noopener noreferrer">Términos y condiciones</a></p>
+            <p>Y el <a href="/aviso_privacidad.html" target="_blank" rel="noopener noreferrer">Aviso de privacidad</a></p>
+            <p>¿Necesitas ayuda? - <a href="http://bureau-manager.mx" target="_blank" rel="noreferrer noopener">Soporte</a></p>
           </form> 
         </div>  
       </>

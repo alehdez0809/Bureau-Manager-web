@@ -43,7 +43,7 @@ function MenuInicial() {
         <>
         <form className='fromMenu' style={{marginTop: "50px"}}>
             <h1>Bienvenido administrador(a):</h1>
-            <h1>{adminName}</h1>
+            <h1>{adminName} {adminApellidoP} {adminApellidoM}</h1>
 
             <div><h1>¿Que puedes hacer?</h1></div>
             <div className='menudiv'>
