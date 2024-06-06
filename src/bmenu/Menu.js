@@ -5,6 +5,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { MenuDatos } from './MenuDatos';
 import { IconContext } from 'react-icons';
 import { useAuth } from '../AuthContext';
+import logob from '../img/loguito2.png';
+
 
 function Menu() {
   const [sidebar, setSidebar] = useState(false);
