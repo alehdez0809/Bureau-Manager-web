@@ -11,6 +11,8 @@ function Menu() {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
+  const logob = '../img/logob.png';
+
   const mostrarSidebar = () => setSidebar(!sidebar);
 
   const handleLogout = () => {
@@ -28,7 +30,7 @@ function Menu() {
         </Link>
         <p style={{marginLeft: "15px", fontSize: "1.2rem", fontStyle: "italic", color: "whitesmoke"}}>Bureau-Manager</p>
         <div className='navv'>
-          <img style={{marginRight: "25px"}} src={logob}/>
+          <img style={{marginRight: "25px"}} src={logob} alt='logo'/>
         </div>
       </div>
         <nav className={sidebar ? 'nav-menu active' : 'nav-menu'}>
