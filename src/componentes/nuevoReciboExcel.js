@@ -275,7 +275,7 @@ function NuevoReciboExcel() {
             id_inquilino: inquilino.id_inquilino,
             no_recibo: fila[10],
             total_pagado: totalPagar.toString(),
-            adeudo: totalPagar <= 0 ? '0' : totalPagar.toFixed(1),
+            adeudo: fila[11].toFixed(1),
             fecha_pago: convertirFechaExcel(fila[8])
           }
           datosInfoPagos.push(info_pagos_form);

@@ -277,7 +277,10 @@ function NuevoInquilino() {
       setErrorApellidoM('Debe ingresar un apellido materno');
       return;
     }
-
+    const trimmedNombreInquilino = formulario.nombre_inquilino.trim();
+    const trimmedApellidoP = formulario.apellino_paterno_inquilino.trim();
+    const trimmedApellidoM = formulario.apellino_materno_inquilino.trim(); 
+    
     try {
       const response = await axios.post('http://localhost:4000/api/getInquilinosbyDepartamento', { id_departamento: formulario.id_departamento });
       if (response.data.length > 0) {
@@ -285,7 +288,12 @@ function NuevoInquilino() {
         return;
       }
       const codigo = await verificarYGenerarCodigo();
-      const nuevoFormulario = { ...formulario, codigo_inquilino: codigo };
+      const nuevoFormulario = { ...formulario, 
+                                codigo_inquilino: codigo,
+                                nombre_inquilino: trimmedNombreInquilino,
+                                apellino_paterno_inquilino: trimmedApellidoP,
+                                apellino_materno_inquilino: trimmedApellidoM,
+                                };
       const resultado = await axios.post('http://localhost:4000/api/registrarInquilino', nuevoFormulario);
       if (resultado.data === 200) {
         setVisible(true);

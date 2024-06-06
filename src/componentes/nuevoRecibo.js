@@ -161,12 +161,12 @@ function NuevoRecibo() {
 
   const handleChange = event => {
     const { name, value } = event.target;
-    setFormulario(prevState => ({ ...prevState, [name]: value }));
+    setFormulario(prevState => ({ ...prevState, [name]: value.trim() }));
   };
 
   const handleChange2 = event => {
     const { name, value } = event.target;
-    setFormulario2(prevState => ({ ...prevState, [name]: value }));
+    setFormulario2(prevState => ({ ...prevState, [name]: value.trim() }));
   };
 
   

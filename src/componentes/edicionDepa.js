@@ -149,8 +149,12 @@ function EditoDepartamento() {
       setErrorDepartamento2('Ingrese un nombre/número para el departamento');
       return;
     }
+    const trimmedNumeroDepartamento = formulario.nombre_departamento.trim();
     try {
-      const resultado = await axios.post('http://localhost:4000/api/actualizarDepartamento', formulario);
+      const resultado = await axios.post('http://localhost:4000/api/actualizarDepartamento', {
+        ...formulario,
+        numero_departamento: trimmedNumeroDepartamento
+      });
       if (resultado.data === 200) {
         setVisible(true);
         window.location.reload();

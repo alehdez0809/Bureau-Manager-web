@@ -420,9 +420,17 @@ function EditoInquilino() {
       setErrorApellidoM('Debe ingresar un apellido materno');
       return;
     }
+    const trimmedNombreInquilino = formulario.nombre_inquilino.trim();
+    const trimmedApellidoP = formulario.apellino_paterno_inquilino.trim();
+    const trimmedApellidoM = formulario.apellino_materno_inquilino.trim();
 
     try {
-      const resultado = await axios.post('http://localhost:4000/api/actualizarInquilino', formulario);
+      const resultado = await axios.post('http://localhost:4000/api/actualizarInquilino', {
+        ...formulario,
+        nombre_inquilino: trimmedNombreInquilino,
+        apellino_paterno_inquilino: trimmedApellidoP,
+        apellino_materno_inquilino: trimmedApellidoM,
+      });
       if (resultado.data === 200) {
         setVisible(true);
         window.location.reload();

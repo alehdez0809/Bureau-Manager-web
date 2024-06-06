@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 function EditoEdificio() {
@@ -155,8 +154,12 @@ function EditoEdificio() {
       setErrorEdificio2('Debes ingresar un nombre para el edificio');
       return;
     }
+    const trimmedNombreEdificio = formulario.nombre_edificio.trim();
     try {
-      const resultado = await axios.post('http://localhost:4000/api/actualizarEdificio', formulario);
+      const resultado = await axios.post('http://localhost:4000/api/actualizarEdificio', {
+        ...formulario,
+        nombre_edificio: trimmedNombreEdificio
+      });
       if (resultado.data === 200) {
         setVisible(true);
         window.location.reload();

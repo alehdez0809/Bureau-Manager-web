@@ -50,31 +50,43 @@ function NuevoCondominio() {
 
   const handleSubmit = async event => {
     event.preventDefault();
-    if (formulario.nombre_condominio.trim() === '') {
-      setErrorCorreo('*Ingrese un nombre de condominio');
-    }
-    if (formulario.direccion_condominio.trim() === '') {
-      setErrorContraseña('*Ingrese una direccion de condominio');
-    }
-    if (formulario.nombre_condominio.trim() !== '' && formulario.direccion_condominio.trim() !== '' && formulario.id_administrador && formulario.admin_condominio) {
-      try {
-        const resultado = await axios.post('http://localhost:4000/api/registrarCondominio', formulario);
-        if (resultado.data === 200) {
-          setVisible(true);
 
-          formulario.nombre_condominio='';
-          formulario.direccion_condominio='';
-          window.location.reload();
+    const trimmedNombreCondominio = formulario.nombre_condominio.trim();
+    const trimmedDireccionCondominio = formulario.direccion_condominio.trim();
 
-        } else {
-          alert(resultado.data);
+    if (trimmedNombreCondominio === '') {
+        setErrorCorreo('*Ingrese un nombre de condominio');
+    }
+    if (trimmedDireccionCondominio === '') {
+        setErrorContraseña('*Ingrese una direccion de condominio');
+    }
+    if (trimmedNombreCondominio !== '' && trimmedDireccionCondominio !== '' && formulario.id_administrador && formulario.admin_condominio) {
+        try {
+            const resultado = await axios.post('http://localhost:4000/api/registrarCondominio', {
+                ...formulario,
+                nombre_condominio: trimmedNombreCondominio,
+                direccion_condominio: trimmedDireccionCondominio
+            });
+            if (resultado.data === 200) {
+                setVisible(true);
+
+                setFormulario({
+                    nombre_condominio: '',
+                    direccion_condominio: '',
+                    admin_condominio: 'EDITH ROGELIA QUIÑONES BONILLA',
+                    id_administrador: id_administrador
+                });
+                window.location.reload();
+            } else {
+                alert(resultado.data);
+            }
+        } catch (error) {
+            console.error(error);
+            alert('Error al registrar el condominio');
         }
-      } catch (error) {
-        console.error(error);
-        alert('Error al registrar el condominio');
-      }
     }
   };
+
 
     return (
           <form onSubmit={handleSubmit}>

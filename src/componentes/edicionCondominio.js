@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 function EditoCondominio() {
@@ -122,8 +121,16 @@ function EditoCondominio() {
       setErrorDireccion('*Ingrese una direccion de condominio');
     }
     if (formulario.nombre_condominio.trim() !== '' && formulario.direccion_condominio.trim() !== '') {
+      const trimmedNombreCondominio = formulario.nombre_condominio.trim();
+      const trimmedDireccionCondominio = formulario.direccion_condominio.trim();
     try {
-      const resultado = await axios.post('http://localhost:4000/api/actualizarCondominio', formulario);
+      const resultado = await axios.post('http://localhost:4000/api/actualizarCondominio', 
+        {
+          ...formulario,
+          nombre_condominio: trimmedNombreCondominio,
+          direccion_condominio: trimmedDireccionCondominio
+        }
+      );
       if (resultado.data === 200) {
         setVisible(true);
         window.location.reload();

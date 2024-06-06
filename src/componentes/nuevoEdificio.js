@@ -83,8 +83,14 @@ function NuevoEdificio() {
       setErrorEdificio('Ingrese un nombre para el edificio');
       return;
     }
+    const trimmedNombreEdificio = formulario.nombre_edificio.trim();
     try {
-      const resultado = await axios.post('http://localhost:4000/api/registrarEdificio', formulario);
+      const resultado = await axios.post('http://localhost:4000/api/registrarEdificio', 
+        {
+          ...formulario,
+          nombre_edificio: trimmedNombreEdificio
+        }
+      );
       if (resultado.data === 200) {
         setVisible(true);
         setError('');

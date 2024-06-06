@@ -195,6 +195,7 @@ function InfoPagos() {
                             <thead>
                                 <tr>
                                     <th>Condominio</th>
+                                    <th>Edificio</th>
                                     <th>Departamento</th>
                                     <th>Total Pagado</th>
                                     <th>Adeudo</th>
@@ -206,9 +207,10 @@ function InfoPagos() {
                                     datosActuales.map((pago, index) => (
                                         <tr key={index}>
                                             <td>{pago.nombre_condominio}</td>
+                                            <td>{pago.nombre_edificio}</td>
                                             <td>{pago.numero_departamento}</td>
                                             <td>{pago.total_pagado}</td>
-                                            <td style={{ color: parseFloat(pago.adeudo) > 0 ? 'red' : 'black' }}>{pago.adeudo}</td>
+                                            <td style={{ color: parseFloat(pago.adeudo) > 0 ? 'red' : 'green' }}>{pago.adeudo}</td>
                                             <td>{pago.fecha_pago}</td>
                                         </tr>
                                     ))

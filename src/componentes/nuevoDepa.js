@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 function EditoEdificio() {
@@ -125,8 +124,15 @@ function EditoEdificio() {
       setErrorDepa('Ingrese un nombre/numero del departamento');
       return;
     }
+    const trimmedNumeroDepartamento = formulario.numero_departamento.trim();
+    
     try {
-      const resultado = await axios.post('http://localhost:4000/api/registrarDepartamento', formulario);
+      const resultado = await axios.post('http://localhost:4000/api/registrarDepartamento', 
+      {
+        ...formulario,
+        numero_departamento: trimmedNumeroDepartamento
+      }
+      );
       if (resultado.data === 200) {
         setVisible(true);
         window.location.reload();

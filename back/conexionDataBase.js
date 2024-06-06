@@ -829,6 +829,7 @@ app.get('/api/getInfoPagos/:id_administrador', (req, res) => {
   const sql = `
     SELECT
       c.nombre_condominio,
+      e.nombre_edificio,
       d.numero_departamento,
       p.total_pagado,
       p.adeudo,
@@ -837,6 +838,7 @@ app.get('/api/getInfoPagos/:id_administrador', (req, res) => {
     INNER JOIN inquilino i ON p.id_inquilino = i.id_inquilino
     INNER JOIN departamento d ON i.id_departamento = d.id_departamento
     INNER JOIN condominio c ON p.id_condominio = c.id_condominio
+    INNER JOIN edificio e ON p.id_edificio = e.id_edificio
     WHERE p.id_administrador = ?
   `;
 
@@ -925,6 +927,7 @@ app.get('/api/getInfoPagosFiltrados/:id_administrador', (req, res) => {
   let query = `
     SELECT
       c.nombre_condominio,
+      e.nombre_edificio,
       d.numero_departamento,
       p.total_pagado,
       p.adeudo,
@@ -933,6 +936,7 @@ app.get('/api/getInfoPagosFiltrados/:id_administrador', (req, res) => {
     INNER JOIN inquilino i ON p.id_inquilino = i.id_inquilino
     INNER JOIN departamento d ON i.id_departamento = d.id_departamento
     INNER JOIN condominio c ON p.id_condominio = c.id_condominio
+    INNER JOIN edificio e ON p.id_edificio = e.id_edificio
     WHERE p.id_administrador = ?
   `;
   let params = [req.params.id_administrador];
