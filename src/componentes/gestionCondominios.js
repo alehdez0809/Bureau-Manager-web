@@ -92,7 +92,7 @@ function CondominiosComponent() {
     };
 
     return (
-        <div  className='formmm' style={{ marginTop: "100px" }}>
+        <div className='formmm' style={{ marginTop: "100px" }}>
           <h1 style={{ color: "#163C40" }}>Información de condominios</h1>
           {condominios.map((condominio, index) => (
             <div key={condominio.id_condominio}>

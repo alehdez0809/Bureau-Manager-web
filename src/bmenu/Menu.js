@@ -13,7 +13,6 @@ function Menu() {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
-  const logob = '../img/logob.png';
 
   const mostrarSidebar = () => setSidebar(!sidebar);
 
