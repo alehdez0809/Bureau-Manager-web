@@ -422,15 +422,23 @@ html, body {
 
     .navbar {
       position: fixed; 
-      top: 0; 
       left: 0;
+      top: 0; 
       width: 100%;
       z-index: 1000; 
-      background-color: #163C40;
+      background-color: #173C40;
       height: 50px;
       display: flex;
       justify-content: flex-start;
       align-items: center;
+    }
+
+    .navv {
+      position: fixed; 
+      top: 0; 
+      right: 0;
+      z-index: 1000; 
+      height: 50px;
     }
     
     .menu-bars {

@@ -22,12 +22,15 @@ function Menu() {
   return (
     <>
       <IconContext.Provider value={{ color: 'whitesmoke' }}>
-        <div className='navbar'>
-          <Link to="#" className='menu-bars'>
-            <FaIcons.FaBars onClick={mostrarSidebar} />
-          </Link>
-          <p style={{ marginLeft: "15px", fontSize: "1.2rem", fontStyle: "italic", color: "whitesmoke" }}>Bureau-Manager</p>
+      <div className='navbar'>
+        <Link to="#" className='menu-bars'>
+            <FaIcons.FaBars onClick={mostrarSidebar}/>
+        </Link>
+        <p style={{marginLeft: "15px", fontSize: "1.2rem", fontStyle: "italic", color: "whitesmoke"}}>Bureau-Manager</p>
+        <div className='navv'>
+          <img style={{marginRight: "25px"}} src={logob}/>
         </div>
+      </div>
         <nav className={sidebar ? 'nav-menu active' : 'nav-menu'}>
           <ul className='nav-menu-items' onClick={mostrarSidebar}>
             <li className='navbar-toggle'>
