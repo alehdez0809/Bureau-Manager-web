@@ -29,9 +29,13 @@ function Menu() {
         <Link to="#" className='menu-bars'>
             <FaIcons.FaBars onClick={mostrarSidebar}/>
         </Link>
-        <p style={{marginLeft: "15px", fontSize: "1.2rem", fontStyle: "italic", color: "whitesmoke"}}>Bureau-Manager</p>
+        <Link to="/MenuPrincipal">
+          <p style={{marginLeft: "15px", fontSize: "1.2rem", fontStyle: "italic", color: "whitesmoke"}}>Bureau-Manager</p>
+        </Link>
         <div className='navv'>
-          <img style={{marginRight: "25px"}} src={logob} alt='logo'/>
+          <Link to="/MenuPrincipal">
+            <img style={{marginRight: "25px"}} src={logob} alt='logo'/>
+          </Link>
         </div>
       </div>
         <nav className={sidebar ? 'nav-menu active' : 'nav-menu'}>

@@ -112,7 +112,7 @@ function EditoEdificio() {
 
   const handleSubmit = async event => {
     event.preventDefault();
-    if(formulario.id_edificio === '' || formulario.id_edificio === 'Defecto'){
+    if (formulario.id_edificio === '' || formulario.id_edificio === 'Defecto') {
       setErrorEdificio('Debes registrar antes un edificio');
       return;
     }
@@ -120,19 +120,31 @@ function EditoEdificio() {
       setError('Debes registrar antes un condominio');
       return;
     }
-    if(formulario.numero_departamento.trim() === ''){
+    if (formulario.numero_departamento.trim() === '') {
       setErrorDepa('Ingrese un nombre/numero del departamento');
       return;
     }
     const trimmedNumeroDepartamento = formulario.numero_departamento.trim();
-    
+  
     try {
-      const resultado = await axios.post('http://localhost:4000/api/registrarDepartamento', 
-      {
+      const response = await axios.post('http://localhost:4000/api/getDepartamentosbyEdificios', {
+        id_edificio: formulario.id_edificio
+      });
+  
+      const departamentoExistente = response.data.some(departamento => 
+        departamento.numero_departamento === trimmedNumeroDepartamento
+      );
+  
+      if (departamentoExistente) {
+        setErrorDepa('El departamento ya existe en este edificio');
+        return;
+      }
+  
+      const resultado = await axios.post('http://localhost:4000/api/registrarDepartamento', {
         ...formulario,
         numero_departamento: trimmedNumeroDepartamento
-      }
-      );
+      });
+  
       if (resultado.data === 200) {
         setVisible(true);
         window.location.reload();
@@ -144,6 +156,7 @@ function EditoEdificio() {
       alert('Error al registrar el Departamento');
     }
   };
+  
 
   let opcionesCondominio;
   if (condominios.length === 0) {

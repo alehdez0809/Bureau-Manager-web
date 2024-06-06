@@ -84,13 +84,26 @@ function NuevoEdificio() {
       return;
     }
     const trimmedNombreEdificio = formulario.nombre_edificio.trim();
+  
     try {
-      const resultado = await axios.post('http://localhost:4000/api/registrarEdificio', 
-        {
-          ...formulario,
-          nombre_edificio: trimmedNombreEdificio
-        }
+      const response = await axios.post('http://localhost:4000/api/getEdificiosbyCondominio', {
+        id_condominio: formulario.id_condominio
+      });
+  
+      const edificioExistente = response.data.some(edificio => 
+        edificio.nombre_edificio === trimmedNombreEdificio
       );
+  
+      if (edificioExistente) {
+        setErrorEdificio('El edificio ya existe en este condominio');
+        return;
+      }
+  
+      const resultado = await axios.post('http://localhost:4000/api/registrarEdificio', {
+        ...formulario,
+        nombre_edificio: trimmedNombreEdificio
+      });
+  
       if (resultado.data === 200) {
         setVisible(true);
         setError('');
@@ -103,6 +116,7 @@ function NuevoEdificio() {
       alert('Error al registrar el edificio');
     }
   };
+  
 
   return (
           <form onSubmit={handleSubmit} className='formulario'>

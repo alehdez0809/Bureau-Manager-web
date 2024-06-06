@@ -149,6 +149,11 @@ function EditoDepartamento() {
       setErrorDepartamento2('Ingrese un nombre/número para el departamento');
       return;
     }
+    const departamentoExiste = departamentos.find(c => c.numero_departamento === formulario.nombre_departamento.trim());
+    if (departamentoExiste) {
+      setErrorDepartamento2('El departamento ya existe en el edificio');
+      return;
+    }    
     const trimmedNumeroDepartamento = formulario.nombre_departamento.trim();
     try {
       const resultado = await axios.post('http://localhost:4000/api/actualizarDepartamento', {

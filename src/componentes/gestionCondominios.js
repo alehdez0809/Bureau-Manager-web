@@ -25,12 +25,7 @@ function CondominiosComponent() {
 
     useEffect(() => {
         fetchCondominios();
-        document.body.classList.add('body2');
-
-        return () => {
-            document.body.classList.remove('body2');
-        };
-    },);
+    },[]);
 
     const fetchCondominios = async () => {
         try {
@@ -92,7 +87,7 @@ function CondominiosComponent() {
     };
 
     return (
-        <div className='formmm' style={{ marginTop: "100px" }}>
+        <div style={{ marginTop: "100px" }}>
           <h1 style={{ color: "#163C40" }}>Información de condominios</h1>
           {condominios.map((condominio, index) => (
             <div key={condominio.id_condominio}>

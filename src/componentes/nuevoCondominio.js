@@ -60,6 +60,17 @@ function NuevoCondominio() {
     if (trimmedDireccionCondominio === '') {
         setErrorContraseña('*Ingrese una direccion de condominio');
     }
+    try{
+      const response = await axios.get(`http://localhost:4000/api/getCondominios/${id_administrador}`);
+      const condominioExiste = response.data.find(condominio => condominio.nombre_condominio === trimmedNombreCondominio);
+      if(condominioExiste){
+        setErrorCorreo('Este condominio ya existe');
+        return;
+      }
+    }catch(error){
+      console.error(error);
+      alert('Error al obtener los condominios');
+    }
     if (trimmedNombreCondominio !== '' && trimmedDireccionCondominio !== '' && formulario.id_administrador && formulario.admin_condominio) {
         try {
             const resultado = await axios.post('http://localhost:4000/api/registrarCondominio', {

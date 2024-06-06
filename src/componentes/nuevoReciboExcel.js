@@ -91,6 +91,10 @@ function NuevoReciboExcel() {
       setCargando(false);
       return;
     }
+
+    const [year, month] = selectedMes.split('-');
+    const hoy = obtenerUltimoDiaDelMes(parseInt(year), parseInt(month));
+
     try {
       const data = await archivo.arrayBuffer();
       const workbook = XLSX.read(data);
@@ -163,7 +167,6 @@ function NuevoReciboExcel() {
       const cuotaBase = parseFloat(cuota.cuota_base);
       const cuotaExtra = cuota.cuota_extra ? parseFloat(cuota.cuota_extra) : null;
 
-      const hoy = new Date().toISOString().split('T')[0];
       for (let fila of datos) {
         if (!fila[0] || fila[0] === '') break;
         if(fila[7] === undefined || fila[7] === ''){
@@ -308,7 +311,12 @@ function NuevoReciboExcel() {
     const meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
     const [año, mes] = fecha.split('-');
     return `${meses[parseInt(mes, 10) - 1]} ${año}`;
-  }
+  };
+
+  const obtenerUltimoDiaDelMes = (year, month) => {
+    return new Date(year, month, 0).toISOString().split('T')[0];
+  };
+  
 
   function numeroALetra(numero){
     const unidades = ["", "UNO", "DOS", "TRES", "CUATRO", "CINCO", "SEIS", "SIETE", "OCHO", "NUEVE"];
